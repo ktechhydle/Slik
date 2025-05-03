@@ -171,6 +171,27 @@ class PythonLexer(BaseLexer):
     def styleText(self, start, end):
         self.startStyling(start)
 
+        start_line = self.editor.SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
+        end_line = self.editor.SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, end)
+
+        for line_num in range(start_line, end_line + 1):
+            line_text = self.editor.text(line_num)
+            indent = self.editor.SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION, line_num)
+            level = QsciScintilla.SC_FOLDLEVELBASE + indent // 4
+
+            is_blank = not line_text.strip()
+
+            next_indent = self.editor.SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION,
+                              line_num + 1) if line_num + 1 <= end_line else indent
+
+            if line_text.strip().endswith(':') and next_indent > indent:
+                level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
+
+            if is_blank:
+                level |= QsciScintilla.SC_FOLDLEVELWHITEFLAG
+
+            self.editor.SendScintilla(QsciScintilla.SCI_SETFOLDLEVEL, line_num, level)
+
         text = self.editor.text()[start:end]
         self.generateTokens(text)
 
