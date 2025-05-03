@@ -1,5 +1,3 @@
-from multiprocessing.connection import families
-
 from src.imports import *
 
 
@@ -20,9 +18,8 @@ class PythonLexer(QsciLexerPython):
         bold.setBold(True)
 
         self.setFont(QFont(regular))
-        self.setFont(QFont(italic), self.FunctionMethodName)
-        self.setFont(QFont(italic), self.ClassName)
 
+        self.setColor(QColor('gray'), self.Comment)
         self.setColor(QColor('#ff79c6'), self.Keyword)
         self.setColor(QColor('#53a7f4'), self.FunctionMethodName)
         self.setColor(QColor('#ffffff'), self.ClassName)
