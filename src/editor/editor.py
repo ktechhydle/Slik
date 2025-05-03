@@ -43,7 +43,7 @@ class Editor(QsciScintilla):
 
     def createLexer(self):
         if self._file_type == Editor.FileTypePython:
-            self.lexer = PythonLexer()
+            self.lexer = PythonLexer(self)
 
         elif self._file_type == Editor.FileTypeRust:
             self.lexer = RustLexer()
@@ -57,9 +57,6 @@ class Editor(QsciScintilla):
         self.auto_completer = AutoCompleter(self._file_name, self._file_type, self.api)
         self.auto_completer.finished.connect(self.loadAutoCompletions)
 
-        for style in range(128):
-            self.SendScintilla(QsciScintilla.SCI_STYLESETBACK, style, QColor('#121212'))
-
     def createMargins(self):
         self.setMarginType(0, QsciScintilla.MarginType.NumberMargin)
         self.setMarginsFont(QFont('JetBrains Mono'))
@@ -68,7 +65,7 @@ class Editor(QsciScintilla):
         self.setMarginsBackgroundColor(QColor('#121212'))
         self.setMarginsForegroundColor(QColor('#454545'))
 
-        self.setFolding(QsciScintilla.FoldStyle.BoxedTreeFoldStyle, 1)
+        self.setFolding(QsciScintilla.FoldStyle.BoxedFoldStyle, 1)
         self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
 
         self.setMarginWidth(0, '00000')
@@ -83,6 +80,8 @@ class Editor(QsciScintilla):
         self.setWhitespaceForegroundColor(QColor('#ffffff'))
         self.setSelectionBackgroundColor(QColor('#214283'))
         self.setCaretForegroundColor(QColor('#ffffff'))
+        self.setCaretLineBackgroundColor(QColor('#383838'))
+        self.setCaretLineVisible(True)
         self.setMatchedBraceBackgroundColor(QColor('#505050'))
         self.setMatchedBraceForegroundColor(QColor('#ffffff'))
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
