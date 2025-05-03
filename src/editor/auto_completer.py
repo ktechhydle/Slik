@@ -1,3 +1,5 @@
+import jedi.api
+
 from src.imports import *
 
 
@@ -9,7 +11,7 @@ class AutoCompleter(QThread):
     FileTypeMarkdown = 4
     FileTypePlainText = 5
 
-    def __init__(self, file_name: str, file_type, api: QsciAPIs):
+    def __init__(self, file_name: str, file_type: int, api: QsciAPIs):
         super(AutoCompleter, self).__init__(None)
 
         self._file_name = file_name
@@ -34,9 +36,9 @@ class AutoCompleter(QThread):
 
         self.finished.emit()
 
-    def loadAutoCompletions(self, completions):
+    def loadAutoCompletions(self, completions: list[jedi.api.Completion]):
         self._api.clear()
-        [self._api.add(i.name) for i in completions]
+        [self._api.add(i.complete) for i in completions]
         self._api.prepare()
 
     def getPyCompletion(self, line: int, index: int, text: str):
