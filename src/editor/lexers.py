@@ -23,7 +23,6 @@ class PythonLexer(QsciLexerPython):
 
         self.setColor(QColor('gray'), QsciLexerPython.Comment)
         self.setColor(QColor('#ff79c6'), QsciLexerPython.Keyword)
-        self.setColor(QColor('#ff79c6'), QsciLexerPython.Keyword)
         self.setColor(QColor('#ffffff'), QsciLexerPython.ClassName)
         self.setColor(QColor('#53a7f4'), QsciLexerPython.FunctionMethodName)
         self.setColor(QColor('#b3ae60'), QsciLexerPython.Decorator)
@@ -39,7 +38,7 @@ class PythonLexer(QsciLexerPython):
         self.setColor(QColor('#2aacb8'), QsciLexerPython.Number)
 
 
-class PlainTextLexer(QsciLexer):
+class PlainTextLexer(QsciLexerCustom):
     def __init__(self):
         super().__init__()
 
@@ -48,3 +47,6 @@ class PlainTextLexer(QsciLexer):
         self.setFont(QFont('JetBrains Mono'))
 
         self.setColor(QColor('#ffffff'))
+
+    def description(self, style: int):
+        pass

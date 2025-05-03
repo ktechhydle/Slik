@@ -1,5 +1,6 @@
 from src.imports import *
 from src.editor.lexers import PythonLexer, PlainTextLexer
+from src.editor.auto_completer import AutoCompleter
 
 
 class Editor(QsciScintilla):
@@ -10,14 +11,13 @@ class Editor(QsciScintilla):
     FileTypeMarkdown = 4
     FileTypePlainText = 5
 
-    def __init__(self, file_type: int, parent=None):
+    def __init__(self, file_name: str, file_type: int, parent=None):
         super().__init__(parent)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setUtf8(True)
         self.setBraceMatching(QsciScintilla.BraceMatch.SloppyBraceMatch)
         self.setTabWidth(4)
         self.setIndentationGuides(True)
-        self.setIndentationsUseTabs(False)
         self.setAutoIndent(True)
         self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsAPIs)
         self.setAutoCompletionThreshold(1)
@@ -32,7 +32,10 @@ class Editor(QsciScintilla):
         self.setCallTipsForegroundColor(QColor(0x50, 0x50, 0x50, 0xff))
         self.setCallTipsHighlightColor(QColor(0xff, 0x00, 0x00, 0xff))
 
+        self._file_name = file_name
         self._file_type = file_type
+
+        self.cursorPositionChanged.connect(self.getAutoCompletions)
 
         self.createLexer()
         self.createMargins()
@@ -40,12 +43,21 @@ class Editor(QsciScintilla):
 
     def createLexer(self):
         if self._file_type == Editor.FileTypePython:
-            self.setLexer(PythonLexer())
+            self.lexer = PythonLexer()
+
+            self.setLexer(self.lexer)
 
         else:
-            self.setLexer(PlainTextLexer())
+            self.lexer = PlainTextLexer()
 
-        self.setPaper(QColor('#121212'))
+            self.setLexer(self.lexer)
+
+        self.api = QsciAPIs(self.lexer)
+        self.auto_completer = AutoCompleter(self._file_name, self._file_type, self.api)
+        self.auto_completer.finished.connect(self.loadAutoCompletions)
+
+        for style in range(128):
+            self.SendScintilla(QsciScintilla.SCI_STYLESETBACK, style, QColor('#121212'))
 
     def createMargins(self):
         self.setMarginType(0, QsciScintilla.MarginType.NumberMargin)
@@ -73,3 +85,15 @@ class Editor(QsciScintilla):
         self.setMatchedBraceForegroundColor(QColor('#ffffff'))
         self.setUnmatchedBraceBackgroundColor(QColor('#383838'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
+
+    def getAutoCompletions(self, line: int, index: int):
+        if self._file_type == Editor.FileTypePython:
+            self.auto_completer.getPyCompletion(line + 1, index, self.text())
+            self.autoCompleteFromAPIs()
+
+        else:
+            self.auto_completer.getPlainTextCompletion(line + 1, index, self.text())
+            self.autoCompleteFromAPIs()
+
+    def loadAutoCompletions(self):
+        pass
