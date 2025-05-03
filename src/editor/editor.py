@@ -1,5 +1,5 @@
 from src.imports import *
-from src.editor.lexers import PythonLexer, PlainTextLexer
+from src.editor.lexers import PythonLexer, PlainTextLexer, RustLexer
 from src.editor.auto_completer import AutoCompleter
 
 
@@ -45,12 +45,13 @@ class Editor(QsciScintilla):
         if self._file_type == Editor.FileTypePython:
             self.lexer = PythonLexer()
 
-            self.setLexer(self.lexer)
+        elif self._file_type == Editor.FileTypeRust:
+            self.lexer = RustLexer()
 
         else:
             self.lexer = PlainTextLexer()
 
-            self.setLexer(self.lexer)
+        self.setLexer(self.lexer)
 
         self.api = QsciAPIs(self.lexer)
         self.auto_completer = AutoCompleter(self._file_name, self._file_type, self.api)
@@ -87,13 +88,8 @@ class Editor(QsciScintilla):
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
 
     def getAutoCompletions(self, line: int, index: int):
-        if self._file_type == Editor.FileTypePython:
-            self.auto_completer.getPyCompletion(line + 1, index, self.text())
-            self.autoCompleteFromAPIs()
-
-        else:
-            self.auto_completer.getPlainTextCompletion(line + 1, index, self.text())
-            self.autoCompleteFromAPIs()
+        self.auto_completer.getCompletion(line + 1, index, self.text())
+        self.autoCompleteFromAPIs()
 
     def loadAutoCompletions(self):
         pass

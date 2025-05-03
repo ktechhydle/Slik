@@ -10,3 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.24.0", features = ["extension-module"] }
+ra_ap_ide = "0.0.204"
+ra_ap_vfs = "0.0.204"
+ra_ap_base_db = "0.0.204"
+ra_ap_text_edit = "0.0.204"

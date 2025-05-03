@@ -28,6 +28,10 @@ class AutoCompleter(QThread):
                 self.script = jedi.Script(self.text, path=self._file_name)
                 self.loadAutoCompletions(self.script.complete(self.line, self.index))
 
+            if self._file_type == AutoCompleter.FileTypeRust:
+                self.script = jedi.Script(self.text, path=self._file_name)
+                self.loadAutoCompletions(self.script.complete(self.line, self.index))
+
             else:
                 self.loadAutoCompletions([])
 
@@ -41,13 +45,7 @@ class AutoCompleter(QThread):
         [self._api.add(i.complete) for i in completions]
         self._api.prepare()
 
-    def getPyCompletion(self, line: int, index: int, text: str):
-        self.line = line
-        self.index = index
-        self.text = text.replace('\t', '    ')
-        self.start()
-
-    def getPlainTextCompletion(self, line: int, index: int, text: str):
+    def getCompletion(self, line: int, index: int, text: str):
         self.line = line
         self.index = index
         self.text = text.replace('\t', '    ')
