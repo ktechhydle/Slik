@@ -49,13 +49,16 @@ class Editor(QsciScintilla):
 
     def createMargins(self):
         self.setMarginType(0, QsciScintilla.MarginType.NumberMargin)
-        self.setMarginWidth(0, '00000')
         self.setMarginLineNumbers(0, True)
         self.setMarginSensitivity(0, True)
         self.setMarginsBackgroundColor(QColor('#121212'))
         self.setMarginsForegroundColor(QColor('#ffffff'))
+
         self.setFolding(QsciScintilla.FoldStyle.BoxedTreeFoldStyle, 1)
         self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
+
+        self.setMarginWidth(0, '00000')
+        self.setMarginWidth(1, 25)
 
     def createStyle(self):
         self.setIndentationGuidesBackgroundColor(QColor('#383838'))
