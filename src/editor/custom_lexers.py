@@ -201,7 +201,7 @@ class PythonLexer(BaseLexer):
         if start > 0:
             previous_style_nr = self.editor.SendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
 
-            if previous_style_nr == self.COMMENTS:
+            if previous_style_nr == PythonLexer.COMMENTS:
                 comment_flag = False
 
         while True:
