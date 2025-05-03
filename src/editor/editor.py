@@ -41,15 +41,23 @@ class Editor(QsciScintilla):
         self.createMargins()
         self.createStyle()
 
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key.Key_F:
+            if event.modifiers() and Qt.KeyboardModifier.ControlModifier:
+                self.foldAll(True)
+                return
+
+        super().keyPressEvent(event)
+
     def createLexer(self):
         if self._file_type == Editor.FileTypePython:
             self.lexer = PythonLexer(self)
 
         elif self._file_type == Editor.FileTypeRust:
-            self.lexer = RustLexer()
+            self.lexer = RustLexer(self)
 
         else:
-            self.lexer = PlainTextLexer()
+            self.lexer = PlainTextLexer(self)
 
         self.setLexer(self.lexer)
 

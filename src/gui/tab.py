@@ -28,3 +28,6 @@ class Tab(QWidget):
             self._editor.setText(slik.read(self._file_name))
 
         self.layout().addWidget(self._editor)
+
+    def editor(self) -> Editor:
+        return self._editor
