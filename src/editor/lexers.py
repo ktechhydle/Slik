@@ -18,10 +18,10 @@ class PythonLexer(QsciLexerPython):
 
         self.setFont(regular)
         self.setFont(bold, QsciLexerPython.ClassName)
-        self.setFont(bold, QsciLexerPython.FunctionMethodName)
         self.setFont(italic, QsciLexerPython.Decorator)
 
-        self.setColor(QColor('gray'), QsciLexerPython.Comment)
+        self.setColor(QColor('#f2f2f2'), QsciLexerPython.Identifier)
+        self.setColor(QColor('#6a737d'), QsciLexerPython.Comment)
         self.setColor(QColor('#ff79c6'), QsciLexerPython.Keyword)
         self.setColor(QColor('#ffffff'), QsciLexerPython.ClassName)
         self.setColor(QColor('#53a7f4'), QsciLexerPython.FunctionMethodName)

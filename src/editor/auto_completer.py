@@ -1,5 +1,3 @@
-import jedi.api
-
 from src.imports import *
 
 
@@ -25,8 +23,7 @@ class AutoCompleter(QThread):
     def run(self):
         try:
             if self._file_type == AutoCompleter.FileTypePython:
-                self.script = jedi.Script(self.text, path=self._file_name)
-                self.loadAutoCompletions(self.script.complete(self.line, self.index))
+                self.loadAutoCompletions(jedi.Script(self.text, path=self._file_name).complete(self.line, self.index))
 
             if self._file_type == AutoCompleter.FileTypeRust:
                 self.loadAutoCompletions(slik.get_completions(self.text, self.line, self.index))
@@ -43,11 +40,11 @@ class AutoCompleter(QThread):
         self._api.clear()
 
         for i in completions:
-            if isinstance(i, jedi.api.Completion):
-                self._api.add(i.complete)
+            if isinstance(i, str):
+                self._api.add(i)
 
             else:
-                self._api.add(i)
+                self._api.add(i.complete)
 
         self._api.prepare()
 

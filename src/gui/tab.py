@@ -24,4 +24,7 @@ class Tab(QWidget):
     def createUI(self):
         self._editor = Editor(self._file_name, self._file_type, self)
 
+        if os.path.exists(self._file_name):
+            self._editor.setText(slik.read(self._file_name))
+
         self.layout().addWidget(self._editor)

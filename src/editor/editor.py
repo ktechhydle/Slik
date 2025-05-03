@@ -62,10 +62,11 @@ class Editor(QsciScintilla):
 
     def createMargins(self):
         self.setMarginType(0, QsciScintilla.MarginType.NumberMargin)
+        self.setMarginsFont(QFont('JetBrains Mono'))
         self.setMarginLineNumbers(0, True)
         self.setMarginSensitivity(0, True)
         self.setMarginsBackgroundColor(QColor('#121212'))
-        self.setMarginsForegroundColor(QColor('#ffffff'))
+        self.setMarginsForegroundColor(QColor('#454545'))
 
         self.setFolding(QsciScintilla.FoldStyle.BoxedTreeFoldStyle, 1)
         self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
@@ -76,20 +77,21 @@ class Editor(QsciScintilla):
     def createStyle(self):
         self.setIndentationGuidesBackgroundColor(QColor('#383838'))
         self.setIndentationGuidesForegroundColor(QColor('#383838'))
-        self.setEdgeColor(QColor('#121212'))
+        self.setEdgeColor(QColor('#383838'))
         self.setEdgeMode(QsciScintilla.EdgeMode.EdgeLine)
         self.setWhitespaceBackgroundColor(QColor('#383838'))
         self.setWhitespaceForegroundColor(QColor('#ffffff'))
         self.setSelectionBackgroundColor(QColor('#214283'))
         self.setCaretForegroundColor(QColor('#ffffff'))
-        self.setMatchedBraceBackgroundColor(QColor('#383838'))
+        self.setMatchedBraceBackgroundColor(QColor('#505050'))
         self.setMatchedBraceForegroundColor(QColor('#ffffff'))
-        self.setUnmatchedBraceBackgroundColor(QColor('#383838'))
+        self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
 
     def getAutoCompletions(self, line: int, index: int):
-        self.auto_completer.getCompletion(line + 1, index, self.text())
-        self.autoCompleteFromAPIs()
+        if not self.selectedText():
+            self.auto_completer.getCompletion(line + 1, index, self.text())
+            self.autoCompleteFromAPIs()
 
     def loadAutoCompletions(self):
         pass
