@@ -10,7 +10,7 @@ fn test() -> PyResult<()> {
 }
 
 #[pymodule]
-fn slik(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn slik(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(test, m)?)?;
 
     Ok(())
