@@ -276,8 +276,22 @@ class PythonLexer(BaseLexer):
                 continue
 
             elif tok == '#':
-                self.setStyling(tok_len, PythonLexer.COMMENTS)
-                comment_flag = True
+                comment_text = tok
+                comment_len = tok_len
+
+                while True:
+                    peek = self.peekTok()
+
+                    if peek is None or '\n' in peek[0]:
+                        break
+
+                    next_tok = self.nextTok()
+                    comment_text += next_tok[0]
+                    comment_len += next_tok[1]
+
+                self.setStyling(comment_len, PythonLexer.COMMENTS)
+
+                continue
 
             elif tok in self.builtin_names:
                 self.setStyling(tok_len, PythonLexer.TYPES)
