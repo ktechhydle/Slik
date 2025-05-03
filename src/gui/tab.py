@@ -22,4 +22,6 @@ class Tab(QWidget):
         self.createUI()
 
     def createUI(self):
-        self.layout().addWidget(Editor(self._file_type, self))
+        self._editor = Editor(self._file_type, self)
+
+        self.layout().addWidget(self._editor)

@@ -4,7 +4,6 @@ from src.imports import *
 class PythonLexer(QsciLexerPython):
     def __init__(self):
         super().__init__()
-        self.setFoldCompact(True)
 
         self.createStyle()
 
@@ -29,13 +28,13 @@ class PythonLexer(QsciLexerPython):
         self.setColor(QColor('#53a7f4'), QsciLexerPython.FunctionMethodName)
         self.setColor(QColor('#b3ae60'), QsciLexerPython.Decorator)
         self.setColor(QColor('#9ecbff'), QsciLexerPython.SingleQuotedString)
-        self.setColor(QColor('#9ecbff'), QsciLexerPython.SingleQuotedFString)
+        self.setColor(QColor('#b3ae60'), QsciLexerPython.SingleQuotedFString)
         self.setColor(QColor('#9ecbff'), QsciLexerPython.DoubleQuotedString)
-        self.setColor(QColor('#9ecbff'), QsciLexerPython.DoubleQuotedFString)
+        self.setColor(QColor('#b3ae60'), QsciLexerPython.DoubleQuotedFString)
         self.setColor(QColor('#9ecbff'), QsciLexerPython.TripleSingleQuotedString)
-        self.setColor(QColor('#9ecbff'), QsciLexerPython.TripleSingleQuotedFString)
+        self.setColor(QColor('#b3ae60'), QsciLexerPython.TripleSingleQuotedFString)
         self.setColor(QColor('#9ecbff'), QsciLexerPython.TripleDoubleQuotedString)
-        self.setColor(QColor('#9ecbff'), QsciLexerPython.TripleDoubleQuotedFString)
+        self.setColor(QColor('#b3ae60'), QsciLexerPython.TripleDoubleQuotedFString)
         self.setColor(QColor('#ff0000'), QsciLexerPython.UnclosedString)
         self.setColor(QColor('#2aacb8'), QsciLexerPython.Number)
 
