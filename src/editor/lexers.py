@@ -64,36 +64,6 @@ class RustLexer(QsciLexerCustom):
             self.TYPE: 'Type'
         }.get(style, '')
 
-    def createStyle(self):
-        self.setPaper(QColor('#121212'))
-
-        regular = QFont('JetBrains Mono')
-        bold = QFont('JetBrains Mono')
-        bold.setBold(True)
-        italic = QFont('JetBrains Mono')
-        italic.setItalic(True)
-
-        self.setFont(regular, self.DEFAULT)
-        self.setColor(QColor('#ffffff'), self.DEFAULT)
-
-        self.setFont(regular, self.KEYWORD)
-        self.setColor(QColor('#ff79c6'), self.KEYWORD)
-
-        self.setFont(regular, self.COMMENT)
-        self.setColor(QColor('gray'), self.COMMENT)
-
-        self.setFont(regular, self.STRING)
-        self.setColor(QColor('#9ecbff'), self.STRING)
-
-        self.setFont(regular, self.NUMBER)
-        self.setColor(QColor('#2aacb8'), self.NUMBER)
-
-        self.setFont(regular, self.FUNCTION)
-        self.setColor(QColor('#53a7f4'), self.FUNCTION)
-
-        self.setFont(italic, self.TYPE)
-        self.setColor(QColor('#ffffff'), self.TYPE)
-
     def styleText(self, start, end):
         editor = self.editor()
         if editor is None:
@@ -128,6 +98,36 @@ class RustLexer(QsciLexerCustom):
         remaining = len(text) - last_end
         if remaining > 0:
             self.setStyling(remaining, self.DEFAULT)
+
+    def createStyle(self):
+        self.setPaper(QColor('#121212'))
+
+        regular = QFont('JetBrains Mono')
+        bold = QFont('JetBrains Mono')
+        bold.setBold(True)
+        italic = QFont('JetBrains Mono')
+        italic.setItalic(True)
+
+        self.setFont(regular, self.DEFAULT)
+        self.setColor(QColor('#ffffff'), self.DEFAULT)
+
+        self.setFont(regular, self.KEYWORD)
+        self.setColor(QColor('#ff79c6'), self.KEYWORD)
+
+        self.setFont(regular, self.COMMENT)
+        self.setColor(QColor('gray'), self.COMMENT)
+
+        self.setFont(regular, self.STRING)
+        self.setColor(QColor('#9ecbff'), self.STRING)
+
+        self.setFont(regular, self.NUMBER)
+        self.setColor(QColor('#2aacb8'), self.NUMBER)
+
+        self.setFont(regular, self.FUNCTION)
+        self.setColor(QColor('#53a7f4'), self.FUNCTION)
+
+        self.setFont(italic, self.TYPE)
+        self.setColor(QColor('#ffffff'), self.TYPE)
 
 
 class PlainTextLexer(QsciLexer):
