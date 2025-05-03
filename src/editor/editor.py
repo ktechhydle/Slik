@@ -1,5 +1,5 @@
 from src.imports import *
-from src.editor.lexers import PythonLexer, PlainTextLexer, RustLexer
+from src.editor.custom_lexers import PythonLexer, PlainTextLexer, RustLexer
 from src.editor.auto_completer import AutoCompleter
 
 

@@ -108,7 +108,7 @@ class BaseLexer(QsciLexerCustom):
     def setBuiltinNames(self, builtin_names: list[str]):
         self.builtin_names = builtin_names
 
-    def generateTokes(self, text: str):
+    def generateTokens(self, text: str):
         p = re.compile(r'[*]\/|\/[*]|\s+|\w+|\W')
 
         self.token_list = [(token, len(bytearray(token, 'utf-8'))) for token in p.findall(text)]
@@ -172,7 +172,7 @@ class PythonLexer(BaseLexer):
         self.startStyling(start)
 
         text = self.editor.text()[start:end]
-        self.generateTokes(text)
+        self.generateTokens(text)
 
         string_flag = False
         comment_flag = False
@@ -330,7 +330,7 @@ class RustLexer(BaseLexer):
         self.startStyling(start)
 
         text = self.editor.text()[start:end]
-        self.generateTokes(text)
+        self.generateTokens(text)
 
         string_flag = False
         comment_flag = False
@@ -470,6 +470,6 @@ class PlainTextLexer(BaseLexer):
         self.startStyling(start)
 
         text = self.editor.text()[start:end]
-        self.generateTokes(text)
+        self.generateTokens(text)
 
         self.setStyling(len(text), PythonLexer.DEFAULT)
