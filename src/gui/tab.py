@@ -7,7 +7,8 @@ class Tab(QWidget):
     FileTypeRust = 1
     FileTypeHtml = 2
     FileTypeCSS = 3
-    FileTypeMarkdown = 3
+    FileTypeMarkdown = 4
+    FileTypePlainText = 5
 
     def __init__(self, file_name: str, tab_view, file_type: int = FileTypePython, parent=None):
         super().__init__(parent)
