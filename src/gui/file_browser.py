@@ -35,7 +35,7 @@ class FileSystemWatcher(QFileSystemWatcher):
 
 
 class FileBrowser(QMenu):
-    def __init__(self, path: str, tab_view, parent=None):
+    def __init__(self, path: str, tab_view: QTabWidget, parent=None):
         super().__init__(parent)
         self.setWindowFlag(Qt.WindowType.Tool)
         self.setObjectName('fileBrowser')
@@ -137,7 +137,9 @@ class FileBrowser(QMenu):
     def createWatcher(self):
         self._watcher = FileSystemWatcher(self)
         self._watcher.directoryChanged.connect(self.updateFileBrowser)
+        self._watcher.directoryChanged.connect(self.updateTab)
         self._watcher.fileChanged.connect(self.updateFileBrowser)
+        self._watcher.fileChanged.connect(self.updateTab)
 
     def updateFileBrowser(self):
         if os.path.exists(self._path):
@@ -152,6 +154,14 @@ class FileBrowser(QMenu):
             self._file_view.hideColumn(3)
 
             self._watcher.changePath(os.path.abspath(self._path))
+
+    def updateTab(self):
+        for tab in self.tab_view.tabs():
+            new_contents = slik.read(tab.filename())
+
+            if tab.editor().text() != new_contents:
+                tab.editor().setText(new_contents)
+
 
     def newFile(self):
         if self._file_view.selectedIndexes():
