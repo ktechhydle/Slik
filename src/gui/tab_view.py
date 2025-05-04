@@ -63,13 +63,17 @@ class TabView(QTabWidget):
         else:
             for tab in self._tabs:
                 if tab.filename() == filename:
-                    if insert:
-                        self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
-                        self.setCurrentIndex(self.currentIndex() + 1)
+                    if not self.indexOf(tab):  # tab doesn't exist already
+                        if insert:
+                            self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
+                            self.setCurrentIndex(self.currentIndex() + 1)
+
+                        else:
+                            self.addTab(tab, os.path.basename(tab.filename()))
+                            self.setCurrentIndex(self.count() + 1)
 
                     else:
-                        self.addTab(tab, os.path.basename(tab.filename()))
-                        self.setCurrentIndex(self.count() + 1)
+                        self.setCurrentIndex(self.indexOf(tab)) # select the tab
 
     def closeTab(self, index: int):
         if self.count() == 1:
