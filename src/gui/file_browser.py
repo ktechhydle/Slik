@@ -162,7 +162,6 @@ class FileBrowser(QMenu):
             if tab.editor().text() != new_contents:
                 tab.editor().setText(new_contents)
 
-
     def newFile(self):
         if self._file_view.selectedIndexes():
             if len(self._file_view.selectedIndexes()) > 1:
@@ -202,8 +201,6 @@ class FileBrowser(QMenu):
                 if not os.path.exists(filename):
                     slik.write(filename, '')
 
-        self.exec()
-
     def openFile(self, index: QModelIndex):
         model = self._file_view.model()
         filepath = model.filePath(index)
@@ -224,8 +221,6 @@ class FileBrowser(QMenu):
             if path:
                 self.setPath(path)
                 self.tab_view.clear()
-
-        self.exec()
 
     def renameSelected(self):
         if len(self._file_view.selectedIndexes()) > 1:
@@ -253,8 +248,6 @@ class FileBrowser(QMenu):
 
             except Exception as e:
                 raise e
-
-        self.exec()
 
     def removeSelected(self):
         indexes = self._file_view.selectedIndexes()
@@ -286,8 +279,6 @@ class FileBrowser(QMenu):
 
                 except Exception as e:
                     raise e
-
-        self.exec()
 
     def setPath(self, path: str):
         self._path = path
