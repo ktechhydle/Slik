@@ -30,6 +30,9 @@ class Tab(QWidget):
 
         self.layout().addWidget(self._editor)
 
+    def updateEditor(self):
+        self._editor.updateFileAndType(self._file_name, self._file_type)
+
     def save(self):
         slik.write(self._file_name, self._editor.text())
 
@@ -41,3 +44,14 @@ class Tab(QWidget):
 
     def editor(self) -> Editor:
         return self._editor
+
+    def setFileName(self, name: str):
+        self._file_name = name
+
+        self.tab_view.setTabText(self.tab_view.indexOf(self), os.path.basename(name))
+        self.updateEditor()
+
+    def setFileType(self, type: int):
+        self._file_type = type
+
+        self.updateEditor()

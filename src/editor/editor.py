@@ -93,6 +93,14 @@ class Editor(QsciScintilla):
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
 
+    def updateFileAndType(self, file_name: str, file_type: int):
+        self._file_name = file_name
+        self._file_type = file_type
+
+        self.createLexer()
+        self.createMargins()
+        self.createStyle()
+
     def getAutoCompletions(self, line: int, index: int):
         if not self.selectedText():
             self.auto_completer.getCompletion(line + 1, index, self.text())

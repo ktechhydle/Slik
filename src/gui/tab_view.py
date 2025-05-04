@@ -96,9 +96,17 @@ class TabView(QTabWidget):
 
         self.removeTab(index)
 
-    def updateTabs(self):
+    def updateTab(self, old_name: str, new_name: str):
         for i in range(self.count()):
             tab = self.widget(i)
+            current_name = os.path.basename(tab.filename())
+
+            if current_name == old_name:
+                if current_name in self._tabs:
+                    self._tabs[self._tabs.index(current_name)] = os.path.basename(new_name)
+
+                self.setTabText(i, os.path.basename(new_name))
+                tab.setFileName(new_name)
 
     def showFileBrowser(self):
         self.file_browser.exec()

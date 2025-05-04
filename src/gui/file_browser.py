@@ -91,16 +91,23 @@ class FileBrowser(QMenu):
         rename_file_btn = QPushButton('✏️', self)
         rename_file_btn.setObjectName('actionButton')
         rename_file_btn.setFixedSize(25, 25)
+        rename_file_btn.clicked.connect(self.renameSelected)
+        new_file_btn = QPushButton('➕', self)
+        new_file_btn.setObjectName('actionButton')
+        new_file_btn.setFixedSize(25, 25)
+        new_file_btn.clicked.connect(self.newFile)
         self._project_dir_label = QLabel('')
 
         action_container.layout().addWidget(open_project_btn)
         action_container.layout().addWidget(rename_file_btn)
+        action_container.layout().addWidget(new_file_btn)
         action_container.layout().addStretch()
         action_container.layout().addWidget(self._project_dir_label)
 
         self._file_view = QTreeView(self)
         self._file_view.setAnimated(True)
         self._file_view.setHeaderHidden(True)
+        self._file_view.setSelectionMode(QTreeView.SelectionMode.ExtendedSelection)
         self._file_view.doubleClicked.connect(self.openFile)
 
         self.container.layout().addWidget(action_container)
@@ -148,6 +155,38 @@ class FileBrowser(QMenu):
             self.tab_view.clear()
 
         self.exec()
+
+    def renameSelected(self):
+        if len(self._file_view.selectedIndexes()) > 1:
+            return
+
+        index = self._file_view.currentIndex()
+
+        if not index.isValid():
+            return
+
+        model = self._file_view.model()
+        old_path = model.filePath(index)
+        old_name = os.path.basename(old_path)
+        dir_path = os.path.dirname(old_path)
+
+        new_name, ok = QInputDialog.getText(self.parent(), 'Rename', 'New name:', text=old_name)
+
+        if ok and new_name:
+            new_path = os.path.join(dir_path, new_name)
+            self.tab_view.updateTab(old_name, new_path)
+
+            try:
+                os.rename(old_path, new_path)
+                self.updateFileBrowser()
+
+            except Exception as e:
+                raise e
+
+        self.exec()
+
+    def newFile(self):
+        pass
 
     def setPath(self, path: str):
         self._path = path
