@@ -41,7 +41,7 @@ class BaseLexer(QsciLexerCustom):
         'black': QFont.Weight.Black,
     }
 
-    def __init__(self, editor, language_name):
+    def __init__(self, editor: QsciScintilla, language_name: str):
         super().__init__(editor)
 
         self.editor = editor
@@ -147,7 +147,7 @@ class BaseLexer(QsciLexerCustom):
 
 
 class PythonLexer(BaseLexer):
-    def __init__(self, editor):
+    def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
         self.setKeywords(keyword.kwlist)
         self.setBuiltinNames([
@@ -181,9 +181,6 @@ class PythonLexer(BaseLexer):
 
             is_blank = not line_text.strip()
 
-            next_indent = self.editor.SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION,
-                              line_num + 1) if line_num + 1 <= end_line else indent
-
             if line_text.strip().startswith(('def',
                                              'class',
                                              'if',
@@ -205,7 +202,8 @@ class PythonLexer(BaseLexer):
 
             self.editor.SendScintilla(QsciScintilla.SCI_SETFOLDLEVEL, line_num, level)
 
-        text = self.editor.text()[start:end]
+        raw_bytes = self.editor.bytes(start, end)
+        text = raw_bytes.data().decode('utf-8')
         self.generateTokens(text)
 
         string_flag = False
