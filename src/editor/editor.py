@@ -38,6 +38,75 @@ class Editor(QsciScintilla):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.newLine(event)
 
+        elif event.key() == Qt.Key.Key_Comma:
+            super().keyPressEvent(event)
+
+            line, column = self.getCursorPosition()
+            self.insert(' ')
+            self.setCursorPosition(line, column + 1)
+
+        elif event.key() == Qt.Key.Key_Backspace:
+            line, column = self.getCursorPosition()
+
+            if column > 0:
+                prev_char = self.text(line)[column - 1]
+                next_char = self.text(line)[column] if column < len(self.text(line)) else ''
+
+                pairs = {
+                    "'": "'",
+                    '"': '"',
+                    '(': ')',
+                    '{': '}',
+                    '[': ']',
+                    '`': '`'
+                }
+
+                if prev_char in pairs and next_char == pairs[prev_char]:
+                    self.setSelection(line, column - 1, line, column + 1)
+                    self.removeSelectedText()
+
+                    return
+
+            super().keyPressEvent(event)
+
+        elif event.key() in (Qt.Key.Key_BracketLeft,
+                             Qt.Key.Key_BraceLeft,
+                             Qt.Key.Key_ParenLeft,
+                             Qt.Key.Key_QuoteLeft,
+                             Qt.Key.Key_Apostrophe,
+                             Qt.Key.Key_QuoteDbl):
+            char = event.text()
+            wrap_pairs = {
+                '(': ')',
+                '{': '}',
+                '[': ']',
+                "'": "'",
+                '"': '"',
+                '`': '`',
+            }
+
+            if char in wrap_pairs:
+                closing_char = wrap_pairs[char]
+                if self.hasSelectedText():
+                    start_line, start_index, end_line, end_index = self.getSelection()
+                    selected_text = self.selectedText()
+
+                    self.beginUndoAction()
+                    self.removeSelectedText()
+                    self.setCursorPosition(start_line, start_index)
+                    self.insert(f"{char}{selected_text}{closing_char}")
+                    self.setCursorPosition(end_line, end_index + 1)
+                    self.setSelection(start_line, start_index + 1, end_line, end_index + 1)
+                    self.endUndoAction()
+
+                else:
+                    super().keyPressEvent(event)
+                    line, column = self.getCursorPosition()
+                    self.insert(closing_char)
+                    self.setCursorPosition(line, column)
+
+                return
+
         else:
             super().keyPressEvent(event)
 
