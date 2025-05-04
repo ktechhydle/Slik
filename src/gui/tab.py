@@ -23,6 +23,7 @@ class Tab(QWidget):
 
     def createUI(self):
         self._editor = Editor(self._file_name, self._file_type, self)
+        self._editor.textChanged.connect(self.save)
 
         if os.path.exists(self._file_name):
             self._editor.setText(slik.read(self._file_name))
