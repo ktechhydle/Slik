@@ -37,7 +37,7 @@ class FileSystemWatcher(QFileSystemWatcher):
 class FileBrowser(QMenu):
     def __init__(self, path: str, tab_view: QTabWidget, parent=None):
         super().__init__(parent)
-        self.setWindowFlag(Qt.WindowType.Tool)
+        self.setWindowFlag(Qt.WindowType.CoverWindow)
         self.setObjectName('fileBrowser')
 
         self._path = path

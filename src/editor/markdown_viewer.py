@@ -19,7 +19,7 @@ class MarkdownViewer(QWebEngineView):
                     background-color: #1e1e1e;
                 }
                 
-                h1, h2, h3, h4, h5, p {
+                h1, h2, h3, h4, h5, p, li {
                     color: #ffffff;
                 }
                 
