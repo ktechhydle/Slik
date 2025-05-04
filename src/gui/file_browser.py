@@ -95,8 +95,7 @@ class FileBrowser(QMenu):
 
         if not model.isDir(index):
             if filepath.endswith('.py'):
-                self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePython, self.tab_view))
-
+                self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePython, self.tab_view), insert=True)
 
     def setPath(self, path: str):
         self._path = path

@@ -60,9 +60,15 @@ class TabView(QTabWidget):
     def defaultTab(self):
         self.addTab(StartPage(), ignore=True)
 
-    def addTab(self, widget: Tab, ignore=False):
+    def addTab(self, widget: Tab, insert=False, ignore=False):
         if widget.filename() not in self._tabs:
-            super().addTab(widget, widget.filename() if ignore else os.path.basename(widget.filename()))
+            if insert:
+                self.insertTab(self.currentIndex() + 1, widget, os.path.basename(widget.filename()))
+                self.setCurrentIndex(self.currentIndex() + 1)
+
+            else:
+                super().addTab(widget, widget.filename() if ignore else os.path.basename(widget.filename()))
+                self.setCurrentIndex(self.count() + 1)
 
             self._tabs.append(widget.filename())
 
