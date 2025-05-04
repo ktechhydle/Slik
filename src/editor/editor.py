@@ -103,7 +103,7 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
-    def newLine(self, event):
+    def newLine(self, event: QKeyEvent):
         line, index = self.getCursorPosition()
         current_line_text = self.text(line).rstrip().split('#')[0].strip()
 
@@ -114,7 +114,7 @@ class Editor(QsciScintilla):
             indent += self.tabWidth()
 
         # exit indent if return
-        elif current_line_text.endswith('return'):
+        elif any(keyword in current_line_text for keyword in ('return', 'break', 'continue', 'raise')):
             indent -= self.tabWidth()
 
         self.insert('\n')
