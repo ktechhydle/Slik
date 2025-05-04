@@ -10,6 +10,7 @@ class Editor(QsciScintilla):
         self.setUtf8(True)
         self.setBraceMatching(QsciScintilla.BraceMatch.SloppyBraceMatch)
         self.setTabWidth(4)
+        self.setIndentationsUseTabs(False)
         self.setIndentationGuides(True)
         self.setAutoIndent(True)
         self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsAPIs)
