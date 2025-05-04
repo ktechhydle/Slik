@@ -19,7 +19,8 @@ class FileSystemModel(QFileSystemModel):
 class FileBrowser(QMenu):
     def __init__(self, path: str, tab_view, parent=None):
         super().__init__(parent)
-        self.setObjectName('blankWidget')
+        self.setWindowFlag(Qt.WindowType.Popup)
+        self.setObjectName('fileBrowser')
 
         self._path = path
         self.tab_view = tab_view
@@ -66,11 +67,28 @@ class FileBrowser(QMenu):
         self.container = QWidget()
         self.container.setLayout(QVBoxLayout())
 
+        action_container = QWidget()
+        action_container.setLayout(QHBoxLayout())
+        action_container.layout().setContentsMargins(0, 0, 0, 0)
+
+        open_project_btn = QPushButton('📁', self)
+        open_project_btn.setObjectName('actionButton')
+        open_project_btn.setFixedSize(25, 25)
+        open_project_btn.clicked.connect(self.openProject)
+        rename_file_btn = QPushButton('✏️', self)
+        rename_file_btn.setObjectName('actionButton')
+        rename_file_btn.setFixedSize(25, 25)
+
+        action_container.layout().addWidget(open_project_btn)
+        action_container.layout().addWidget(rename_file_btn)
+        action_container.layout().addStretch()
+
         self.file_view = QTreeView(self)
         self.file_view.setAnimated(True)
         self.file_view.setHeaderHidden(True)
         self.file_view.doubleClicked.connect(self.openFile)
 
+        self.container.layout().addWidget(action_container)
         self.container.layout().addWidget(self.file_view)
 
         action = QWidgetAction(self)
@@ -96,6 +114,15 @@ class FileBrowser(QMenu):
         if not model.isDir(index):
             if filepath.endswith('.py'):
                 self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePython, self.tab_view), insert=True)
+
+    def openProject(self):
+        path = QFileDialog.getExistingDirectory(self.parent(), 'Open Project')
+
+        if path:
+            self.setPath(path)
+            self.tab_view.clear()
+
+        self.exec()
 
     def setPath(self, path: str):
         self._path = path

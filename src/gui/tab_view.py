@@ -37,6 +37,24 @@ class TabView(QTabWidget):
         self.createUI()
         self.createActions()
 
+    def addTab(self, widget: Tab, insert=False, ignore=False):
+        if widget.filename() not in self._tabs:
+            if insert:
+                self.insertTab(self.currentIndex() + 1, widget, os.path.basename(widget.filename()))
+                self.setCurrentIndex(self.currentIndex() + 1)
+
+            else:
+                super().addTab(widget, widget.filename() if ignore else os.path.basename(widget.filename()))
+                self.setCurrentIndex(self.count() + 1)
+
+            self._tabs.append(widget.filename())
+
+    def clear(self):
+        super().clear()
+
+        self._tabs.clear()
+        self.defaultTab()
+
     def createUI(self):
         self.file_browser = FileBrowser('', self, self)
 
@@ -59,18 +77,6 @@ class TabView(QTabWidget):
 
     def defaultTab(self):
         self.addTab(StartPage(), ignore=True)
-
-    def addTab(self, widget: Tab, insert=False, ignore=False):
-        if widget.filename() not in self._tabs:
-            if insert:
-                self.insertTab(self.currentIndex() + 1, widget, os.path.basename(widget.filename()))
-                self.setCurrentIndex(self.currentIndex() + 1)
-
-            else:
-                super().addTab(widget, widget.filename() if ignore else os.path.basename(widget.filename()))
-                self.setCurrentIndex(self.count() + 1)
-
-            self._tabs.append(widget.filename())
 
     def closeTab(self, index: int):
         widget = self.widget(index)
@@ -99,6 +105,7 @@ class TabView(QTabWidget):
 
     def openProject(self, path: str):
         self.file_browser.setPath(path)
+        self.clear()
 
     def tabs(self) -> list[str]:
         return self._tabs
