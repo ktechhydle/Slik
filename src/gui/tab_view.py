@@ -17,31 +17,6 @@ class TabView(QTabWidget):
         self.createUI()
         self.createActions()
 
-    def openTab(self, filename: str, insert=False):
-        if filename not in [tab.filename() for tab in self._tabs]:
-            tab = Tab(filename, self, self)
-
-            if insert:
-                self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
-                self.setCurrentIndex(self.currentIndex() + 1)
-
-            else:
-                self.addTab(tab, os.path.basename(tab.filename()))
-                self.setCurrentIndex(self.count() + 1)
-
-            self._tabs.append(tab)
-
-        else:
-            for tab in self._tabs:
-                if tab.filename() == filename:
-                    if insert:
-                        self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
-                        self.setCurrentIndex(self.currentIndex() + 1)
-
-                    else:
-                        self.addTab(tab, os.path.basename(tab.filename()))
-                        self.setCurrentIndex(self.count() + 1)
-
     def clear(self):
         super().clear()
 
@@ -68,8 +43,33 @@ class TabView(QTabWidget):
         self.addAction(toggle_collapse_action)
         self.addAction(file_browser_action)
 
-    def defaultTab(self):
-        self.openTab('resources/default/start.md')
+    def openTab(self, filename: str, insert=False):
+        filename = os.path.abspath(filename)
+
+        if filename not in [tab.filename() for tab in self._tabs]:
+            tab = Tab(filename, self, self)
+            name = os.path.basename(tab.filename())
+
+            if insert:
+                self.insertTab(self.currentIndex() + 1, tab, name)
+                self.setCurrentIndex(self.currentIndex() + 1)
+
+            else:
+                self.addTab(tab, name)
+                self.setCurrentIndex(self.count() + 1)
+
+            self._tabs.append(tab)
+
+        else:
+            for tab in self._tabs:
+                if tab.filename() == filename:
+                    if insert:
+                        self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
+                        self.setCurrentIndex(self.currentIndex() + 1)
+
+                    else:
+                        self.addTab(tab, os.path.basename(tab.filename()))
+                        self.setCurrentIndex(self.count() + 1)
 
     def closeTab(self, index: int):
         if self.count() == 1:
@@ -79,6 +79,9 @@ class TabView(QTabWidget):
             return
 
         self.removeTab(index)
+
+    def defaultTab(self):
+        self.openTab('resources/default/start.md')
 
     def updateTab(self, old_name: str, new_name: str):
         for tab in self._tabs:

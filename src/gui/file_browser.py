@@ -10,7 +10,13 @@ class FileSystemModel(QFileSystemModel):
             if file_path.endswith('.py'):
                 return QIcon('resources/icons/python_icon.svg')
 
-            if file_path.endswith('.rs'):
+            elif file_path.endswith('.rs'):
+                return QIcon('resources/icons/rust_icon.svg')
+
+            elif os.path.isdir(file_path):
+                return QIcon('resources/icons/rust_icon.svg')
+
+            else:
                 return QIcon('resources/icons/rust_icon.svg')
 
         return super().data(index, role)
@@ -142,6 +148,47 @@ class FileBrowser(QMenu):
 
             self._watcher.changePath(os.path.abspath(self._path))
 
+    def newFile(self):
+        if self._file_view.selectedIndexes():
+            if len(self._file_view.selectedIndexes()) > 1:
+                return
+
+            index = self._file_view.currentIndex()
+
+            if not index.isValid():
+                return
+
+            model = self._file_view.model()
+
+            if model.isDir(index):
+                target_dir = model.filePath(index)
+
+            else:
+                target_dir = os.path.dirname(model.filePath(index))
+
+            name, ok = QInputDialog.getText(self.parent(),
+                                            f'New File In {target_dir}',
+                                            'File Name:')
+
+            if ok and name:
+                filename = os.path.join(target_dir, os.path.basename(name))
+
+                if not os.path.exists(filename):
+                    slik.write(filename, '')
+
+        else:
+            name, ok = QInputDialog.getText(self.parent(),
+                                            f'New File In {self._path}',
+                                            'File Name:')
+
+            if ok and name:
+                filename = os.path.join(self._path, os.path.basename(name))
+
+                if not os.path.exists(filename):
+                    slik.write(filename, '')
+
+        self.exec()
+
     def openFile(self, index: QModelIndex):
         model = self._file_view.model()
         filepath = model.filePath(index)
@@ -224,47 +271,6 @@ class FileBrowser(QMenu):
 
                 except Exception as e:
                     raise e
-
-        self.exec()
-
-    def newFile(self):
-        if self._file_view.selectedIndexes():
-            if len(self._file_view.selectedIndexes()) > 1:
-                return
-
-            index = self._file_view.currentIndex()
-
-            if not index.isValid():
-                return
-
-            model = self._file_view.model()
-
-            if model.isDir(index):
-                target_dir = model.filePath(index)
-
-            else:
-                target_dir = os.path.dirname(model.filePath(index))
-
-            name, ok = QInputDialog.getText(self.parent(),
-                                            f'New File In {target_dir}',
-                                            'File Name:')
-
-            if ok and name:
-                filename = os.path.join(target_dir, os.path.basename(name))
-
-                if not os.path.exists(filename):
-                    slik.write(filename, '')
-
-        else:
-            name, ok = QInputDialog.getText(self.parent(),
-                                            f'New File In {self._path}',
-                                            'File Name:')
-
-            if ok and name:
-                filename = os.path.join(self._path, os.path.basename(name))
-
-                if not os.path.exists(filename):
-                    slik.write(filename, '')
 
         self.exec()
 
