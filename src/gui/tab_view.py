@@ -105,7 +105,6 @@ class TabView(QTabWidget):
                 if current_name in self._tabs:
                     self._tabs[self._tabs.index(current_name)] = os.path.basename(new_name)
 
-                self.setTabText(i, os.path.basename(new_name))
                 tab.setFileName(new_name)
 
     def showFileBrowser(self):

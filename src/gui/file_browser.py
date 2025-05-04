@@ -141,11 +141,7 @@ class FileBrowser(QMenu):
         filepath = model.filePath(index)
 
         if not model.isDir(index):
-            if filepath.endswith('.py'):
-                self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePython, self.tab_view), insert=True)
-
-            else:
-                self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePlainText, self.tab_view), insert=True)
+            self.tab_view.addTab(Tab(filepath, self.tab_view, self.tab_view), insert=True)
 
     def openProject(self):
         path = QFileDialog.getExistingDirectory(self.parent(), 'Open Project')

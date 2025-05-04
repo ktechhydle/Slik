@@ -2,18 +2,10 @@ from src.imports import *
 
 
 class AutoCompleter(QThread):
-    FileTypePython = 0
-    FileTypeRust = 1
-    FileTypeHtml = 2
-    FileTypeCSS = 3
-    FileTypeMarkdown = 4
-    FileTypePlainText = 5
-
-    def __init__(self, file_name: str, file_type: int, api: QsciAPIs):
+    def __init__(self, file_name: str, api: QsciAPIs):
         super(AutoCompleter, self).__init__(None)
 
         self._file_name = file_name
-        self._file_type = file_type
         self._api = api
 
         self.line = 0
@@ -22,10 +14,10 @@ class AutoCompleter(QThread):
 
     def run(self):
         try:
-            if self._file_type == AutoCompleter.FileTypePython:
+            if self._file_name.endswith('.py'):
                 self.loadAutoCompletions(jedi.Script(self.text, path=self._file_name).complete(self.line, self.index))
 
-            if self._file_type == AutoCompleter.FileTypeRust:
+            if self._file_name.endswith('.rs'):
                 self.loadAutoCompletions(slik.get_completions(self.text, self.line, self.index))
 
             else:

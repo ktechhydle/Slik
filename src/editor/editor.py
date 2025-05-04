@@ -4,14 +4,7 @@ from src.editor.auto_completer import AutoCompleter
 
 
 class Editor(QsciScintilla):
-    FileTypePython = 0
-    FileTypeRust = 1
-    FileTypeHtml = 2
-    FileTypeCSS = 3
-    FileTypeMarkdown = 4
-    FileTypePlainText = 5
-
-    def __init__(self, file_name: str, file_type: int, parent=None):
+    def __init__(self, file_name: str, parent=None):
         super().__init__(parent)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setUtf8(True)
@@ -33,7 +26,6 @@ class Editor(QsciScintilla):
         self.setCallTipsHighlightColor(QColor(0xff, 0x00, 0x00, 0xff))
 
         self._file_name = file_name
-        self._file_type = file_type
 
         self.cursorPositionChanged.connect(self.getAutoCompletions)
 
@@ -42,10 +34,10 @@ class Editor(QsciScintilla):
         self.createStyle()
 
     def createLexer(self):
-        if self._file_type == Editor.FileTypePython:
+        if self._file_name.endswith('.py'):
             self.lexer = PythonLexer(self)
 
-        elif self._file_type == Editor.FileTypeRust:
+        elif self._file_name.endswith('.rs'):
             self.lexer = RustLexer(self)
 
         else:
@@ -54,7 +46,7 @@ class Editor(QsciScintilla):
         self.setLexer(self.lexer)
 
         self.api = QsciAPIs(self.lexer)
-        self.auto_completer = AutoCompleter(self._file_name, self._file_type, self.api)
+        self.auto_completer = AutoCompleter(self._file_name, self.api)
         self.auto_completer.finished.connect(self.loadAutoCompletions)
 
     def createMargins(self):
@@ -93,9 +85,8 @@ class Editor(QsciScintilla):
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
 
-    def updateFileAndType(self, file_name: str, file_type: int):
+    def setFileName(self, file_name: str):
         self._file_name = file_name
-        self._file_type = file_type
 
         self.createLexer()
         self.createMargins()
