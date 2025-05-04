@@ -66,6 +66,7 @@ class FileBrowser(QMenu):
 
         self.setGeometry(start_rect)
         self.container.setFixedSize(target_width, target_height)
+        self.updateFileBrowser()
 
         self.animation = QPropertyAnimation(self, b'geometry')
         self.animation.setDuration(250)
@@ -96,11 +97,16 @@ class FileBrowser(QMenu):
         new_file_btn.setObjectName('actionButton')
         new_file_btn.setFixedSize(25, 25)
         new_file_btn.clicked.connect(self.newFile)
+        remove_selected_btn = QPushButton('➖', self)
+        remove_selected_btn.setObjectName('actionButton')
+        remove_selected_btn.setFixedSize(25, 25)
+        remove_selected_btn.clicked.connect(self.removeSelected)
         self._project_dir_label = QLabel('')
 
         action_container.layout().addWidget(open_project_btn)
         action_container.layout().addWidget(rename_file_btn)
         action_container.layout().addWidget(new_file_btn)
+        action_container.layout().addWidget(remove_selected_btn)
         action_container.layout().addStretch()
         action_container.layout().addWidget(self._project_dir_label)
 
@@ -182,7 +188,37 @@ class FileBrowser(QMenu):
         self.exec()
 
     def removeSelected(self):
-        pass
+        indexes = self._file_view.selectedIndexes()
+
+        if not indexes:
+            return
+
+        model = self._file_view.model()
+        paths = list(set(model.filePath(index) for index in indexes if index.column() == 0))
+
+        if not paths:
+            return
+
+        confirm = QMessageBox.question(
+            self.parent(),
+            'Remove',
+            f'Are you sure you want to delete the {len(paths)} selected item(s)?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if confirm == QMessageBox.StandardButton.Yes:
+            for path in paths:
+                try:
+                    if os.path.isfile(path):
+                        os.remove(path)
+
+                    elif os.path.isdir(path):
+                        shutil.rmtree(path)
+
+                except Exception as e:
+                    raise e
+
+        self.exec()
 
     def newFile(self):
         if self._file_view.selectedIndexes():
