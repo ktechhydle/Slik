@@ -16,6 +16,18 @@ class FileSystemModel(QFileSystemModel):
         return super().data(index, role)
 
 
+class FileSystemWatcher(QFileSystemWatcher):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def changePath(self, path: str):
+        self.clear()
+        self.addPath(path)
+
+    def clear(self):
+        self.removePaths(self.directories())
+
+
 class FileBrowser(QMenu):
     def __init__(self, path: str, tab_view, parent=None):
         super().__init__(parent)
@@ -26,7 +38,8 @@ class FileBrowser(QMenu):
         self.tab_view = tab_view
 
         self.createUI()
-        self.updateView()
+        self.createWatcher()
+        self.updateFileBrowser()
 
     def exec(self, pos=None):
         if pos:
@@ -78,42 +91,54 @@ class FileBrowser(QMenu):
         rename_file_btn = QPushButton('✏️', self)
         rename_file_btn.setObjectName('actionButton')
         rename_file_btn.setFixedSize(25, 25)
+        self._project_dir_label = QLabel('')
 
         action_container.layout().addWidget(open_project_btn)
         action_container.layout().addWidget(rename_file_btn)
         action_container.layout().addStretch()
+        action_container.layout().addWidget(self._project_dir_label)
 
-        self.file_view = QTreeView(self)
-        self.file_view.setAnimated(True)
-        self.file_view.setHeaderHidden(True)
-        self.file_view.doubleClicked.connect(self.openFile)
+        self._file_view = QTreeView(self)
+        self._file_view.setAnimated(True)
+        self._file_view.setHeaderHidden(True)
+        self._file_view.doubleClicked.connect(self.openFile)
 
         self.container.layout().addWidget(action_container)
-        self.container.layout().addWidget(self.file_view)
+        self.container.layout().addWidget(self._file_view)
 
         action = QWidgetAction(self)
         action.setDefaultWidget(self.container)
         self.addAction(action)
 
-    def updateView(self):
+    def createWatcher(self):
+        self._watcher = FileSystemWatcher(self)
+        self._watcher.directoryChanged.connect(self.updateFileBrowser)
+        self._watcher.fileChanged.connect(self.updateFileBrowser)
+
+    def updateFileBrowser(self):
         if os.path.exists(self._path):
-            model = FileSystemModel(self.file_view)
+            model = FileSystemModel(self._file_view)
             model.setRootPath(self._path)
             model.setFilter(QDir.Filter.AllEntries | QDir.Filter.NoDotAndDotDot)
 
-            self.file_view.setModel(model)
-            self.file_view.setRootIndex(model.index(self._path))
-            self.file_view.hideColumn(1)
-            self.file_view.hideColumn(2)
-            self.file_view.hideColumn(3)
+            self._file_view.setModel(model)
+            self._file_view.setRootIndex(model.index(self._path))
+            self._file_view.hideColumn(1)
+            self._file_view.hideColumn(2)
+            self._file_view.hideColumn(3)
+
+            self._watcher.changePath(os.path.abspath(self._path))
 
     def openFile(self, index: QModelIndex):
-        model = self.file_view.model()
+        model = self._file_view.model()
         filepath = model.filePath(index)
 
         if not model.isDir(index):
             if filepath.endswith('.py'):
                 self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePython, self.tab_view), insert=True)
+
+            else:
+                self.tab_view.addTab(Tab(filepath, self.tab_view, Tab.FileTypePlainText, self.tab_view), insert=True)
 
     def openProject(self):
         path = QFileDialog.getExistingDirectory(self.parent(), 'Open Project')
@@ -126,8 +151,12 @@ class FileBrowser(QMenu):
 
     def setPath(self, path: str):
         self._path = path
+        self._project_dir_label.setText(f'Project Dir: {os.path.abspath(self._path)}')
 
-        self.updateView()
+        self.updateFileBrowser()
 
     def path(self) -> str:
         return self._path
+
+    def fileView(self) -> QTreeView:
+        return self._file_view
