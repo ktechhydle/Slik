@@ -1,5 +1,6 @@
 from src.imports import *
 from src.gui.tab import Tab
+from src.gui.file_browser import FileBrowser
 
 
 class StartPage(QWidget):
@@ -29,11 +30,15 @@ class TabView(QTabWidget):
         self.setMovable(True)
         self.setTabsClosable(True)
 
-        self.tabs = []
+        self._tabs = []
 
         self.tabCloseRequested.connect(self.closeTab)
 
+        self.createUI()
         self.createActions()
+
+    def createUI(self):
+        self.file_browser = FileBrowser('', self, self)
 
     def createActions(self):
         save_action = QAction('Save', self)
@@ -44,33 +49,50 @@ class TabView(QTabWidget):
         toggle_collapse_action.setShortcut(QKeySequence('Ctrl+F'))
         toggle_collapse_action.triggered.connect(lambda: self.currentWidget().editor().foldAll(True))
 
+        file_browser_action = QAction('File Browser', self)
+        file_browser_action.setShortcut(QKeySequence('Ctrl+Q'))
+        file_browser_action.triggered.connect(self.showFileBrowser)
+
         self.addAction(save_action)
         self.addAction(toggle_collapse_action)
+        self.addAction(file_browser_action)
+
+    def defaultTab(self):
+        self.addTab(StartPage(), ignore=True)
+
+    def addTab(self, widget: Tab, ignore=False):
+        if widget.filename() not in self._tabs:
+            super().addTab(widget, widget.filename() if ignore else os.path.basename(widget.filename()))
+
+            self._tabs.append(widget.filename())
+
+    def closeTab(self, index: int):
+        widget = self.widget(index)
+
+        if self.count() == 1:
+            self.removeTab(index)
+
+            if widget.filename() in self._tabs:
+                self._tabs.remove(widget.filename())
+
+            self.defaultTab()
+
+            return
+
+        if widget.filename() in self._tabs:
+            self._tabs.remove(widget.filename())
+
+        self.removeTab(index)
 
     def updateTabs(self):
         for i in range(self.count()):
             tab = self.widget(i)
 
-    def addTab(self, widget: Tab):
-        if widget in self.tabs:
-            self.removeTab(self.indexOf(widget))
-            super().addTab(widget, widget.filename())
+    def showFileBrowser(self):
+        self.file_browser.exec()
 
-            return
+    def openProject(self, path: str):
+        self.file_browser.setPath(path)
 
-        self.tabs.append(widget)
-
-        super().addTab(widget, widget.filename())
-
-    def openCachedTab(self, filename: str):
-        for widget in self.tabs:
-            if widget.filename() == filename:
-                self.addTab(widget, widget.filename())
-
-    def closeTab(self, index: int):
-        if self.count() == 1:
-            self.addTab(StartPage())
-            self.removeTab(index - 1)
-
-        self.removeTab(index)
-        self.update()
+    def tabs(self) -> list[str]:
+        return self._tabs

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 64 64"
+   fill="none"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="python_icon.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.35532116"
+     inkscape:cx="-8.443066"
+     inkscape:cy="70.358884"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5" />
+  <path
+     d="m 31.77,0.0835 c -16.248,0 -15.234,7.046 -15.234,7.046 l 0.02,7.3 H 32.06 v 2.19 H 10.394 c 0,0 -10.394,-1.18 -10.394,15.216 0,16.392 9.074,15.812 9.074,15.812 h 5.416 v -7.608 c 0,0 -0.292,-9.074 8.93,-9.074 h 15.376 c 0,0 8.64,0.14 8.64,-8.35 V 8.5775 c 0,0 1.312,-8.494 -15.666,-8.494 z m -8.55,4.908 c 1.542,0 2.79,1.248 2.79,2.79 0,1.542 -1.248,2.79 -2.79,2.79 a 2.786,2.786 0 0 1 -2.79,-2.79 c 0,-1.542 1.248,-2.79 2.79,-2.79 z"
+     fill="url(#a)"
+     id="path1"
+     style="fill:url(#a);stroke-width:2" />
+  <path
+     d="m 32.23,63.7495 c 16.248,0 15.234,-7.046 15.234,-7.046 l -0.02,-7.3 H 31.94 v -2.19 h 21.664 c 0,0 10.396,1.18 10.396,-15.214 0,-16.394 -9.074,-15.812 -9.074,-15.812 H 49.51 v 7.606 c 0,0 0.292,9.074 -8.93,9.074 H 25.204 c 0,0 -8.64,-0.14 -8.64,8.35 v 14.038 c 0,0 -1.312,8.494 15.666,8.494 z m 8.55,-4.908 a 2.786,2.786 0 0 1 -2.79,-2.79 c 0,-1.54 1.248,-2.788 2.79,-2.788 1.542,0 2.79,1.246 2.79,2.788 0,1.544 -1.248,2.79 -2.79,2.79 z"
+     fill="url(#b)"
+     id="path2"
+     style="fill:url(#b);stroke-width:2" />
+  <defs
+     id="defs5">
+    <linearGradient
+       id="a"
+       x1="19.075"
+       y1="18.782"
+       x2="34.898"
+       y2="34.658"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2,0,0,2,-32,-31.9165)">
+      <stop
+         stop-color="#387EB8"
+         id="stop2" />
+      <stop
+         offset="1"
+         stop-color="#366994"
+         id="stop3" />
+    </linearGradient>
+    <linearGradient
+       id="b"
+       x1="28.809"
+       y1="28.882"
+       x2="45.803"
+       y2="45.163"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2,0,0,2,-32,-31.9165)">
+      <stop
+         stop-color="#FFE052"
+         id="stop4" />
+      <stop
+         offset="1"
+         stop-color="#FFC331"
+         id="stop5" />
+    </linearGradient>
+  </defs>
+</svg>
