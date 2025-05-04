@@ -184,7 +184,20 @@ class PythonLexer(BaseLexer):
             next_indent = self.editor.SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION,
                               line_num + 1) if line_num + 1 <= end_line else indent
 
-            if ':' in line_text and next_indent > indent:
+            if line_text.strip().startswith(('def',
+                                             'class',
+                                             'if',
+                                             'elif',
+                                             'else',
+                                             'with',
+                                             'async',
+                                             'match',
+                                             'case',
+                                             'for',
+                                             'while',
+                                             'try',
+                                             'except',
+                                             'finally')):
                 level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
 
             if is_blank:

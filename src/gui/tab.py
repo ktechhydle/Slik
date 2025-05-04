@@ -32,6 +32,9 @@ class Tab(QWidget):
     def save(self):
         slik.write(self._file_name, self._editor.text())
 
+    def setMarkdownViewer(self, enabled: bool):
+        pass
+
     def setFileName(self, name: str):
         self._file_name = name
 
