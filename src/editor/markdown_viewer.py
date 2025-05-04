@@ -4,6 +4,7 @@ from src.imports import *
 class MarkdownViewer(QWebEngineView):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
 
     def setMarkdown(self, md: str):
         # Convert Markdown to HTML
