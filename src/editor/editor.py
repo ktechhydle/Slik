@@ -41,14 +41,6 @@ class Editor(QsciScintilla):
         self.createMargins()
         self.createStyle()
 
-    def keyPressEvent(self, event: QKeyEvent):
-        if event.key() == Qt.Key.Key_F:
-            if event.modifiers() and Qt.KeyboardModifier.ControlModifier:
-                self.foldAll(True)
-                return
-
-        super().keyPressEvent(event)
-
     def createLexer(self):
         if self._file_type == Editor.FileTypePython:
             self.lexer = PythonLexer(self)
@@ -75,15 +67,15 @@ class Editor(QsciScintilla):
 
         self.setFolding(QsciScintilla.FoldStyle.PlainFoldStyle, 1)
         self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
-        self.markerDefine(QsciScintilla.MarkerSymbol.Minus, QsciScintilla.SC_MARKNUM_FOLDEROPEN)
-        self.markerDefine(QsciScintilla.MarkerSymbol.ThreeDots, QsciScintilla.SC_MARKNUM_FOLDER)
-        self.setMarkerForegroundColor(QColor('#606060'), QsciScintilla.SC_MARKNUM_FOLDEROPEN)
-        self.setMarkerBackgroundColor(QColor('#606060'), QsciScintilla.SC_MARKNUM_FOLDEROPEN)
-        self.setMarkerForegroundColor(QColor('#606060'), QsciScintilla.SC_MARKNUM_FOLDER)
-        self.setMarkerBackgroundColor(QColor('#606060'), QsciScintilla.SC_MARKNUM_FOLDER)
+        self.markerDefine(QsciScintilla.MarkerSymbol.DownTriangle, QsciScintilla.SC_MARKNUM_FOLDEROPEN)
+        self.markerDefine(QsciScintilla.MarkerSymbol.RightTriangle, QsciScintilla.SC_MARKNUM_FOLDER)
+        self.setMarkerForegroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDEROPEN)
+        self.setMarkerBackgroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDEROPEN)
+        self.setMarkerForegroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDER)
+        self.setMarkerBackgroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDER)
 
-        self.setMarginWidth(0, '00000')
-        self.setMarginWidth(1, 25)
+        self.setMarginWidth(0, '000000')
+        self.setMarginWidth(1, 45)
 
     def createStyle(self):
         self.setIndentationGuidesBackgroundColor(QColor('#383838'))

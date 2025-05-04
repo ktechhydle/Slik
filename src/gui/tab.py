@@ -29,5 +29,14 @@ class Tab(QWidget):
 
         self.layout().addWidget(self._editor)
 
+    def save(self):
+        slik.write(self._file_name, self._editor.text())
+
+    def filename(self) -> str:
+        return self._file_name
+
+    def filetype(self) -> int:
+        return self._file_type
+
     def editor(self) -> Editor:
         return self._editor
