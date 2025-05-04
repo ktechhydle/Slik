@@ -43,7 +43,6 @@ class Editor(QsciScintilla):
 
         elif self._file_name.endswith('.md'):
             self.lexer = PlainTextLexer(self)
-            self.parent().setMarkdownViewer(True)
 
         else:
             self.lexer = PlainTextLexer(self)

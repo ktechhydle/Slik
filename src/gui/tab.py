@@ -1,5 +1,6 @@
 from src.imports import *
 from src.editor.editor import Editor
+from src.editor.markdown_viewer import MarkdownViewer
 
 
 class Tab(QWidget):
@@ -12,37 +13,54 @@ class Tab(QWidget):
         self.tab_view = tab_view
 
         self.createUI()
+        self.updateUI()
 
     def createUI(self):
-        container = QWidget(self)
-        container.setLayout(QHBoxLayout())
-        container.layout().setContentsMargins(0, 0, 0, 0)
+        self.container = QSplitter(self)
+        self.container.setOrientation(Qt.Orientation.Horizontal)
 
         self._editor = Editor(self._file_name, self)
 
         if os.path.exists(self._file_name):
             self._editor.setText(slik.read(self._file_name))
 
-        container.layout().addWidget(self._editor)
-        self.layout().addWidget(container)
+        self.container.addWidget(self._editor)
+        self.layout().addWidget(self.container)
 
-    def updateEditor(self):
+    def updateUI(self):
+        if self.basename().endswith('.md'):
+            # add a markdown viewer
+            viewer = MarkdownViewer(self)
+            viewer.setMarkdown(self._editor.text())
+            self._editor.textChanged.connect(lambda: viewer.setMarkdown(self._editor.text()))
+
+            self.container.addWidget(viewer)
+
+        else:
+            # remove the markdown viewer (if existent)
+            for i in range(self.container.count()):
+                widget = self.container.widget(i)
+
+                if isinstance(widget, MarkdownViewer):
+                    widget.close()
+                    del widget
+
         self._editor.setFileName(self._file_name)
 
     def save(self):
         slik.write(self._file_name, self._editor.text())
 
-    def setMarkdownViewer(self, enabled: bool):
-        pass
-
     def setFileName(self, name: str):
         self._file_name = name
 
         self.tab_view.setTabText(self.tab_view.indexOf(self), os.path.basename(name))
-        self.updateEditor()
+        self.updateUI()
 
     def filename(self) -> str:
         return self._file_name
+
+    def basename(self) -> str:
+        return os.path.basename(self._file_name)
 
     def filetype(self) -> int:
         return self._file_type

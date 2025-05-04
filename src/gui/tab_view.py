@@ -50,12 +50,13 @@ class TabView(QTabWidget):
             if tab.filename() == filename:
                 index = self.indexOf(tab)
                 if index == -1:
-                    # tab exists in memory but not in QTabWidget, re-add it
-                    name = os.path.basename(tab.filename())
+                    # tab exists in memory but not in widget, re-add it
+                    name = tab.basename()
 
                     if insert:
                         self.insertTab(self.currentIndex() + 1, tab, name)
                         self.setCurrentIndex(self.currentIndex() + 1)
+
                     else:
                         self.addTab(tab, name)
                         self.setCurrentIndex(self.count() - 1)
@@ -68,11 +69,12 @@ class TabView(QTabWidget):
 
         # tab doesn't exist at all, create and add it
         tab = Tab(filename, self, self)
-        name = os.path.basename(tab.filename())
+        name = tab.basename()
 
         if insert:
             self.insertTab(self.currentIndex() + 1, tab, name)
             self.setCurrentIndex(self.currentIndex() + 1)
+
         else:
             self.addTab(tab, name)
             self.setCurrentIndex(self.count() - 1)
@@ -93,13 +95,11 @@ class TabView(QTabWidget):
 
     def updateTab(self, old_name: str, new_name: str):
         for tab in self._tabs:
-            current_name = os.path.basename(tab.filename())
+            current_name = tab.basename()
 
             if current_name == old_name:
-                if current_name in self._tabs:
-                    self._tabs[self._tabs.index(current_name)] = os.path.basename(new_name)
-
-                tab.setFileName(new_name)
+                if new_name != old_name:
+                    tab.setFileName(new_name)
 
     def showFileBrowser(self):
         self.file_browser.exec()
