@@ -34,6 +34,13 @@ class Editor(QsciScintilla):
         self.createMargins()
         self.createStyle()
 
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
+            self.newLine(event)
+
+        else:
+            super().keyPressEvent(event)
+
     def createLexer(self):
         if self._file_name.endswith('.py'):
             self.lexer = PythonLexer(self)
@@ -95,6 +102,25 @@ class Editor(QsciScintilla):
 
         self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
+
+    def newLine(self, event):
+        line, index = self.getCursorPosition()
+        current_line_text = self.text(line).rstrip().split('#')[0].strip()
+
+        indent = self.indentation(line)
+
+        # increase indent
+        if current_line_text.endswith(':'):
+            indent += self.tabWidth()
+
+        # exit indent if return
+        elif current_line_text.endswith('return'):
+            indent -= self.tabWidth()
+
+        self.insert('\n')
+
+        self.setIndentation(line + 1, indent)
+        self.setCursorPosition(line + 1, indent)
 
     def setFileName(self, file_name: str):
         self._file_name = file_name
