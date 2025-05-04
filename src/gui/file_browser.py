@@ -14,10 +14,10 @@ class FileSystemModel(QFileSystemModel):
                 return QIcon('resources/icons/rust_icon.svg')
 
             elif os.path.isdir(file_path):
-                return QIcon('resources/icons/rust_icon.svg')
+                return QIcon('resources/icons/folder_icon.svg')
 
             else:
-                return QIcon('resources/icons/rust_icon.svg')
+                return QIcon('resources/icons/txt_icon.svg')
 
         return super().data(index, role)
 
@@ -37,7 +37,7 @@ class FileSystemWatcher(QFileSystemWatcher):
 class FileBrowser(QMenu):
     def __init__(self, path: str, tab_view, parent=None):
         super().__init__(parent)
-        self.setWindowFlag(Qt.WindowType.Popup)
+        self.setWindowFlag(Qt.WindowType.Tool)
         self.setObjectName('fileBrowser')
 
         self._path = path
@@ -81,7 +81,7 @@ class FileBrowser(QMenu):
         self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
         self.animation.start()
 
-        super().exec(end_rect.topLeft())
+        self.show()
 
     def createUI(self):
         self.container = QWidget()
@@ -108,6 +108,10 @@ class FileBrowser(QMenu):
         remove_selected_btn.setFixedSize(25, 25)
         remove_selected_btn.clicked.connect(self.removeSelected)
         self._project_dir_label = QLabel('')
+        close_btn = QPushButton('❌', self)
+        close_btn.setObjectName('actionButton')
+        close_btn.setFixedSize(25, 25)
+        close_btn.clicked.connect(self.animateClose)
 
         action_container.layout().addWidget(open_project_btn)
         action_container.layout().addWidget(rename_file_btn)
@@ -115,6 +119,7 @@ class FileBrowser(QMenu):
         action_container.layout().addWidget(remove_selected_btn)
         action_container.layout().addStretch()
         action_container.layout().addWidget(self._project_dir_label)
+        action_container.layout().addWidget(close_btn)
 
         self._file_view = QTreeView(self)
         self._file_view.setAnimated(True)
@@ -285,3 +290,20 @@ class FileBrowser(QMenu):
 
     def fileView(self) -> QTreeView:
         return self._file_view
+
+    def animateClose(self):
+        current_geometry = self.geometry()
+        end_rect = QRect(
+            current_geometry.center().x(),
+            current_geometry.center().y(),
+            1,
+            1
+        )
+
+        self.close_animation = QPropertyAnimation(self, b'geometry')
+        self.close_animation.setDuration(200)
+        self.close_animation.setStartValue(current_geometry)
+        self.close_animation.setEndValue(end_rect)
+        self.close_animation.setEasingCurve(QEasingCurve.Type.InCubic)
+        self.close_animation.finished.connect(self.close)
+        self.close_animation.start()
