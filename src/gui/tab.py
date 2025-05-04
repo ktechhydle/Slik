@@ -19,7 +19,6 @@ class Tab(QWidget):
         container.layout().setContentsMargins(0, 0, 0, 0)
 
         self._editor = Editor(self._file_name, self)
-        self._editor.textChanged.connect(self.save)
 
         if os.path.exists(self._file_name):
             self._editor.setText(slik.read(self._file_name))
@@ -33,6 +32,12 @@ class Tab(QWidget):
     def save(self):
         slik.write(self._file_name, self._editor.text())
 
+    def setFileName(self, name: str):
+        self._file_name = name
+
+        self.tab_view.setTabText(self.tab_view.indexOf(self), os.path.basename(name))
+        self.updateEditor()
+
     def filename(self) -> str:
         return self._file_name
 
@@ -41,9 +46,3 @@ class Tab(QWidget):
 
     def editor(self) -> Editor:
         return self._editor
-
-    def setFileName(self, name: str):
-        self._file_name = name
-
-        self.tab_view.setTabText(self.tab_view.indexOf(self), os.path.basename(name))
-        self.updateEditor()

@@ -3,26 +3,6 @@ from src.gui.tab import Tab
 from src.gui.file_browser import FileBrowser
 
 
-class StartPage(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setLayout(QVBoxLayout())
-
-        self.createUI()
-
-    def createUI(self):
-        welcome_label = QLabel('<h1>Welcome to Slik!</h1>')
-        help_label = QLabel('To get started, open a file with <code>Ctrl+Q</code>')
-
-        self.layout().addStretch()
-        self.layout().addWidget(welcome_label, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.layout().addWidget(help_label, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.layout().addStretch()
-
-    def filename(self) -> str:
-        return 'Start'
-
-
 class TabView(QTabWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -37,17 +17,30 @@ class TabView(QTabWidget):
         self.createUI()
         self.createActions()
 
-    def addTab(self, widget: Tab, insert=False, ignore=False):
-        if widget.filename() not in self._tabs:
+    def openTab(self, filename: str, insert=False):
+        if filename not in [tab.filename() for tab in self._tabs]:
+            tab = Tab(filename, self, self)
+
             if insert:
-                self.insertTab(self.currentIndex() + 1, widget, os.path.basename(widget.filename()))
+                self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
                 self.setCurrentIndex(self.currentIndex() + 1)
 
             else:
-                super().addTab(widget, widget.filename() if ignore else os.path.basename(widget.filename()))
+                self.addTab(tab, os.path.basename(tab.filename()))
                 self.setCurrentIndex(self.count() + 1)
 
-            self._tabs.append(widget.filename())
+            self._tabs.append(tab)
+
+        else:
+            for tab in self._tabs:
+                if tab.filename() == filename:
+                    if insert:
+                        self.insertTab(self.currentIndex() + 1, tab, os.path.basename(tab.filename()))
+                        self.setCurrentIndex(self.currentIndex() + 1)
+
+                    else:
+                        self.addTab(tab, os.path.basename(tab.filename()))
+                        self.setCurrentIndex(self.count() + 1)
 
     def clear(self):
         super().clear()
@@ -76,29 +69,19 @@ class TabView(QTabWidget):
         self.addAction(file_browser_action)
 
     def defaultTab(self):
-        self.addTab(StartPage(), ignore=True)
+        self.openTab('resources/default/start.md')
 
     def closeTab(self, index: int):
-        widget = self.widget(index)
-
         if self.count() == 1:
             self.removeTab(index)
-
-            if widget.filename() in self._tabs:
-                self._tabs.remove(widget.filename())
-
             self.defaultTab()
 
             return
 
-        if widget.filename() in self._tabs:
-            self._tabs.remove(widget.filename())
-
         self.removeTab(index)
 
     def updateTab(self, old_name: str, new_name: str):
-        for i in range(self.count()):
-            tab = self.widget(i)
+        for tab in self._tabs:
             current_name = os.path.basename(tab.filename())
 
             if current_name == old_name:

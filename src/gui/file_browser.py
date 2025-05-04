@@ -147,14 +147,21 @@ class FileBrowser(QMenu):
         filepath = model.filePath(index)
 
         if not model.isDir(index):
-            self.tab_view.addTab(Tab(filepath, self.tab_view, self.tab_view), insert=True)
+            self.tab_view.openTab(filepath, insert=True)
 
     def openProject(self):
-        path = QFileDialog.getExistingDirectory(self.parent(), 'Open Project')
+        ok = QMessageBox.warning(self.parent(),
+                                 'Open Project', 'Opening a project will clear '
+                                                 'any unsaved changes, are you sure you want to do this?',
+                                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                                 )
 
-        if path:
-            self.setPath(path)
-            self.tab_view.clear()
+        if ok == QMessageBox.StandardButton.Yes:
+            path = QFileDialog.getExistingDirectory(self.parent(), 'Open Project')
+
+            if path:
+                self.setPath(path)
+                self.tab_view.clear()
 
         self.exec()
 
@@ -199,7 +206,7 @@ class FileBrowser(QMenu):
         if not paths:
             return
 
-        confirm = QMessageBox.question(
+        confirm = QMessageBox.warning(
             self.parent(),
             'Remove',
             f'Are you sure you want to delete the {len(paths)} selected item(s)?',
