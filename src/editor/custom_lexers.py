@@ -181,7 +181,7 @@ class PythonLexer(BaseLexer):
 
         # Get text
         raw_bytes = self.editor.bytes(start, end)
-        text = raw_bytes.data().decode('utf-8')
+        text = raw_bytes.data().decode('utf-8').replace('\0', '')
         tree = self.parser.parse(bytes(text, 'utf8'))
 
         def walk(node: Node):

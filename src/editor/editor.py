@@ -76,10 +76,15 @@ class Editor(QsciScintilla):
                     self.endUndoAction()
 
                 else:
+                    self.beginUndoAction()
+
                     super().keyPressEvent(event)
+
                     line, column = self.getCursorPosition()
                     self.insert(closing_char)
                     self.setCursorPosition(line, column)
+
+                    self.endUndoAction()
 
                 return
 
@@ -149,24 +154,28 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
     def enter(self, event: QKeyEvent):
-        line, index = self.getCursorPosition()
-        current_line_text = self.text(line).rstrip().split('#')[0].strip()
+        # python style indents
+        if self.filename().endswith('.py'):
+            line, index = self.getCursorPosition()
+            current_line_text = self.text(line)[:index].rstrip()
+            indent = self.indentation(line)
 
-        indent = self.indentation(line)
+            if current_line_text.endswith(':'):
+                indent += self.tabWidth()
 
-        # increase indent
-        if current_line_text.endswith(':'):
-            indent += self.tabWidth()
+            elif any(keyword in self.text(line).rstrip().split('#')[0].strip() for keyword in (
+                    'return',
+                    'pass',
+                    'break',
+                    'continue',
+                    'raise')):
+                indent -= self.tabWidth()
 
-        # exit indent if return
-        elif any(keyword in current_line_text for keyword in ('return', 'break', 'continue', 'raise')):
-            indent -= self.tabWidth()
-
-        self.beginUndoAction()
-        self.insert('\n')
-        self.setIndentation(line + 1, indent)
-        self.setCursorPosition(line + 1, indent)
-        self.endUndoAction()
+            self.beginUndoAction()
+            self.insert('\n')
+            self.setIndentation(line + 1, indent)
+            self.setCursorPosition(line + 1, indent)
+            self.endUndoAction()
 
     def backspace(self):
         line, column = self.getCursorPosition()
@@ -185,7 +194,7 @@ class Editor(QsciScintilla):
             }
 
             if prev_char in pairs and next_char == pairs[prev_char]:
-                self.setSelection(line, column - 1, line, column + 1)
+                self.setSelection(line, column, line, column + 1)
                 self.removeSelectedText()
 
                 return
