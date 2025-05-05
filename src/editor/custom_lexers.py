@@ -17,12 +17,12 @@ class BaseLexer(QsciLexerCustom):
     COMMENTS = 6
     CONSTANTS = 7
     FUNCTIONS = 8
-    CLASSES = 9
+    CLASS_DEF = 9
     FUNCTION_DEF = 10
     DEFAULT_NAMES = [
         'default',
         'keyword',
-        'classes',
+        'class_def',
         'functions',
         'function_def',
         'string',
@@ -32,17 +32,6 @@ class BaseLexer(QsciLexerCustom):
         'comments',
         'constants',
     ]
-    FONT_WEIGHTS = {
-        'thin': QFont.Weight.Thin,
-        'extralight': QFont.Weight.ExtraLight,
-        'light': QFont.Weight.Light,
-        'normal': QFont.Weight.Normal,
-        'medium': QFont.Weight.Medium,
-        'demibold': QFont.Weight.DemiBold,
-        'bold': QFont.Weight.Bold,
-        'extrabold': QFont.Weight.ExtraBold,
-        'black': QFont.Weight.Black,
-    }
 
     def __init__(self, editor: QsciScintilla, language_name: str):
         super().__init__(editor)
@@ -94,8 +83,8 @@ class BaseLexer(QsciLexerCustom):
         elif style == self.FUNCTIONS:
             return 'FUNCTIONS'
 
-        elif style == self.CLASSES:
-            return 'CLASSES'
+        elif style == self.CLASS_DEF:
+            return 'CLASS_DEF'
 
         elif style == self.FUNCTION_DEF:
             return 'FUNCTION_DEF'
@@ -105,59 +94,14 @@ class BaseLexer(QsciLexerCustom):
     def createStyle(self):
         pass
 
-    def setKeywords(self, keywords: list[str]):
-        self.keywords_list = keywords
-
-    def setBuiltinNames(self, builtin_names: list[str]):
-        self.builtin_names = builtin_names
-
-    def generateTokens(self, text: str):
-        p = re.compile(r'[*]\/|\/[*]|\s+|\w+|\W')
-
-        self.token_list = [(token, len(bytearray(token, 'utf-8'))) for token in p.findall(text)]
-
-    def nextTok(self, skip: int = None):
-        if len(self.token_list) > 0:
-            if skip is not None and skip != 0:
-                for _ in range(skip - 1):
-                    if len(self.token_list) > 0:
-                        self.token_list.pop(0)
-
-            return self.token_list.pop(0)
-
-        else:
-            return None
-
-    def peekTok(self, n=0):
-        try:
-            return self.token_list[n]
-
-        except IndexError:
-            return ['']
-
-    def skipSpacesPeek(self, skip=None):
-        i = 0
-        tok = " "
-
-        if skip is not None:
-            i = skip
-
-        while tok[0].isspace():
-            tok = self.peekTok(i)
-            i += 1
-
-        return tok, i
+    def applyFolding(self):
+        pass
 
 
 class PythonLexer(BaseLexer):
     def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
         self.parser = Parser(Language(PYTHON.language()))
-
-        self.setKeywords(keyword.kwlist + ['self'])
-        self.setBuiltinNames([
-            name for name, obj in vars(builtins).items() if isinstance(obj, types.BuiltinFunctionType)
-        ] + ['super'])
 
     def createStyle(self):
         normal = QColor('#abb2bf')
@@ -169,7 +113,7 @@ class PythonLexer(BaseLexer):
         self.setColor(normal, PythonLexer.BRACKETS)
         self.setColor(QColor('#7f848e'), PythonLexer.COMMENTS)
         self.setColor(QColor('#c678dd'), PythonLexer.KEYWORD)
-        self.setColor(QColor('#e5C07b'), PythonLexer.CLASSES)
+        self.setColor(QColor('#e5C07b'), PythonLexer.CLASS_DEF)
         self.setColor(QColor('#61afef'), PythonLexer.FUNCTIONS)
         self.setColor(QColor('#61afef'), PythonLexer.FUNCTION_DEF)
         self.setColor(QColor('#56b6c2'), PythonLexer.TYPES)
@@ -179,7 +123,7 @@ class PythonLexer(BaseLexer):
     def styleText(self, start, end):
         self.startStyling(start)
 
-        # Get text
+        # get text
         raw_bytes = self.editor.bytes(start, end)
         text = raw_bytes.data().decode('utf-8').replace('\0', '')
         tree = self.parser.parse(bytes(text, 'utf8'))
