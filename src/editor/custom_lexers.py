@@ -186,8 +186,6 @@ class PythonLexer(BaseLexer):
 
         def walk(node: Node):
             for child in node.children:
-                print(child.type)
-
                 if child.type == 'comment':
                     self.setStyling(child.end_byte - child.start_byte, PythonLexer.COMMENTS)
 
@@ -197,6 +195,7 @@ class PythonLexer(BaseLexer):
                 walk(child)
 
         walk(tree.root_node)
+        print(tree.root_node)
 
         self.applyFolding(start, end)
 
