@@ -181,18 +181,21 @@ class RustLexer(BaseLexer):
         super().__init__(editor, 'Rust')
 
     def createStyle(self):
-        normal = QColor('#ffffff')
+        normal = QColor('#abb2bf')
+        italic = QFont('JetBrains Mono', 14)
+        italic.setItalic(True)
 
+        self.setFont(italic, RustLexer.COMMENTS)
         self.setColor(normal, RustLexer.DEFAULT)
         self.setColor(normal, RustLexer.BRACKETS)
-        self.setColor(QColor('#6a737d'), RustLexer.COMMENTS)
-        self.setColor(QColor('#ff79c6'), RustLexer.KEYWORD)
-        self.setColor(normal, RustLexer.CLASSES)
-        self.setColor(QColor('#79c0ff'), RustLexer.FUNCTIONS)
-        self.setColor(QColor('#53a7f4'), RustLexer.FUNCTION_DEF)
-        self.setColor(normal, RustLexer.TYPES)
-        self.setColor(QColor('#b392f0'), RustLexer.CONSTANTS)
-        self.setColor(QColor('#9ecbff'), RustLexer.STRING)
+        self.setColor(QColor('#7f848e'), RustLexer.COMMENTS)
+        self.setColor(QColor('#c678dd'), RustLexer.KEYWORD)
+        self.setColor(QColor('#e5C07b'), RustLexer.CLASS_DEF)
+        self.setColor(QColor('#61afef'), RustLexer.FUNCTIONS)
+        self.setColor(QColor('#61afef'), RustLexer.FUNCTION_DEF)
+        self.setColor(QColor('#56b6c2'), RustLexer.TYPES)
+        self.setColor(QColor('#d19a66'), RustLexer.CONSTANTS)
+        self.setColor(QColor('#98c379'), RustLexer.STRING)
 
     def styleText(self, start, end):
         self.startStyling(start)

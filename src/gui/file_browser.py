@@ -10,7 +10,7 @@ class FileSystemModel(QFileSystemModel):
             if file_path.endswith('.py'):
                 return QIcon('resources/icons/python_icon.svg')
 
-            elif file_path.endswith('.rs'):
+            elif any(item in file_path for item in ('.rs', 'Cargo')):
                 return QIcon('resources/icons/rust_icon.svg')
 
             elif os.path.isdir(file_path):
@@ -32,6 +32,117 @@ class FileSystemWatcher(QFileSystemWatcher):
 
     def clear(self):
         self.removePaths(self.directories())
+
+
+class FileSystemViewer(QTreeView):
+    def __init__(self, tab_view, file_browser, parent=None):
+        super().__init__(parent)
+        self.setAnimated(True)
+        self.setHeaderHidden(True)
+        self.setSelectionMode(QTreeView.SelectionMode.ExtendedSelection)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+
+        self.tab_view = tab_view
+        self.file_browser = file_browser
+
+        self.customContextMenuRequested.connect(self.showMenu)
+        self.doubleClicked.connect(self.openFile)
+
+    def showMenu(self, pos):
+        if not hasattr(self, 'menu'):
+            self.menu = QMenu(self.tab_view)
+
+            new_file_action = QAction('New File', self)
+            new_file_action.triggered.connect(self.newFile)
+
+            new_dir_action = QAction('New Directory', self)
+            new_dir_action.triggered.connect(self.newDir)
+
+            rename_action = QAction('Rename...', self)
+            rename_action.triggered.connect(self.renameSelected)
+
+            delete_action = QAction('Delete', self)
+            delete_action.triggered.connect(self.removeSelected)
+
+            self.menu.addAction(new_file_action)
+            self.menu.addAction(new_dir_action)
+            self.menu.addSeparator()
+            self.menu.addAction(rename_action)
+            self.menu.addSeparator()
+            self.menu.addAction(delete_action)
+
+        self.menu.exec(self.mapToGlobal(pos))
+
+    def newFile(self):
+        pass
+
+    def newDir(self):
+        pass
+
+    def openFile(self, index: QModelIndex):
+        model = self.model()
+        filepath = model.filePath(index)
+
+        if not model.isDir(index):
+            self.tab_view.openTab(filepath, insert=True)
+
+    def renameSelected(self):
+        if len(self.selectedIndexes()) > 1:
+            return
+
+        index = self.currentIndex()
+
+        if not index.isValid():
+            return
+
+        model = self.model()
+        old_path = model.filePath(index)
+        old_name = os.path.basename(old_path)
+        dir_path = os.path.dirname(old_path)
+
+        new_name, ok = QInputDialog.getText(self.tab_view, 'Rename', 'New name:', text=old_name)
+
+        if ok and new_name:
+            new_path = os.path.join(dir_path, new_name)
+            self.tab_view.updateTab(old_name, new_path)
+
+            try:
+                os.rename(old_path, new_path)
+                self.file_browser.updateFileBrowser()
+
+            except Exception as e:
+                raise e
+
+    def removeSelected(self):
+        indexes = self.selectedIndexes()
+
+        if not indexes:
+            return
+
+        model = self.model()
+        paths = list(set(model.filePath(index) for index in indexes if index.column() == 0))
+
+        if not paths:
+            return
+
+        confirm = QMessageBox.warning(
+            self.tab_view,
+            'Remove',
+            f'Are you sure you want to delete the {len(paths)} selected item(s)?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if confirm == QMessageBox.StandardButton.Yes:
+            for path in paths:
+                try:
+                    if os.path.isfile(path):
+                        os.remove(path)
+
+                    elif os.path.isdir(path):
+                        shutil.rmtree(path)
+
+                except Exception as e:
+                    raise e
 
 
 class FileBrowser(QMenu):
@@ -91,41 +202,22 @@ class FileBrowser(QMenu):
         action_container.setLayout(QHBoxLayout())
         action_container.layout().setContentsMargins(0, 0, 0, 0)
 
+        self._project_dir_label = QLabel('')
         open_project_btn = QPushButton('📁', self)
         open_project_btn.setObjectName('actionButton')
         open_project_btn.setFixedSize(25, 25)
         open_project_btn.clicked.connect(self.openProject)
-        rename_file_btn = QPushButton('✏️', self)
-        rename_file_btn.setObjectName('actionButton')
-        rename_file_btn.setFixedSize(25, 25)
-        rename_file_btn.clicked.connect(self.renameSelected)
-        new_file_btn = QPushButton('➕', self)
-        new_file_btn.setObjectName('actionButton')
-        new_file_btn.setFixedSize(25, 25)
-        new_file_btn.clicked.connect(self.newFile)
-        remove_selected_btn = QPushButton('➖', self)
-        remove_selected_btn.setObjectName('actionButton')
-        remove_selected_btn.setFixedSize(25, 25)
-        remove_selected_btn.clicked.connect(self.removeSelected)
-        self._project_dir_label = QLabel('')
         close_btn = QPushButton('❌', self)
         close_btn.setObjectName('actionButton')
         close_btn.setFixedSize(25, 25)
         close_btn.clicked.connect(self.animateClose)
 
-        action_container.layout().addWidget(open_project_btn)
-        action_container.layout().addWidget(rename_file_btn)
-        action_container.layout().addWidget(new_file_btn)
-        action_container.layout().addWidget(remove_selected_btn)
-        action_container.layout().addStretch()
         action_container.layout().addWidget(self._project_dir_label)
+        action_container.layout().addStretch()
+        action_container.layout().addWidget(open_project_btn)
         action_container.layout().addWidget(close_btn)
 
-        self._file_view = QTreeView(self)
-        self._file_view.setAnimated(True)
-        self._file_view.setHeaderHidden(True)
-        self._file_view.setSelectionMode(QTreeView.SelectionMode.ExtendedSelection)
-        self._file_view.doubleClicked.connect(self.openFile)
+        self._file_view = FileSystemViewer(self.tab_view, self, self)
 
         self.container.layout().addWidget(action_container)
         self.container.layout().addWidget(self._file_view)
@@ -162,52 +254,6 @@ class FileBrowser(QMenu):
             if tab.editor().text() != new_contents:
                 tab.editor().setText(new_contents)
 
-    def newFile(self):
-        if self._file_view.selectedIndexes():
-            if len(self._file_view.selectedIndexes()) > 1:
-                return
-
-            index = self._file_view.currentIndex()
-
-            if not index.isValid():
-                return
-
-            model = self._file_view.model()
-
-            if model.isDir(index):
-                target_dir = model.filePath(index)
-
-            else:
-                target_dir = os.path.dirname(model.filePath(index))
-
-            name, ok = QInputDialog.getText(self.parent(),
-                                            f'New File In {target_dir}',
-                                            'File Name:')
-
-            if ok and name:
-                filename = os.path.join(target_dir, os.path.basename(name))
-
-                if not os.path.exists(filename):
-                    slik.write(filename, '')
-
-        else:
-            name, ok = QInputDialog.getText(self.parent(),
-                                            f'New File In {self._path}',
-                                            'File Name:')
-
-            if ok and name:
-                filename = os.path.join(self._path, os.path.basename(name))
-
-                if not os.path.exists(filename):
-                    slik.write(filename, '')
-
-    def openFile(self, index: QModelIndex):
-        model = self._file_view.model()
-        filepath = model.filePath(index)
-
-        if not model.isDir(index):
-            self.tab_view.openTab(filepath, insert=True)
-
     def openProject(self):
         ok = QMessageBox.warning(self.parent(),
                                  'Open Project', 'Opening a project will clear '
@@ -221,64 +267,6 @@ class FileBrowser(QMenu):
             if path:
                 self.setPath(path)
                 self.tab_view.clear()
-
-    def renameSelected(self):
-        if len(self._file_view.selectedIndexes()) > 1:
-            return
-
-        index = self._file_view.currentIndex()
-
-        if not index.isValid():
-            return
-
-        model = self._file_view.model()
-        old_path = model.filePath(index)
-        old_name = os.path.basename(old_path)
-        dir_path = os.path.dirname(old_path)
-
-        new_name, ok = QInputDialog.getText(self.parent(), 'Rename', 'New name:', text=old_name)
-
-        if ok and new_name:
-            new_path = os.path.join(dir_path, new_name)
-            self.tab_view.updateTab(old_name, new_path)
-
-            try:
-                os.rename(old_path, new_path)
-                self.updateFileBrowser()
-
-            except Exception as e:
-                raise e
-
-    def removeSelected(self):
-        indexes = self._file_view.selectedIndexes()
-
-        if not indexes:
-            return
-
-        model = self._file_view.model()
-        paths = list(set(model.filePath(index) for index in indexes if index.column() == 0))
-
-        if not paths:
-            return
-
-        confirm = QMessageBox.warning(
-            self.parent(),
-            'Remove',
-            f'Are you sure you want to delete the {len(paths)} selected item(s)?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-
-        if confirm == QMessageBox.StandardButton.Yes:
-            for path in paths:
-                try:
-                    if os.path.isfile(path):
-                        os.remove(path)
-
-                    elif os.path.isdir(path):
-                        shutil.rmtree(path)
-
-                except Exception as e:
-                    raise e
 
     def setPath(self, path: str):
         self._path = path
