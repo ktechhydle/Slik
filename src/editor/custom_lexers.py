@@ -101,6 +101,7 @@ class BaseLexer(QsciLexerCustom):
 class PythonLexer(BaseLexer):
     def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
+
         self.parser = Parser(Language(PYTHON.language()))
 
     def createStyle(self):
@@ -169,12 +170,6 @@ class PythonLexer(BaseLexer):
 class RustLexer(BaseLexer):
     def __init__(self, editor):
         super().__init__(editor, 'Rust')
-        self.setKeywords([
-
-        ])
-        self.setBuiltinNames([
-
-        ])
 
     def createStyle(self):
         normal = QColor('#ffffff')
@@ -322,8 +317,6 @@ class RustLexer(BaseLexer):
 class PlainTextLexer(BaseLexer):
     def __init__(self, editor):
         super().__init__(editor, 'Plain Text')
-        self.setKeywords([])
-        self.setBuiltinNames([])
 
     def createStyle(self):
         normal = QColor('#ffffff')
