@@ -1,7 +1,5 @@
-from tree_sitter_languages.core import Language
-
 from src.imports import *
-from tree_sitter import Parser, Node
+from tree_sitter import Parser, Node, Language
 import tree_sitter_python as PYTHON
 import tree_sitter_rust as RUST
 import types
