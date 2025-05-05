@@ -1,3 +1,5 @@
+from operator import index
+
 from src.imports import *
 from tree_sitter import Parser, Node, Language
 import tree_sitter_python as PYTHON
@@ -129,20 +131,27 @@ class PythonLexer(BaseLexer):
         text = raw_bytes.data().decode('utf-8').replace('\0', '')
         tree = self.parser.parse(bytes(text, 'utf8'))
 
-        def walk(node: Node):
-            for child in node.children:
-                if child.type == 'comment':
-                    self.setStyling(child.end_byte - child.start_byte, PythonLexer.COMMENTS)
-
-                else:
-                    self.setStyling(child.end_byte - child.start_byte, PythonLexer.DEFAULT)
-
-                walk(child)
-
-        walk(tree.root_node)
         print(tree.root_node)
+        self.walk(tree.root_node, start)
 
         self.applyFolding(start, end)
+
+    def walk(self, node: Node, chunk_start: int):
+        for child in node.children:
+            child_start_absolute = chunk_start + child.start_byte
+            child_end_absolute = chunk_start + child.end_byte
+            length = child_end_absolute - child_start_absolute
+
+            if child.type == 'comment':
+                self.setStyling(length, PythonLexer.COMMENTS)
+
+            elif child.type == 'string':
+                self.setStyling(length, PythonLexer.STRING)
+
+            else:
+                self.setStyling(length, PythonLexer.DEFAULT)
+
+            self.walk(child, chunk_start)
 
     def applyFolding(self, start, end):
         start_line = self.editor.SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
@@ -327,6 +336,5 @@ class PlainTextLexer(BaseLexer):
         self.startStyling(start)
 
         text = self.editor.text()[start:end]
-        self.generateTokens(text)
 
         self.setStyling(len(text), PythonLexer.DEFAULT)
