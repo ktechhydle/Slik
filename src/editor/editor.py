@@ -38,13 +38,6 @@ class Editor(QsciScintilla):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.newLine(event)
 
-        elif event.key() == Qt.Key.Key_Comma:
-            super().keyPressEvent(event)
-
-            line, column = self.getCursorPosition()
-            self.insert(' ')
-            self.setCursorPosition(line, column + 1)
-
         elif event.key() == Qt.Key.Key_Backspace:
             line, column = self.getCursorPosition()
 
@@ -87,6 +80,7 @@ class Editor(QsciScintilla):
 
             if char in wrap_pairs:
                 closing_char = wrap_pairs[char]
+
                 if self.hasSelectedText():
                     start_line, start_index, end_line, end_index = self.getSelection()
                     selected_text = self.selectedText()
@@ -186,10 +180,11 @@ class Editor(QsciScintilla):
         elif any(keyword in current_line_text for keyword in ('return', 'break', 'continue', 'raise')):
             indent -= self.tabWidth()
 
+        self.beginUndoAction()
         self.insert('\n')
-
         self.setIndentation(line + 1, indent)
         self.setCursorPosition(line + 1, indent)
+        self.endUndoAction()
 
     def setFileName(self, file_name: str):
         self._file_name = file_name

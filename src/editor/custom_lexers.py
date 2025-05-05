@@ -149,24 +149,27 @@ class BaseLexer(QsciLexerCustom):
 class PythonLexer(BaseLexer):
     def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
-        self.setKeywords(keyword.kwlist)
+        self.setKeywords(keyword.kwlist + ['self'])
         self.setBuiltinNames([
             name for name, obj in vars(builtins).items() if isinstance(obj, types.BuiltinFunctionType)
-        ] + ['super', 'self'])
+        ] + ['super'])
 
     def createStyle(self):
-        normal = QColor('#ffffff')
+        normal = QColor('#abb2bf')
+        italic = QFont('JetBrains Mono', 14)
+        italic.setItalic(True)
 
+        self.setFont(italic, PythonLexer.COMMENTS)
         self.setColor(normal, PythonLexer.DEFAULT)
         self.setColor(normal, PythonLexer.BRACKETS)
-        self.setColor(QColor('#6a737d'), PythonLexer.COMMENTS)
-        self.setColor(QColor('#ff79c6'), PythonLexer.KEYWORD)
-        self.setColor(QColor('#ff7b72'), PythonLexer.CLASSES)
-        self.setColor(QColor('#79c0ff'), PythonLexer.FUNCTIONS)
-        self.setColor(QColor('#ff7b72'), PythonLexer.FUNCTION_DEF)
-        self.setColor(QColor('#b392f0'), PythonLexer.TYPES)
-        self.setColor(QColor('#3fa3fc'), PythonLexer.CONSTANTS)
-        self.setColor(QColor('#9ecbff'), PythonLexer.STRING)
+        self.setColor(QColor('#7f848e'), PythonLexer.COMMENTS)
+        self.setColor(QColor('#c678dd'), PythonLexer.KEYWORD)
+        self.setColor(QColor('#e5C07b'), PythonLexer.CLASSES)
+        self.setColor(QColor('#61afef'), PythonLexer.FUNCTIONS)
+        self.setColor(QColor('#61afef'), PythonLexer.FUNCTION_DEF)
+        self.setColor(QColor('#56b6c2'), PythonLexer.TYPES)
+        self.setColor(QColor('#d19a66'), PythonLexer.CONSTANTS)
+        self.setColor(QColor('#98c379'), PythonLexer.STRING)
 
     def styleText(self, start, end):
         self.startStyling(start)
@@ -272,6 +275,11 @@ class PythonLexer(BaseLexer):
                     continue
 
             elif tok in self.keywords_list:
+                if tok == 'self':
+                    self.setStyling(tok_len, PythonLexer.CLASSES)
+
+                    continue
+
                 self.setStyling(tok_len, PythonLexer.KEYWORD)
 
                 continue
