@@ -15,10 +15,10 @@ class AutoCompleter(QThread):
     def run(self):
         try:
             if self._file_name.endswith('.py'):
-                self.loadAutoCompletions(jedi.Script(self.text, path=self._file_name).complete(self.line, self.index))
+                self.loadAutoCompletions([])
 
             if self._file_name.endswith('.rs'):
-                self.loadAutoCompletions(slik.get_completions(self.text, self.line, self.index))
+                self.loadAutoCompletions([])
 
             else:
                 self.loadAutoCompletions([])
@@ -28,15 +28,11 @@ class AutoCompleter(QThread):
 
         self.finished.emit()
 
-    def loadAutoCompletions(self, completions: list[jedi.api.Completion | str]):
+    def loadAutoCompletions(self, completions: list[str]):
         self._api.clear()
 
         for i in completions:
-            if isinstance(i, str):
-                self._api.add(i)
-
-            else:
-                self._api.add(i.complete)
+            self._api.add(i)
 
         self._api.prepare()
 
@@ -45,3 +41,9 @@ class AutoCompleter(QThread):
         self.index = index
         self.text = text.replace('\t', '    ')
         self.start()
+
+    def setFileName(self, file_name: str):
+        self._file_name = file_name
+
+    def filename(self) -> str:
+        return self._file_name

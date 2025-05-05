@@ -8,7 +8,6 @@ import os
 import sys
 import shutil
 import subprocess
-import jedi
 import markdown
 import re
 import slik

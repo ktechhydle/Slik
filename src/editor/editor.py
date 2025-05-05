@@ -13,6 +13,7 @@ class Editor(QsciScintilla):
         self.setIndentationsUseTabs(False)
         self.setIndentationGuides(True)
         self.setAutoIndent(True)
+        self.setBackspaceUnindents(True)
         self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsAPIs)
         self.setAutoCompletionThreshold(1)
         self.setAutoCompletionCaseSensitivity(False)
@@ -36,29 +37,10 @@ class Editor(QsciScintilla):
 
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
-            self.newLine(event)
+            self.enter(event)
 
         elif event.key() == Qt.Key.Key_Backspace:
-            line, column = self.getCursorPosition()
-
-            if column > 0:
-                prev_char = self.text(line)[column - 1]
-                next_char = self.text(line)[column] if column < len(self.text(line)) else ''
-
-                pairs = {
-                    "'": "'",
-                    '"': '"',
-                    '(': ')',
-                    '{': '}',
-                    '[': ']',
-                    '`': '`'
-                }
-
-                if prev_char in pairs and next_char == pairs[prev_char]:
-                    self.setSelection(line, column - 1, line, column + 1)
-                    self.removeSelectedText()
-
-                    return
+            self.backspace()
 
             super().keyPressEvent(event)
 
@@ -166,7 +148,7 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
-    def newLine(self, event: QKeyEvent):
+    def enter(self, event: QKeyEvent):
         line, index = self.getCursorPosition()
         current_line_text = self.text(line).rstrip().split('#')[0].strip()
 
@@ -186,12 +168,27 @@ class Editor(QsciScintilla):
         self.setCursorPosition(line + 1, indent)
         self.endUndoAction()
 
-    def setFileName(self, file_name: str):
-        self._file_name = file_name
+    def backspace(self):
+        line, column = self.getCursorPosition()
 
-        self.createLexer()
-        self.createMargins()
-        self.createStyle()
+        if column > 0:
+            prev_char = self.text(line)[column - 1]
+            next_char = self.text(line)[column] if column < len(self.text(line)) else ''
+
+            pairs = {
+                "'": "'",
+                '"': '"',
+                '(': ')',
+                '{': '}',
+                '[': ']',
+                '`': '`'
+            }
+
+            if prev_char in pairs and next_char == pairs[prev_char]:
+                self.setSelection(line, column - 1, line, column + 1)
+                self.removeSelectedText()
+
+                return
 
     def getAutoCompletions(self, line: int, index: int):
         if not self.selectedText():
@@ -200,3 +197,13 @@ class Editor(QsciScintilla):
 
     def loadAutoCompletions(self):
         pass
+
+    def setFileName(self, file_name: str):
+        self._file_name = file_name
+
+        self.createLexer()
+        self.createMargins()
+        self.createStyle()
+
+    def filename(self) -> str:
+        return self._file_name
