@@ -132,15 +132,15 @@ class PythonLexer(BaseLexer):
         tree = self.parser.parse(bytes(text, 'utf8'))
 
         print(tree.root_node)
-        self.walk(tree.root_node, start)
+        self.walk(tree.root_node)
 
         self.applyFolding(start, end)
 
-    def walk(self, node: Node, chunk_start: int):
+    def walk(self, node: Node):
         for child in node.children:
-            child_start_absolute = chunk_start + child.start_byte
-            child_end_absolute = chunk_start + child.end_byte
-            length = child_end_absolute - child_start_absolute
+            child_start = child.start_byte
+            child_end = child.end_byte + 1
+            length = child_end
 
             if child.type == 'comment':
                 self.setStyling(length, PythonLexer.COMMENTS)
@@ -151,7 +151,7 @@ class PythonLexer(BaseLexer):
             else:
                 self.setStyling(length, PythonLexer.DEFAULT)
 
-            self.walk(child, chunk_start)
+            self.walk(child)
 
     def applyFolding(self, start, end):
         start_line = self.editor.SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)

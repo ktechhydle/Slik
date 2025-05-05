@@ -21,6 +21,7 @@ class Slik(QMainWindow):
         self.tab_view = TabView()
         self.tab_view.openProject(os.path.abspath('./'))
         self.tab_view.defaultTab()
+        self.tab_view.openTab('test.py', insert=True)
 
         container.layout().addWidget(self.tab_view)
         self.setCentralWidget(container)
