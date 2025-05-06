@@ -138,7 +138,7 @@ class PythonLexer(BaseLexer):
         for child in node.children:
             child_start = child.start_byte
             child_end = child.end_byte
-            length = child_end - child_start
+            length = child_start + child_end
 
             if child.type == 'comment':
                 self.setStyling(length, PythonLexer.COMMENTS)
