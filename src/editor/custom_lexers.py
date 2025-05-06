@@ -38,9 +38,6 @@ class BaseLexer(QsciLexerCustom):
 
         self.editor = editor
         self.language_name = language_name
-        self.token_list = []
-        self.keywords_list = []
-        self.builtin_names = []
 
         defaults = {}
         defaults['color'] = '#ffffff'
