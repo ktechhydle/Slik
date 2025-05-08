@@ -10,7 +10,7 @@ class FileSystemModel(QFileSystemModel):
             if file_path.endswith('.py'):
                 return QIcon('resources/icons/python_icon.svg')
 
-            elif any(item in file_path for item in ('.rs', 'Cargo')):
+            elif file_path.endswith('.rs'):
                 return QIcon('resources/icons/rust_icon.svg')
 
             elif os.path.isdir(file_path):
