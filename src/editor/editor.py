@@ -16,7 +16,7 @@ class Editor(QsciScintilla):
         self.setBackspaceUnindents(True)
         self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsAPIs)
         self.setAutoCompletionThreshold(1)
-        self.setAutoCompletionCaseSensitivity(False)
+        self.setAutoCompletionCaseSensitivity(True)
         self.setAutoCompletionUseSingle(QsciScintilla.AutoCompletionUseSingle.AcusNever)
         self.setEolMode(QsciScintilla.EolMode.EolWindows)
         self.setEolVisibility(False)
@@ -30,6 +30,7 @@ class Editor(QsciScintilla):
         self._file_name = file_name
 
         self.cursorPositionChanged.connect(self.getAutoCompletions)
+        self.textChanged.connect(self.getAutoCompletions)
 
         self.createLexer()
         self.createMargins()
@@ -103,6 +104,7 @@ class Editor(QsciScintilla):
 
         else:
             self.lexer = PlainTextLexer(self)
+            self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsDocument)
 
         self.setLexer(self.lexer)
 
