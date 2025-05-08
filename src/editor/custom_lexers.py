@@ -171,7 +171,7 @@ class PythonLexer(BaseLexer):
             if line_text.strip().startswith((
                     'def', 'class', 'if', 'elif', 'else', 'with',
                     'async', 'match', 'case', 'for', 'while',
-                    'try', 'except', 'finally', '"""', "'''")):
+                    'try', 'except', 'finally')):
                 level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
 
             if is_blank:
