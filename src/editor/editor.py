@@ -20,7 +20,7 @@ class Editor(QsciScintilla):
         self.setAutoCompletionUseSingle(QsciScintilla.AutoCompletionUseSingle.AcusNever)
         self.setEolMode(QsciScintilla.EolMode.EolWindows)
         self.setEolVisibility(False)
-        self.setCallTipsStyle(QsciScintilla.CallTipsStyle.CallTipsNoContext)
+        self.setCallTipsStyle(QsciScintilla.CallTipsStyle.CallTipsContext)
         self.setCallTipsVisible(0)
         self.setCallTipsPosition(QsciScintilla.CallTipsPosition.CallTipsAboveText)
         self.setCallTipsBackgroundColor(QColor(0xff, 0xff, 0xff, 0xff))
