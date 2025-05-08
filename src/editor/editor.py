@@ -161,7 +161,8 @@ class Editor(QsciScintilla):
                     'pass',
                     'break',
                     'continue',
-                    'raise')):
+                    'raise', 
+                    '...')):
                 indent -= self.tabWidth()
 
             self.beginUndoAction()
