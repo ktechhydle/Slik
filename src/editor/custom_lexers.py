@@ -103,7 +103,8 @@ class PythonLexer(BaseLexer):
 
     def createStyle(self):
         normal = QColor('#abb2bf')
-        italic = QFont('JetBrains Mono', 14)
+        font = QFont('JetBrains Mono', 14)
+        italic = font
         italic.setItalic(True)
 
         self.setFont(italic, PythonLexer.COMMENTS)
@@ -117,6 +118,12 @@ class PythonLexer(BaseLexer):
         self.setColor(QColor('#56b6c2'), PythonLexer.TYPES)
         self.setColor(QColor('#d19a66'), PythonLexer.CONSTANTS)
         self.setColor(QColor('#98c379'), PythonLexer.STRING)
+
+        # fix the braces being too small
+        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACELIGHT, font.family().encode())
+        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACELIGHT, font.pointSize())
+        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
+        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
     def styleText(self, start, end):
         self.startStyling(start)
