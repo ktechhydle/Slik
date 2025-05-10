@@ -114,6 +114,7 @@ QLineEdit:focus {
 QPlainTextEdit,
 QTextEdit {
     background-color: #181818;
+    selection-background-color: #4772b3;
     border-radius: 5px;
 }
 

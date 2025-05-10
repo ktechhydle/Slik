@@ -7,9 +7,10 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLab
 class CommandRunner(QThread):
     outputReady = pyqtSignal(str)
 
-    def __init__(self, command):
+    def __init__(self, command, terminal):
         super().__init__()
         self._command = command
+        self._terminal = terminal
 
     def run(self):
         try:
@@ -21,7 +22,8 @@ class CommandRunner(QThread):
                 text=True,
                 encoding='utf-8',
                 errors='replace',
-                bufsize=1
+                bufsize=1,
+                cwd=self._terminal.cwd(),
             )
 
             for line in iter(process.stdout.readline, ''):
@@ -52,11 +54,13 @@ class OutputTextEdit(QPlainTextEdit):
 
 
 class Terminal(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, cwd: str, parent=None):
         super().__init__(parent)
         self.setObjectName('terminal')
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self._cwd = cwd
 
         self.createUI()
         self.newPrompt()
@@ -78,7 +82,7 @@ class Terminal(QWidget):
         command_line.setLayout(QHBoxLayout())
         command_line.layout().setContentsMargins(0, 0, 0, 0)
 
-        label = QLabel(f'{os.getcwd()}>', self)
+        label = QLabel(f'{self._cwd}>', self)
         prompt_input = QLineEdit(self)
         prompt_input.returnPressed.connect(lambda: self.run(prompt_input))
 
@@ -100,14 +104,11 @@ class Terminal(QWidget):
 
         output_widget = OutputTextEdit(self)
 
-        self._container.layout().insertWidget(self._container.layout().count() - 1, output_widget)
-
         # builtin commands
         if text.startswith('cd'):
             try:
                 path = text[3:].strip()
-                os.chdir(os.path.abspath(path))
-                output_widget.setPlainText(f'changed working dir to {path}')
+                self.setCwd(os.path.abspath(path))
 
             except Exception as e:
                 output_widget.setPlainText(str(e))
@@ -116,12 +117,19 @@ class Terminal(QWidget):
 
             return
 
+        elif text.startswith('exit'):
+            # close the tab
+
+            return
+
         elif text.startswith(('clear', 'cls')):
             self.clear()
 
             return
 
-        self._command_runner = CommandRunner(text)
+        self._container.layout().insertWidget(self._container.layout().count() - 1, output_widget)
+
+        self._command_runner = CommandRunner(text, self)
         self._command_runner.outputReady.connect(lambda line: output_widget.appendPlainText(line))
         self._command_runner.finished.connect(self.newPrompt)
         self._command_runner.start()
@@ -139,3 +147,9 @@ class Terminal(QWidget):
                 widget.deleteLater()
 
         self.newPrompt()
+
+    def setCwd(self, cwd: str):
+        self._cwd = cwd
+
+    def cwd(self) -> str:
+        return self._cwd

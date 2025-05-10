@@ -28,7 +28,7 @@ class Slik(QMainWindow):
         self.tab_view.defaultTab()
         self.tab_view.openTab('test.py', insert=True)
 
-        self.terminal = Terminal(self)
+        self.terminal = Terminal(os.path.abspath('./'), self)
 
         splitter.addWidget(self.tab_view)
         splitter.addWidget(self.terminal)
