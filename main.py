@@ -1,4 +1,7 @@
-from src.imports import (QApplication,
+from PyQt6.QtWidgets import QSplitter
+
+from src.imports import (Qt,
+                         QApplication,
                          QMainWindow,
                          QIcon,
                          QWidget,
@@ -9,6 +12,7 @@ from src.imports import (QApplication,
                          slik,
                          )
 from src.gui.tab_view import TabView
+from src.gui.terminal import Terminal
 from src.gui.message_dialog import MessageDialog
 
 
@@ -22,17 +26,20 @@ class Slik(QMainWindow):
         self.createUI()
 
     def createUI(self):
-        container = QWidget()
-        container.setLayout(QVBoxLayout())
-        container.layout().setContentsMargins(0, 0, 0, 0)
+        splitter = QSplitter()
+        splitter.setHandleWidth(3)
+        splitter.setOrientation(Qt.Orientation.Vertical)
 
         self.tab_view = TabView()
         self.tab_view.openProject(os.path.abspath('./'))
         self.tab_view.defaultTab()
         self.tab_view.openTab('test.py', insert=True)
 
-        container.layout().addWidget(self.tab_view)
-        self.setCentralWidget(container)
+        self.terminal = Terminal(self)
+
+        splitter.addWidget(self.tab_view)
+        splitter.addWidget(self.terminal)
+        self.setCentralWidget(splitter)
 
 
 def main():

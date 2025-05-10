@@ -270,7 +270,8 @@ QDialogButtonBox QPushButton:default:hover {
 
 /* This style is for the QSplitter widget */
 QFrame::handle {
-    border-left: 2px solid #505050;
+    background-color: #383838;
+    border: none;
 }
 
 QScrollBar {
@@ -480,6 +481,35 @@ QToolTip {
 
 #popup QPushButton:default {
     text-decoration: underline;
+}
+
+#terminal {
+    background-color: #262525;
+}
+
+#terminal QWidget {
+    background-color: transparent;
+}
+
+#terminal QLabel {
+    font-family: 'JetBrains Mono';
+    font-size: 16px;
+    color: #ffffff;
+}
+
+#terminal QLineEdit {
+    font-family: 'JetBrains Mono';
+    font-size: 16px;
+    border: none;
+    color: #ffffff;
+}
+
+#terminal QPlainTextEdit {
+    background-color: #2d2d2d;
+    font-family: 'JetBrains Mono';
+    font-size: 16px;
+    border: 2px solid #383838;
+    color: #ffffff;
 }
 
 #actionButton {

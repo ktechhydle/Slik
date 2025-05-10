@@ -1,4 +1,10 @@
-from src.imports import Qt, QWidget, QLabel, QPushButton, QIcon, QHBoxLayout
+from src.imports import (Qt,
+                         QWidget,
+                         QLabel,
+                         QPushButton,
+                         QIcon,
+                         QHBoxLayout,
+                         )
 
 
 class TitleBar(QWidget):
