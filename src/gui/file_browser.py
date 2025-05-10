@@ -8,16 +8,16 @@ class FileSystemModel(QFileSystemModel):
             file_path = self.filePath(index)
 
             if file_path.endswith('.py'):
-                return QIcon('resources/icons/python_icon.svg')
+                return QIcon('resources/icons/logos/python_icon.svg')
 
             elif file_path.endswith('.rs'):
-                return QIcon('resources/icons/rust_icon.svg')
+                return QIcon('resources/icons/logos/rust_icon.svg')
 
             elif os.path.isdir(file_path):
-                return QIcon('resources/icons/folder_icon.svg')
+                return QIcon('resources/icons/ui/folder_icon.svg')
 
             else:
-                return QIcon('resources/icons/txt_icon.svg')
+                return QIcon('resources/icons/ui/txt_icon.svg')
 
         return super().data(index, role)
 
@@ -203,11 +203,11 @@ class FileBrowser(QMenu):
         action_container.layout().setContentsMargins(0, 0, 0, 0)
 
         self._project_dir_label = QLabel('')
-        open_project_btn = QPushButton('📁', self)
+        open_project_btn = QPushButton(QIcon('resources/icons/ui/folder_icon.svg'), '', self)
         open_project_btn.setObjectName('actionButton')
         open_project_btn.setFixedSize(25, 25)
         open_project_btn.clicked.connect(self.openProject)
-        close_btn = QPushButton('❌', self)
+        close_btn = QPushButton(QIcon('resources/icons/ui/close_icon.svg'), '', self)
         close_btn.setObjectName('actionButton')
         close_btn.setFixedSize(25, 25)
         close_btn.clicked.connect(self.animateClose)
