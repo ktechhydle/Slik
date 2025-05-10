@@ -1,6 +1,28 @@
-from src.imports import *
-from src.gui.tab import Tab
-from src.gui.title_bar import TitleBar
+from src.imports import (Qt,
+                         QIcon,
+                         QPixmap,
+                         QMenu,
+                         QAction,
+                         QWidgetAction,
+                         QRect,
+                         QFileDialog,
+                         QInputDialog,
+                         QTabWidget,
+                         QWidget,
+                         QVBoxLayout,
+                         QHBoxLayout,
+                         QLabel,
+                         QPushButton,
+                         QDir,
+                         QModelIndex,
+                         QTreeView,
+                         QFileSystemWatcher,
+                         QFileSystemModel,
+                         QPropertyAnimation,
+                         QEasingCurve,
+                         pyqtSignal,
+                         os,
+                         shutil)
 from src.gui.message_dialog import MessageDialog
 
 
@@ -47,7 +69,6 @@ class FileSystemWatcher(QFileSystemWatcher):
 class FileSystemViewer(QTreeView):
     def __init__(self, tab_view, file_browser, parent=None):
         super().__init__(parent)
-        self.setAnimated(True)
         self.setHeaderHidden(True)
         self.setSelectionMode(QTreeView.SelectionMode.ExtendedSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -165,10 +186,32 @@ class FileBrowser(QMenu):
 
         self._path = path
         self.tab_view = tab_view
+        self._initial_pos = None
 
         self.createUI()
         self.createWatcher()
         self.updateFileBrowser()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._initial_pos = event.position().toPoint()
+
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._initial_pos is not None:
+            delta = event.position().toPoint() - self._initial_pos
+            self.window().move(
+                self.window().x() + delta.x(),
+                self.window().y() + delta.y(),
+            )
+
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self._initial_pos = None
+
+        super().mouseReleaseEvent(event)
 
     def exec(self, pos=None):
         if self.isVisible():
@@ -214,7 +257,9 @@ class FileBrowser(QMenu):
         self._container.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self._container.setLayout(QVBoxLayout())
 
-        self._title_bar = TitleBar(self, create=False)
+        title_bar = QWidget()
+        title_bar.setLayout(QHBoxLayout())
+        title_bar.layout().setContentsMargins(0, 0, 0, 0)
 
         self._project_dir_label = QLabel('')
         open_project_btn = QPushButton(QIcon('resources/icons/ui/folder_icon.svg'), '', self)
@@ -226,14 +271,14 @@ class FileBrowser(QMenu):
         close_btn.setFixedSize(25, 25)
         close_btn.clicked.connect(self.animateClose)
 
-        self._title_bar.layout().addWidget(self._project_dir_label)
-        self._title_bar.layout().addStretch()
-        self._title_bar.layout().addWidget(open_project_btn)
-        self._title_bar.layout().addWidget(close_btn)
+        title_bar.layout().addWidget(self._project_dir_label)
+        title_bar.layout().addStretch()
+        title_bar.layout().addWidget(open_project_btn)
+        title_bar.layout().addWidget(close_btn)
 
         self._file_view = FileSystemViewer(self.tab_view, self, self)
 
-        self._container.layout().addWidget(self._title_bar)
+        self._container.layout().addWidget(title_bar)
         self._container.layout().addWidget(self._file_view)
 
         action = QWidgetAction(self)

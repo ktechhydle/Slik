@@ -453,7 +453,6 @@ QToolTip {
 
 #fileBrowser QTreeView::item:hover, QTreeView::item:selected {
     color: #ffffff;
-    background-color:
 }
 
 #fileBrowser QLabel {
