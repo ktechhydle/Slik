@@ -1,6 +1,15 @@
-from src.imports import *
-from src.gui.tab import Tab
+from src.imports import (QApplication,
+                         QMainWindow,
+                         QIcon,
+                         QWidget,
+                         QVBoxLayout,
+                         QFontDatabase,
+                         os,
+                         sys,
+                         slik,
+                         )
 from src.gui.tab_view import TabView
+from src.gui.message_dialog import MessageDialog
 
 
 class Slik(QMainWindow):
@@ -37,7 +46,12 @@ def main():
 
     # Crash handler
     def handle_exception(exctype, value, tb):
-        QMessageBox.critical(window, 'Error:(', f'Slik encountered an error:\n\n{value}\n')
+        message = MessageDialog('Error:(',
+                      f'Slik encountered an error:\n\n{value}\n',
+                      (MessageDialog.OkButton,),
+                      window)
+        message.exec()
+
         sys.__excepthook__(exctype, value, tb)
 
     # Set the global exception hook

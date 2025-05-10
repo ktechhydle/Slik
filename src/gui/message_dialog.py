@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QHBoxLayout, QPushButton
 
 from src.imports import (Qt,
+                         QApplication,
                          QMenu,
                          QWidget,
                          QWidgetAction,
@@ -78,6 +79,7 @@ class MessageDialog(QMenu):
         self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
         self.animation.start()
 
+        QApplication.beep()
         super().exec()
 
     def createUI(self):
