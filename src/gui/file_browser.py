@@ -1,5 +1,7 @@
 from src.imports import *
 from src.gui.tab import Tab
+from src.gui.title_bar import TitleBar
+from src.gui.message_dialog import MessageDialog
 
 
 class FileSystemModel(QFileSystemModel):
@@ -159,6 +161,9 @@ class FileBrowser(QMenu):
         self.updateFileBrowser()
 
     def exec(self, pos=None):
+        if self.isVisible():
+            return
+
         if pos:
             super().exec(pos)
             return
@@ -182,7 +187,7 @@ class FileBrowser(QMenu):
         )
 
         self.setGeometry(start_rect)
-        self.container.setFixedSize(target_width, target_height)
+        self._container.setFixedSize(target_width, target_height)
         self.updateFileBrowser()
 
         self.animation = QPropertyAnimation(self, b'geometry')
@@ -195,12 +200,11 @@ class FileBrowser(QMenu):
         self.show()
 
     def createUI(self):
-        self.container = QWidget()
-        self.container.setLayout(QVBoxLayout())
+        self._container = QWidget()
+        self._container.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self._container.setLayout(QVBoxLayout())
 
-        action_container = QWidget()
-        action_container.setLayout(QHBoxLayout())
-        action_container.layout().setContentsMargins(0, 0, 0, 0)
+        self._title_bar = TitleBar(self, create=False)
 
         self._project_dir_label = QLabel('')
         open_project_btn = QPushButton(QIcon('resources/icons/ui/folder_icon.svg'), '', self)
@@ -212,18 +216,18 @@ class FileBrowser(QMenu):
         close_btn.setFixedSize(25, 25)
         close_btn.clicked.connect(self.animateClose)
 
-        action_container.layout().addWidget(self._project_dir_label)
-        action_container.layout().addStretch()
-        action_container.layout().addWidget(open_project_btn)
-        action_container.layout().addWidget(close_btn)
+        self._title_bar.layout().addWidget(self._project_dir_label)
+        self._title_bar.layout().addStretch()
+        self._title_bar.layout().addWidget(open_project_btn)
+        self._title_bar.layout().addWidget(close_btn)
 
         self._file_view = FileSystemViewer(self.tab_view, self, self)
 
-        self.container.layout().addWidget(action_container)
-        self.container.layout().addWidget(self._file_view)
+        self._container.layout().addWidget(self._title_bar)
+        self._container.layout().addWidget(self._file_view)
 
         action = QWidgetAction(self)
-        action.setDefaultWidget(self.container)
+        action.setDefaultWidget(self._container)
         self.addAction(action)
 
     def createWatcher(self):
@@ -255,13 +259,13 @@ class FileBrowser(QMenu):
                 tab.editor().setText(new_contents)
 
     def openProject(self):
-        ok = QMessageBox.warning(self.parent(),
-                                 'Open Project', 'Opening a project will clear '
+        message = MessageDialog('Open Project', 'Opening a project will clear '
                                                  'any unsaved changes, are you sure you want to do this?',
-                                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                                 )
+                                (MessageDialog.YesButton, MessageDialog.NoButton),
+                                self)
+        message.exec()
 
-        if ok == QMessageBox.StandardButton.Yes:
+        if message.result() == MessageDialog.Accepted:
             path = QFileDialog.getExistingDirectory(self.parent(), 'Open Project')
 
             if path:
