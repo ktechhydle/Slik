@@ -94,12 +94,16 @@ class TabView(QTabWidget):
         self.openTab('resources/default/start.md')
 
     def updateTab(self, old_name: str, new_name: str):
-        for tab in self._tabs:
-            current_name = tab.basename()
+        old_path = os.path.abspath(old_name)
+        new_path = os.path.abspath(new_name)
 
-            if current_name == old_name:
-                if new_name != old_name:
-                    tab.setFileName(new_name)
+        for i, tab in enumerate(self._tabs):
+            if tab.filename() == old_path:
+                if new_path != old_path:
+                    tab.setFileName(new_path)
+                    self._tabs[i] = tab
+
+                break
 
     def openProject(self, path: str):
         self._project_manager.openProject(path)
