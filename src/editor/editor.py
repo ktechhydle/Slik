@@ -30,7 +30,7 @@ class Editor(QsciScintilla):
         self._file_name = file_name
 
         self.cursorPositionChanged.connect(self.getAutoCompletions)
-        self.textChanged.connect(self.getAutoCompletions)
+        #self.textChanged.connect(self.getAutoCompletions)
 
         self.createLexer()
         self.createMargins()
@@ -148,6 +148,14 @@ class Editor(QsciScintilla):
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
 
+        # fix the braces being too small
+        font = QFont('JetBrains Mono', 14)
+        self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACELIGHT,
+                                  font.family().encode())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACELIGHT, font.pointSize())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
+
     def enter(self, event: QKeyEvent):
         # python style indents
         if self.filename().endswith('.py'):
@@ -172,6 +180,9 @@ class Editor(QsciScintilla):
             self.setIndentation(line + 1, indent)
             self.setCursorPosition(line + 1, indent)
             self.endUndoAction()
+
+        else:
+            super().keyPressEvent(event)
 
     def backspace(self):
         line, column = self.getCursorPosition()
