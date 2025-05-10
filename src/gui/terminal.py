@@ -1,7 +1,9 @@
 import os
 import subprocess
+from PyQt6.QtGui import QTextCursor
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit,
+    QTabWidget)
 
 
 class CommandRunner(QThread):
@@ -49,18 +51,24 @@ class OutputTextEdit(QPlainTextEdit):
         doc_height = self.document().size().height()
         margin = self.frameWidth() * 2 + self.contentsMargins().top() + self.contentsMargins().bottom()
         new_height = int(doc_height * self.fontMetrics().height() + margin)
+        line = self.fontMetrics().height() + margin
 
-        self.setFixedHeight(new_height)
+        self.setFixedHeight(new_height + line)
+
+    def scrollToTop(self):
+        self.moveCursor(QTextCursor.MoveOperation.Start)
+        self.ensureCursorVisible()
 
 
 class Terminal(QWidget):
-    def __init__(self, cwd: str, parent=None):
+    def __init__(self, cwd: str, tab_view: QTabWidget, parent=None):
         super().__init__(parent)
         self.setObjectName('terminal')
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._cwd = cwd
+        self.tab_view = tab_view
 
         self.createUI()
         self.newPrompt()
@@ -118,7 +126,8 @@ class Terminal(QWidget):
             return
 
         elif text.startswith('exit'):
-            # close the tab
+            self.tab_view.removeTab(self.tab_view.indexOf(self))
+            self.tab_view.newTerminal()
 
             return
 
@@ -131,6 +140,7 @@ class Terminal(QWidget):
 
         self._command_runner = CommandRunner(text, self)
         self._command_runner.outputReady.connect(lambda line: output_widget.appendPlainText(line))
+        self._command_runner.finished.connect(output_widget.scrollToTop)
         self._command_runner.finished.connect(self.newPrompt)
         self._command_runner.start()
 

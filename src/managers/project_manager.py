@@ -27,3 +27,6 @@ class ProjectManager:
 
     def fileBrowser(self) -> FileBrowser:
         return self._file_browser
+
+    def projectDir(self) -> str:
+        return self._file_browser.path()

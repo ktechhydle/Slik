@@ -6,7 +6,7 @@ from PyQt6.QtGui import QIcon, QFontDatabase
 from PyQt6.QtWidgets import QMainWindow, QSplitter, QApplication
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
-from src.gui.terminal import Terminal
+from src.gui.terminal_view import TerminalView
 
 
 class Slik(QMainWindow):
@@ -28,10 +28,11 @@ class Slik(QMainWindow):
         self.tab_view.defaultTab()
         self.tab_view.openTab('test.py', insert=True)
 
-        self.terminal = Terminal(os.path.abspath('./'), self)
+        self.terminal_view = TerminalView(self.tab_view.projectManager(), self)
+        self.terminal_view.newTerminal()
 
         splitter.addWidget(self.tab_view)
-        splitter.addWidget(self.terminal)
+        splitter.addWidget(self.terminal_view)
         self.setCentralWidget(splitter)
 
 
