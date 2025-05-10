@@ -40,55 +40,6 @@ class Editor(QsciScintilla):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.enter(event)
 
-        elif event.key() == Qt.Key.Key_Backspace:
-            self.backspace()
-
-            super().keyPressEvent(event)
-
-        elif event.key() in (Qt.Key.Key_BracketLeft,
-                             Qt.Key.Key_BraceLeft,
-                             Qt.Key.Key_ParenLeft,
-                             Qt.Key.Key_QuoteLeft,
-                             Qt.Key.Key_Apostrophe,
-                             Qt.Key.Key_QuoteDbl):
-            char = event.text()
-            wrap_pairs = {
-                '(': ')',
-                '{': '}',
-                '[': ']',
-                "'": "'",
-                '"': '"',
-                '`': '`',
-            }
-
-            if char in wrap_pairs:
-                closing_char = wrap_pairs[char]
-
-                if self.hasSelectedText():
-                    start_line, start_index, end_line, end_index = self.getSelection()
-                    selected_text = self.selectedText()
-
-                    self.beginUndoAction()
-                    self.removeSelectedText()
-                    self.setCursorPosition(start_line, start_index)
-                    self.insert(f"{char}{selected_text}{closing_char}")
-                    self.setCursorPosition(end_line, end_index + 1)
-                    self.setSelection(start_line, start_index + 1, end_line, end_index + 1)
-                    self.endUndoAction()
-
-                else:
-                    self.beginUndoAction()
-
-                    super().keyPressEvent(event)
-
-                    line, column = self.getCursorPosition()
-                    self.insert(closing_char)
-                    self.setCursorPosition(line, column)
-
-                    self.endUndoAction()
-
-                return
-
         else:
             super().keyPressEvent(event)
 
@@ -179,6 +130,28 @@ class Editor(QsciScintilla):
             self.insert('\n')
             self.setIndentation(line + 1, indent)
             self.setCursorPosition(line + 1, indent)
+            self.endUndoAction()
+
+        # bracket style indentation
+        elif self.filename().endswith(('.rs', '.css', '.qss', '.json')):
+            line, index = self.getCursorPosition()
+            current_line_text = self.text(line)[:index].rstrip()
+            indent = self.indentation(line)
+
+            self.beginUndoAction()
+
+            if current_line_text.endswith('{'):
+                self.insert('\n')
+                self.insert('\n')
+                self.setIndentation(line + 1, indent + self.tabWidth())
+                self.setIndentation(line + 2, indent)
+                self.setCursorPosition(line + 1, indent + self.tabWidth())
+
+            else:
+                self.insert('\n')
+                self.setIndentation(line + 1, indent)
+                self.setCursorPosition(line + 1, indent)
+
             self.endUndoAction()
 
         else:
