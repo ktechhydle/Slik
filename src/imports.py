@@ -9,5 +9,4 @@ import sys
 import shutil
 import subprocess
 import markdown
-import re
 import slik

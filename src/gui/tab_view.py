@@ -1,6 +1,6 @@
-from src.imports import *
+from src.imports import QTabWidget, QAction, QKeySequence, os
 from src.gui.tab import Tab
-from src.gui.file_browser import FileBrowser
+from src.managers.project_manager import ProjectManager
 
 
 class TabView(QTabWidget):
@@ -14,7 +14,7 @@ class TabView(QTabWidget):
 
         self.tabCloseRequested.connect(self.closeTab)
 
-        self.createUI()
+        self.createManagers()
         self.createActions()
 
     def clear(self):
@@ -23,8 +23,8 @@ class TabView(QTabWidget):
         self._tabs.clear()
         self.defaultTab()
 
-    def createUI(self):
-        self.file_browser = FileBrowser('', self, self)
+    def createManagers(self):
+        self._project_manager = ProjectManager(self)
 
     def createActions(self):
         save_action = QAction('Save', self)
@@ -37,7 +37,7 @@ class TabView(QTabWidget):
 
         file_browser_action = QAction('File Browser', self)
         file_browser_action.setShortcut(QKeySequence('Ctrl+Q'))
-        file_browser_action.triggered.connect(self.showFileBrowser)
+        file_browser_action.triggered.connect(self._project_manager.showFileBrowser)
 
         self.addAction(save_action)
         self.addAction(toggle_collapse_action)
@@ -101,12 +101,12 @@ class TabView(QTabWidget):
                 if new_name != old_name:
                     tab.setFileName(new_name)
 
-    def showFileBrowser(self):
-        self.file_browser.exec()
-
     def openProject(self, path: str):
-        self.file_browser.setPath(path)
+        self._project_manager.openProject(path)
         self.clear()
 
     def tabs(self) -> list[str]:
         return self._tabs
+
+    def projectManager(self) -> ProjectManager:
+        return self._project_manager

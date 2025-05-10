@@ -148,6 +148,9 @@ class FileSystemViewer(QTreeView):
 
 
 class FileBrowser(QMenu):
+    projectDirChanged = pyqtSignal(str)
+    projectChanged = pyqtSignal()
+
     def __init__(self, path: str, tab_view: QTabWidget, parent=None):
         super().__init__(parent)
         self.setWindowFlag(Qt.WindowType.CoverWindow)
@@ -232,10 +235,10 @@ class FileBrowser(QMenu):
 
     def createWatcher(self):
         self._watcher = FileSystemWatcher(self)
+        self._watcher.directoryChanged.connect(self.projectChanged.emit)
         self._watcher.directoryChanged.connect(self.updateFileBrowser)
-        self._watcher.directoryChanged.connect(self.updateTab)
+        self._watcher.fileChanged.connect(self.projectChanged.emit)
         self._watcher.fileChanged.connect(self.updateFileBrowser)
-        self._watcher.fileChanged.connect(self.updateTab)
 
     def updateFileBrowser(self):
         if os.path.exists(self._path):
@@ -250,13 +253,6 @@ class FileBrowser(QMenu):
             self._file_view.hideColumn(3)
 
             self._watcher.changePath(os.path.abspath(self._path))
-
-    def updateTab(self):
-        for tab in self.tab_view.tabs():
-            new_contents = slik.read(tab.filename())
-
-            if tab.editor().text() != new_contents:
-                tab.editor().setText(new_contents)
 
     def openProject(self):
         message = MessageDialog('Open Project', 'Opening a project will clear '
@@ -276,6 +272,7 @@ class FileBrowser(QMenu):
         self._path = path
         self._project_dir_label.setText(f'Project Dir: {self._path}')
 
+        self.projectDirChanged.emit(self._path)
         self.updateFileBrowser()
 
     def path(self) -> str:
