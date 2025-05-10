@@ -135,14 +135,13 @@ class FileSystemViewer(QTreeView):
         if not paths:
             return
 
-        confirm = QMessageBox.warning(
-            self.tab_view,
-            'Remove',
-            f'Are you sure you want to delete the {len(paths)} selected item(s)?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
+        message = MessageDialog('Remove',
+                                f'Are you sure you want to delete the {len(paths)} selected items?',
+                                (MessageDialog.YesButton, MessageDialog.NoButton),
+                                self.tab_view)
+        message.exec()
 
-        if confirm == QMessageBox.StandardButton.Yes:
+        if message.result() == MessageDialog.Accepted:
             for path in paths:
                 try:
                     if os.path.isfile(path):
