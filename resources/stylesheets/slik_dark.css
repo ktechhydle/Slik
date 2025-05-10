@@ -489,7 +489,8 @@ QToolTip {
 }
 
 #terminal QWidget {
-    background-color: transparent;
+    background-color: #2a2a2a;
+    border: none;
 }
 
 #terminal QLabel {
@@ -506,10 +507,10 @@ QToolTip {
 }
 
 #terminal QPlainTextEdit {
-    background-color: #2d2d2d;
+    background-color: #383838;
     font-family: 'JetBrains Mono';
     font-size: 16px;
-    border: 2px solid #383838;
+    border: 2px solid #707070;
     color: #ffffff;
 }
 
