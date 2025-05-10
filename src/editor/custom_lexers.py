@@ -129,10 +129,11 @@ class PythonLexer(BaseLexer):
 
         highlights = []
         self.buildHighlights(tree.root_node, highlights)
+        highlights.sort(key=lambda h: h[0]) # sort by start byte
 
         for start_byte, end_byte, style in highlights:
-            print(f'Start byte: {start_byte}, End byte: {end_byte}, Style: {style}')
-            self.setStyling(end_byte + start_byte, style)
+            print(f'Start byte: {start_byte}, Line length: {end_byte}, Style: {style}')
+            self.setStyling(end_byte, style)
 
         self.applyFolding(start, end)
 
@@ -150,9 +151,20 @@ class PythonLexer(BaseLexer):
                 # builtins
                 style = PythonLexer.TYPES
 
-            elif child.type in ('function_definition', 'class_definition', 'if_statement'):
-                # keywords
+            elif child.type == 'function_definition':
+                style = PythonLexer.FUNCTION_DEF
+
+            elif child.type == 'class_definition':
+                style = PythonLexer.CLASS_DEF
+
+            elif child.type == 'keyword':
                 style = PythonLexer.KEYWORD
+
+            elif child.type == 'integer':
+                style = PythonLexer.CONSTANTS
+
+            elif child.text in ('(', ')', '{', '}', '[', ']'):
+                style = PythonLexer.BRACKETS
 
             else:
                 style = PythonLexer.DEFAULT
