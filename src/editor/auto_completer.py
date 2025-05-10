@@ -9,22 +9,15 @@ class AutoCompleter(QThread):
         self._api = api
 
         self.line = 0
-        self.index = 0
+        self.column = 0
         self.text = ''
 
     def run(self):
         try:
-            if self._file_name.endswith('.py'):
-                self.loadAutoCompletions([])
-
-            if self._file_name.endswith('.rs'):
-                self.loadAutoCompletions([])
-
-            else:
-                self.loadAutoCompletions([])
+            self.loadAutoCompletions(slik.get_completions(self._file_name, self.text, self.line, self.column))
 
         except Exception as e:
-            print(e)
+            raise e
 
         self.finished.emit()
 
@@ -36,9 +29,9 @@ class AutoCompleter(QThread):
 
         self._api.prepare()
 
-    def getCompletion(self, line: int, index: int, text: str):
+    def getCompletion(self, line: int, column: int, text: str):
         self.line = line
-        self.index = index
+        self.column = column
         self.text = text.replace('\t', '    ')
         self.start()
 
