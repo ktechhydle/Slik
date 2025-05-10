@@ -119,43 +119,48 @@ class PythonLexer(BaseLexer):
         self.setColor(QColor('#d19a66'), PythonLexer.CONSTANTS)
         self.setColor(QColor('#98c379'), PythonLexer.STRING)
 
-        # fix the braces being too small
-        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACELIGHT, font.family().encode())
-        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACELIGHT, font.pointSize())
-        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
-        self.editor.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
-
     def styleText(self, start, end):
         self.startStyling(start)
 
-        # get text
         raw_bytes = self.editor.bytes(start, end)
         text = raw_bytes.data().decode('utf-8').replace('\0', '')
-        tree = self.parser.parse(bytes(text, 'utf8'))
-
+        tree = self.parser.parse(bytes(text, 'utf-8'))
         print(tree.root_node)
-        self.walk(tree.root_node, start)
+
+        highlights = []
+        self.buildHighlights(tree.root_node, highlights)
+
+        for start_byte, end_byte, style in highlights:
+            print(f'Start byte: {start_byte}, End byte: {end_byte}, Style: {style}')
+            self.setStyling(end_byte + start_byte, style)
 
         self.applyFolding(start, end)
 
-    def walk(self, node: Node, current_style_pos: int):
+    def buildHighlights(self, node: Node, highlights: list):
         for child in node.children:
-            child_start = child.start_byte
-            child_end = child.end_byte
-            length = child_start - child_end
+            style = None
 
             if child.type == 'comment':
-                self.setStyling(length, PythonLexer.COMMENTS)
-                
-            elif child.type == 'string':
-                self.setStyling(length, PythonLexer.STRING)
-                
-            else:
-                self.setStyling(length, PythonLexer.DEFAULT)
-                
-            current_style_pos = self.walk(child, current_style_pos + length)
+                style = PythonLexer.COMMENTS
 
-        return current_style_pos
+            elif child.type == 'string':
+                style = PythonLexer.STRING
+
+            elif child.type == 'call':
+                # builtins
+                style = PythonLexer.TYPES
+
+            elif child.type in ('function_definition', 'class_definition', 'if_statement'):
+                # keywords
+                style = PythonLexer.KEYWORD
+
+            else:
+                style = PythonLexer.DEFAULT
+
+            if style:
+                highlights.append((child.start_byte, child.end_byte, style))
+
+            self.buildHighlights(child, highlights)
 
     def applyFolding(self, start, end):
         start_line = self.editor.SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
