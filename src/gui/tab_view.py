@@ -1,6 +1,8 @@
-from src.imports import QTabWidget, QAction, QKeySequence, os
-from src.gui.tab import Tab
+import os
+from PyQt6.QtGui import QAction, QKeySequence
+from PyQt6.QtWidgets import QTabWidget
 from src.managers.project_manager import ProjectManager
+from src.gui.tab import Tab
 
 
 class TabView(QTabWidget):

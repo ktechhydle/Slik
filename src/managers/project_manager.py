@@ -1,4 +1,4 @@
-from src.imports import slik
+import slik
 from src.gui.file_browser import FileBrowser
 
 

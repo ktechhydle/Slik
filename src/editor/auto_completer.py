@@ -1,4 +1,6 @@
-from src.imports import *
+import slik
+from PyQt6.Qsci import QsciAPIs
+from PyQt6.QtCore import QThread
 
 
 class AutoCompleter(QThread):

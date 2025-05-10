@@ -1,14 +1,7 @@
-from src.imports import (Qt,
-                         QWidget, 
-                         QVBoxLayout, 
-                         QHBoxLayout,
-                         QPlainTextEdit,
-                         QLineEdit,
-                         QLabel,
-                         QScrollArea,
-                         os,
-                         subprocess
-                         )
+import os
+import subprocess
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit
 
 
 class Terminal(QWidget):

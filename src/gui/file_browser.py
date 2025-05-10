@@ -1,28 +1,9 @@
-from src.imports import (Qt,
-                         QIcon,
-                         QPixmap,
-                         QMenu,
-                         QAction,
-                         QWidgetAction,
-                         QRect,
-                         QFileDialog,
-                         QInputDialog,
-                         QTabWidget,
-                         QWidget,
-                         QVBoxLayout,
-                         QHBoxLayout,
-                         QLabel,
-                         QPushButton,
-                         QDir,
-                         QModelIndex,
-                         QTreeView,
-                         QFileSystemWatcher,
-                         QFileSystemModel,
-                         QPropertyAnimation,
-                         QEasingCurve,
-                         pyqtSignal,
-                         os,
-                         shutil)
+import os
+import shutil
+from PyQt6.QtCore import Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, QDir
+from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction
+from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
+    QPushButton, QWidgetAction, QFileDialog)
 from src.gui.message_dialog import MessageDialog
 
 

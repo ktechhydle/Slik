@@ -1,4 +1,6 @@
-from src.imports import *
+import markdown
+from PyQt6.QtCore import Qt
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 
 class MarkdownViewer(QWebEngineView):

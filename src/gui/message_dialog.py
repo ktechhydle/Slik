@@ -1,22 +1,5 @@
-from PyQt6.QtWidgets import QHBoxLayout, QPushButton
-
-from src.imports import (Qt,
-                         QApplication,
-                         QMenu,
-                         QWidget,
-                         QWidgetAction,
-                         QVBoxLayout,
-                         QLabel,
-                         QRect,
-                         QRectF,
-                         QRegion,
-                         QPainterPath,
-                         QTransform,
-                         QSize,
-                         QPropertyAnimation,
-                         QEasingCurve,
-                         QDialogButtonBox,
-                         )
+from PyQt6.QtCore import Qt, QSize, QRect, QPropertyAnimation, QEasingCurve
+from PyQt6.QtWidgets import QHBoxLayout, QPushButton, QMenu, QApplication, QVBoxLayout, QWidget, QLabel, QWidgetAction
 from src.gui.title_bar import TitleBar
 
 

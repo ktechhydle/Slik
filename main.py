@@ -1,19 +1,12 @@
-from PyQt6.QtWidgets import QSplitter
-
-from src.imports import (Qt,
-                         QApplication,
-                         QMainWindow,
-                         QIcon,
-                         QWidget,
-                         QVBoxLayout,
-                         QFontDatabase,
-                         os,
-                         sys,
-                         slik,
-                         )
+import os
+import sys
+import slik
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QFontDatabase
+from PyQt6.QtWidgets import QMainWindow, QSplitter, QApplication
+from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
 from src.gui.terminal import Terminal
-from src.gui.message_dialog import MessageDialog
 
 
 class Slik(QMainWindow):

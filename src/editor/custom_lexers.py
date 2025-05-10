@@ -1,10 +1,7 @@
-from src.imports import *
-from tree_sitter import Parser, Node, Language
 import tree_sitter_python as PYTHON
-import tree_sitter_rust as RUST
-import types
-import keyword
-import builtins
+from tree_sitter import Parser, Node, Language
+from PyQt6.Qsci import QsciLexerCustom, QsciScintilla
+from PyQt6.QtGui import QColor, QFont
 
 
 class BaseLexer(QsciLexerCustom):

@@ -1,4 +1,7 @@
-from src.imports import *
+import slik
+import os
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QSplitter, QVBoxLayout
 from src.editor.editor import Editor
 from src.editor.markdown_viewer import MarkdownViewer
 

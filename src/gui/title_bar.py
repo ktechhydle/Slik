@@ -1,10 +1,6 @@
-from src.imports import (Qt,
-                         QWidget,
-                         QLabel,
-                         QPushButton,
-                         QIcon,
-                         QHBoxLayout,
-                         )
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton
 
 
 class TitleBar(QWidget):
