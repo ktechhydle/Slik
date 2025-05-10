@@ -1,5 +1,4 @@
 from src.imports import *
-from mp_software_stylesheets.styles import SLIKCSS
 from src.gui.tab import Tab
 from src.gui.tab_view import TabView
 
@@ -8,7 +7,7 @@ class Slik(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Slik')
-        self.setWindowIcon(QIcon('resources/icons/slik_icon.svg'))
+        self.setWindowIcon(QIcon('resources/icons/logos/slik_icon.svg'))
         self.resize(1000, 800)
 
         self.createUI()
@@ -29,7 +28,7 @@ class Slik(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyleSheet(SLIKCSS)
+    app.setStyleSheet(slik.read_file('resources/stylesheets/slik_dark.css'))
 
     QFontDatabase.addApplicationFont('resources/fonts/JetBrainsMono-Regular.ttf')
 
