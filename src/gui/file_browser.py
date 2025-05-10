@@ -9,17 +9,25 @@ class FileSystemModel(QFileSystemModel):
         if role == Qt.ItemDataRole.DecorationRole and index.column() == 0:
             file_path = self.filePath(index)
 
+            def make_icon(path):
+                pixmap = QPixmap(path)
+                icon = QIcon()
+                icon.addPixmap(pixmap, QIcon.Mode.Normal)
+                icon.addPixmap(pixmap, QIcon.Mode.Selected)
+
+                return icon
+
             if file_path.endswith('.py'):
-                return QIcon('resources/icons/logos/python_icon.svg')
+                return make_icon('resources/icons/logos/python_icon.svg')
 
             elif file_path.endswith('.rs'):
-                return QIcon('resources/icons/logos/rust_icon.svg')
+                return make_icon('resources/icons/logos/rust_icon.svg')
 
             elif os.path.isdir(file_path):
-                return QIcon('resources/icons/ui/folder_icon.svg')
+                return make_icon('resources/icons/ui/folder_icon.svg')
 
             else:
-                return QIcon('resources/icons/ui/txt_icon.svg')
+                return make_icon('resources/icons/ui/txt_icon.svg')
 
         return super().data(index, role)
 
