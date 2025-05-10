@@ -5,7 +5,7 @@ class TitleBar(QWidget):
     def __init__(self, parent, create=True):
         super().__init__(parent)
         self.setLayout(QHBoxLayout())
-        self.layout().setContentsMargins(0, 0, 5, 0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
         if create:
             self.createUI()

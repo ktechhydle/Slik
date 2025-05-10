@@ -32,7 +32,6 @@ class MessageDialog(QMenu):
         super().__init__(parent)
         self.setWindowFlag(Qt.WindowType.CoverWindow)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setObjectName('popup')
 
         self._title = title
@@ -70,7 +69,7 @@ class MessageDialog(QMenu):
         )
 
         self.setGeometry(start_rect)
-        self._container.setFixedSize(target_width, target_height)
+        self._container.setFixedSize(target_width - 5, target_height - 5) # we need to add a small padding
 
         self.animation = QPropertyAnimation(self, b'geometry')
         self.animation.setDuration(250)
@@ -102,7 +101,7 @@ class MessageDialog(QMenu):
     def createButtons(self):
         button_box = QWidget()
         button_box.setLayout(QHBoxLayout())
-        button_box.layout().setContentsMargins(0, 0, 5, 0)
+        button_box.layout().setContentsMargins(0, 0, 0, 0)
         button_box.layout().addStretch()
 
         for name, value in self._standard_btns:

@@ -197,7 +197,7 @@ class FileBrowser(QMenu):
         )
 
         self.setGeometry(start_rect)
-        self._container.setFixedSize(target_width, target_height)
+        self._container.setFixedSize(target_width - 5, target_height - 5)
         self.updateFileBrowser()
 
         self.animation = QPropertyAnimation(self, b'geometry')
