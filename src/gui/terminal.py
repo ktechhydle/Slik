@@ -6,7 +6,7 @@ from src.imports import (Qt,
                          QLineEdit,
                          QLabel,
                          QScrollArea,
-                         QProcess,
+                         os,
                          subprocess
                          )
 
@@ -38,7 +38,7 @@ class Terminal(QWidget):
         command_line.setLayout(QHBoxLayout())
         command_line.layout().setContentsMargins(0, 0, 0, 0)
 
-        label = QLabel('>', self)
+        label = QLabel(f'{os.getcwd()}>', self)
         prompt_input = QLineEdit(self)
         prompt_input.returnPressed.connect(lambda: self.run(prompt_input))
 
@@ -55,15 +55,35 @@ class Terminal(QWidget):
 
         if text.rstrip() == '':
             self.newPrompt()
+
+            return
+
+        output = ''
+
+        # change the working dir
+        if text.startswith('cd'):
+            try:
+                path = text[3:].strip()
+                os.chdir(os.path.abspath(path))
+                output = f'changed working dir to {path}'
+
+            except Exception as e:
+                output = str(e)
+
+        # clear the terminal
+        elif text.startswith(('clear', 'cls')):
+            self.clear()
+
             return
 
         # execute the shell command
-        try:
-            result = subprocess.run(text, shell=True, capture_output=True, text=True)
-            output = result.stdout + result.stderr
+        else:
+            try:
+                result = subprocess.run(text, shell=True, capture_output=True, text=True)
+                output = result.stdout + result.stderr
 
-        except Exception as e:
-            output = str(e)
+            except Exception as e:
+                output = str(e)
 
         output_widget = QPlainTextEdit(self)
         output_widget.setPlainText(output)
@@ -72,5 +92,19 @@ class Terminal(QWidget):
         output_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self._container.layout().insertWidget(self._container.layout().count() - 1, output_widget)
+
+        self.newPrompt()
+
+    def clear(self):
+        layout = self._container.layout()
+        count = layout.count()
+
+        # skip the last item (stretch)
+        for i in reversed(range(count - 1)):
+            item = layout.takeAt(i)
+            widget = item.widget()
+
+            if widget is not None:
+                widget.deleteLater()
 
         self.newPrompt()
