@@ -13,8 +13,16 @@ class CommandRunner(QThread):
 
     def run(self):
         try:
-            process = subprocess.Popen(self._command, shell=True, stdout=subprocess.PIPE,
-                                       stderr=subprocess.STDOUT, text=True, bufsize=1)
+            process = subprocess.Popen(
+                self._command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                bufsize=1
+            )
 
             for line in iter(process.stdout.readline, ''):
                 if line:
@@ -25,6 +33,22 @@ class CommandRunner(QThread):
 
         except Exception as e:
             self.outputReady.emit(str(e))
+
+
+class OutputTextEdit(QPlainTextEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setReadOnly(True)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.textChanged.connect(self.updateSize)
+
+    def updateSize(self):
+        doc_height = self.document().size().height()
+        margin = self.frameWidth() * 2 + self.contentsMargins().top() + self.contentsMargins().bottom()
+        new_height = int(doc_height * self.fontMetrics().height() + margin)
+
+        self.setFixedHeight(new_height)
 
 
 class Terminal(QWidget):
@@ -74,10 +98,7 @@ class Terminal(QWidget):
 
             return
 
-        output_widget = QPlainTextEdit(self)
-        output_widget.setReadOnly(True)
-        output_widget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        output_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        output_widget = OutputTextEdit(self)
 
         self._container.layout().insertWidget(self._container.layout().count() - 1, output_widget)
 
