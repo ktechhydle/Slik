@@ -73,10 +73,6 @@ class Editor(QsciScintilla):
 
         self.setFolding(QsciScintilla.FoldStyle.PlainFoldStyle, 1)
         self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
-        self.setMarkerForegroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDEROPEN)
-        self.setMarkerBackgroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDEROPEN)
-        self.setMarkerForegroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDER)
-        self.setMarkerBackgroundColor(QColor('#454545'), QsciScintilla.SC_MARKNUM_FOLDER)
 
         down_triangle = QPixmap('resources/icons/ui/triangle_down_icon.svg').scaled(18, 18)
         right_triangle = QPixmap('resources/icons/ui/triangle_right_icon.svg').scaled(18, 18)
@@ -101,6 +97,9 @@ class Editor(QsciScintilla):
         self.setMatchedBraceForegroundColor(QColor('#ffffff'))
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
+        self.setCallTipsBackgroundColor(QColor('#ffffff'))
+        self.setCallTipsForegroundColor(QColor('#000000'))
+        self.setCallTipsHighlightColor(QColor('#383838'))
 
         # fix the braces being too small
         font = QFont('JetBrains Mono', 14)
