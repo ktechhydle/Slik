@@ -1,7 +1,30 @@
 import os
 import subprocess
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit
+
+
+class CommandRunner(QThread):
+    outputReady = pyqtSignal(str)
+
+    def __init__(self, command):
+        super().__init__()
+        self._command = command
+
+    def run(self):
+        try:
+            process = subprocess.Popen(self._command, shell=True, stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT, text=True, bufsize=1)
+
+            for line in iter(process.stdout.readline, ''):
+                if line:
+                    self.outputReady.emit(line.rstrip())
+
+            process.stdout.close()
+            process.wait()
+
+        except Exception as e:
+            self.outputReady.emit(str(e))
 
 
 class Terminal(QWidget):
@@ -51,42 +74,36 @@ class Terminal(QWidget):
 
             return
 
-        output = ''
-
-        # change the working dir
-        if text.startswith('cd'):
-            try:
-                path = text[3:].strip()
-                os.chdir(os.path.abspath(path))
-                output = f'changed working dir to {path}'
-
-            except Exception as e:
-                output = str(e)
-
-        # clear the terminal
-        elif text.startswith(('clear', 'cls')):
-            self.clear()
-
-            return
-
-        # execute the shell command
-        else:
-            try:
-                result = subprocess.run(text, shell=True, capture_output=True, text=True)
-                output = result.stdout + result.stderr
-
-            except Exception as e:
-                output = str(e)
-
         output_widget = QPlainTextEdit(self)
-        output_widget.setPlainText(output)
         output_widget.setReadOnly(True)
         output_widget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         output_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self._container.layout().insertWidget(self._container.layout().count() - 1, output_widget)
 
-        self.newPrompt()
+        # builtin commands
+        if text.startswith('cd'):
+            try:
+                path = text[3:].strip()
+                os.chdir(os.path.abspath(path))
+                output_widget.setPlainText(f'changed working dir to {path}')
+
+            except Exception as e:
+                output_widget.setPlainText(str(e))
+
+            self.newPrompt()
+
+            return
+
+        elif text.startswith(('clear', 'cls')):
+            self.clear()
+
+            return
+
+        self._command_runner = CommandRunner(text)
+        self._command_runner.outputReady.connect(lambda line: output_widget.appendPlainText(line))
+        self._command_runner.finished.connect(self.newPrompt)
+        self._command_runner.start()
 
     def clear(self):
         layout = self._container.layout()
