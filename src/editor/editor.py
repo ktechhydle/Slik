@@ -182,9 +182,10 @@ class Editor(QsciScintilla):
 
                 return
 
-    def getAutoCompletions(self, line: int, index: int):
+    def getAutoCompletions(self):
         if not self.selectedText():
-            self.auto_completer.getCompletion(line + 1, index, self.text())
+            line, column = self.getCursorPosition()
+            self.auto_completer.getCompletion(line + 1, column, self.text())
             self.autoCompleteFromAPIs()
 
     def loadAutoCompletions(self):
@@ -192,7 +193,11 @@ class Editor(QsciScintilla):
 
     def textModified(self):
         if self._lexer:
-            self._lexer.startStyling(0, self.length())
+            line, column = self.getCursorPosition()
+            start = self.positionFromLineIndex(line, 0)
+            end = self.positionFromLineIndex(line, column)
+
+            self._lexer.startStyling(start, end)
 
     def setFileName(self, file_name: str):
         self._file_name = file_name

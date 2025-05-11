@@ -249,6 +249,34 @@ class PythonLexer(BaseLexer):
 
                     continue
 
+            elif tok == "'" or tok == '"':
+                self.setStyling(tok_len, PythonLexer.STRING)
+                string_flag = True
+
+                continue
+
+            elif tok == '#':
+                comment_text = tok
+                comment_len = tok_len
+
+                while True:
+                    peek = self.peekToken()
+
+                    if peek is None or '\n' in peek[0]:
+                        break
+
+                    next_tok = self.nextToken()
+
+                    if next_tok is None:
+                        break
+
+                    comment_text += next_tok[0]
+                    comment_len += next_tok[1]
+
+                self.setStyling(comment_len, PythonLexer.COMMENTS)
+
+                continue
+
             elif tok.strip() == '@' and self.peekToken()[0].isidentifier():
                 self.setStyling(tok_len, PythonLexer.DECORATOR)
 
@@ -281,11 +309,6 @@ class PythonLexer(BaseLexer):
 
                 continue
 
-            elif tok in self.keywordList():
-                self.setStyling(tok_len, PythonLexer.KEYWORD)
-
-                continue
-
             elif tok.strip() == '.' and self.peekToken()[0].isidentifier():
                 self.setStyling(tok_len, PythonLexer.DEFAULT)
 
@@ -311,31 +334,8 @@ class PythonLexer(BaseLexer):
 
                 continue
 
-            elif tok == "'" or tok == '"':
-                self.setStyling(tok_len, PythonLexer.STRING)
-                string_flag = True
-
-                continue
-
-            elif tok == '#':
-                comment_text = tok
-                comment_len = tok_len
-
-                while True:
-                    peek = self.peekToken()
-
-                    if peek is None or '\n' in peek[0]:
-                        break
-
-                    next_tok = self.nextToken()
-
-                    if next_tok is None:
-                        break
-
-                    comment_text += next_tok[0]
-                    comment_len += next_tok[1]
-
-                self.setStyling(comment_len, PythonLexer.COMMENTS)
+            elif tok in self.keywordList():
+                self.setStyling(tok_len, PythonLexer.KEYWORD)
 
                 continue
 
