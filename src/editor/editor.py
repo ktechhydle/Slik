@@ -94,7 +94,7 @@ class Editor(QsciScintilla):
         self.setMatchedBraceForegroundColor(QColor('#ffffff'))
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
-        self.setCallTipsBackgroundColor(QColor('#1e1e1e00'))
+        self.setCallTipsBackgroundColor(QColor('#1e1e1e'))
         self.setCallTipsForegroundColor(QColor('#61afef'))
         self.setCallTipsHighlightColor(QColor('#abb2bf'))
         self.setEdgeColor(QColor('#383838'))
