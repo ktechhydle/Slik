@@ -17,7 +17,6 @@ class TerminalView(QTabWidget):
 
         self.tabCloseRequested.connect(self.closeTerminal)
 
-        self.createActions()
         self.createUI()
 
     def clear(self):
@@ -33,19 +32,14 @@ class TerminalView(QTabWidget):
 
         self.setCornerWidget(new_terminal_btn)
 
-    def createActions(self):
-        new_terminal_action = QAction('New Terminal', self)
-        new_terminal_action.setShortcut(QKeySequence('Ctrl+N'))
-
-        self.addAction(new_terminal_action)
-
     def newTerminal(self):
         self.openTerminal(self._project_manager.projectDir())
 
     def openTerminal(self, cwd: str):
         terminal = Terminal(cwd, self)
 
-        self.addTab(terminal, 'Local')
+        self.insertTab(self.currentIndex() + 1, terminal, 'Local')
+        self.setCurrentIndex(self.indexOf(terminal))
 
     def closeTerminal(self, index: int):
         if self.count() == 1:

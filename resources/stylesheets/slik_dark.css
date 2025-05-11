@@ -366,6 +366,10 @@ QTabBar::close-button:hover {
     background-color: #c94e4e;
 }
 
+QTabBar::scroller {
+    width: 0px;
+}
+
 QTableWidget {
     background-color: #ffffff;
     color: #000000;
