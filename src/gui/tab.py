@@ -42,8 +42,14 @@ class Tab(QWidget):
 
         if self.basename().endswith(('.md', '.html', '.svg')):
             viewer = HtmlViewer(self)
-            viewer.setMarkdown(self._editor.text())
-            self._editor.textChanged.connect(lambda: viewer.setMarkdown(self._editor.text()))
+
+            if self.basename().endswith(('.md', '.svg')):
+                viewer.setMarkdown(self._editor.text())
+                self._editor.textChanged.connect(lambda: viewer.setMarkdown(self._editor.text()))
+
+            else:
+                viewer.setHtml(self._editor.text())
+                self._editor.textChanged.connect(lambda: viewer.setHtml(self._editor.text()))
 
             self._splitter.addWidget(viewer)
 
