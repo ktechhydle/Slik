@@ -32,21 +32,20 @@ class Tab(QWidget):
         self.layout().addWidget(self._splitter)
 
     def updateUI(self):
+        # remove the html viewer (if existent)
+        for i in range(self._splitter.count()):
+            widget = self._splitter.widget(i)
+
+            if isinstance(widget, HtmlViewer):
+                widget.close()
+                del widget
+
         if self.basename().endswith(('.md', '.html', '.svg')):
             viewer = HtmlViewer(self)
             viewer.setMarkdown(self._editor.text())
             self._editor.textChanged.connect(lambda: viewer.setMarkdown(self._editor.text()))
 
             self._splitter.addWidget(viewer)
-
-        else:
-            # remove the markdown viewer (if existent)
-            for i in range(self._splitter.count()):
-                widget = self._splitter.widget(i)
-
-                if isinstance(widget, HtmlViewer):
-                    widget.close()
-                    del widget
 
         self._editor.setFileName(self._file_name)
 
