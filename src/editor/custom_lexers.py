@@ -247,11 +247,6 @@ class PythonLexer(BaseLexer):
                     continue
 
             elif tok in self.keywordList():
-                if tok == 'self':
-                    self.setStyling(tok_len, PythonLexer.CLASS_DEF)
-
-                    continue
-
                 self.setStyling(tok_len, PythonLexer.KEYWORD)
 
                 continue
