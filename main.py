@@ -20,7 +20,7 @@ class Slik(QMainWindow):
 
     def createUI(self):
         splitter = QSplitter()
-        splitter.setHandleWidth(3)
+        splitter.setHandleWidth(2)
         splitter.setOrientation(Qt.Orientation.Vertical)
 
         self.tab_view = TabView()

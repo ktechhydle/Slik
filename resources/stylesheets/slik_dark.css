@@ -330,7 +330,7 @@ QTabWidget::pane {
 
 QTabBar {
     background-color: transparent;
-    border: none;
+    border-bottom: 2px solid #2a2a2a;
     qproperty-drawBase: 0;
 }
 
@@ -342,13 +342,12 @@ QTabBar::tab {
     font-size: 14px;
 }
 
-QTabBar::tab:hover {
-    background-color: #222222;
+QTabBar::tab:selected {
+    background-color: #2a2a2a;
     color: white;
 }
 
-QTabBar::tab:selected {
-    background-color: #2a2a2a;
+QTabBar::tab:!selected:hover {
     color: white;
 }
 

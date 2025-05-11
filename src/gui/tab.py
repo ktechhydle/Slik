@@ -20,7 +20,7 @@ class Tab(QWidget):
 
     def createUI(self):
         self.container = QSplitter(self)
-        self.container.setHandleWidth(3)
+        self.container.setHandleWidth(2)
         self.container.setOrientation(Qt.Orientation.Horizontal)
 
         self._editor = Editor(self._file_name, self)

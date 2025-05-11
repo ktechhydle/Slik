@@ -1,6 +1,6 @@
 import os
 from PyQt6.QtGui import QAction, QKeySequence, QIcon
-from PyQt6.QtWidgets import QTabWidget, QToolButton
+from PyQt6.QtWidgets import QTabWidget, QToolButton, QPushButton
 from src.gui.terminal import Terminal
 from src.gui.message_dialog import MessageDialog
 from src.managers.project_manager import ProjectManager
@@ -15,22 +15,13 @@ class TerminalView(QTabWidget):
 
         self._project_manager = project_manager
 
+        self.tabBar().tabBarDoubleClicked.connect(self.newTerminal)
         self.tabCloseRequested.connect(self.closeTerminal)
-
-        self.createUI()
 
     def clear(self):
         super().clear()
 
         self.newTerminal()
-
-    def createUI(self):
-        new_terminal_btn = QToolButton()
-        new_terminal_btn.setObjectName('actionButton')
-        new_terminal_btn.setIcon(QIcon('resources/icons/ui/plus_icon.svg'))
-        new_terminal_btn.clicked.connect(self.newTerminal)
-
-        self.setCornerWidget(new_terminal_btn)
 
     def newTerminal(self):
         self.openTerminal(self._project_manager.projectDir())
