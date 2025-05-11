@@ -11,12 +11,14 @@ class CommandRunner(QThread):
 
     def __init__(self, command, terminal):
         super().__init__()
+
         self._command = command
         self._terminal = terminal
+        self._process = None
 
     def run(self):
         try:
-            process = subprocess.Popen(
+            self._process = subprocess.Popen(
                 self._command,
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -28,15 +30,21 @@ class CommandRunner(QThread):
                 cwd=self._terminal.cwd(),
             )
 
-            for line in iter(process.stdout.readline, ''):
+            for line in iter(self._process.stdout.readline, ''):
                 if line:
                     self.outputReady.emit(line.rstrip())
 
-            process.stdout.close()
-            process.wait()
+            self._process.stdout.close()
+            self._process.wait()
 
         except Exception as e:
             self.outputReady.emit(str(e))
+
+    def quit(self):
+        if self._process:
+            self._process.kill()
+
+        super().quit()
 
 
 class OutputTextEdit(QPlainTextEdit):
@@ -144,6 +152,10 @@ class Terminal(QWidget):
         self._command_runner.finished.connect(self.newPrompt)
         self._command_runner.start()
 
+    def quit(self):
+        if self.hasCurrentProcess():
+            self._command_runner.quit()
+
     def clear(self):
         layout = self._container.layout()
         count = layout.count()
@@ -163,3 +175,6 @@ class Terminal(QWidget):
 
     def cwd(self) -> str:
         return self._cwd
+
+    def hasCurrentProcess(self) -> bool:
+        return hasattr(self, '_command_runner') and self._command_runner.isRunning()
