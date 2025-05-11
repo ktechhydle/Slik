@@ -22,17 +22,16 @@ class Editor(QsciScintilla):
         self.setAutoCompletionUseSingle(QsciScintilla.AutoCompletionUseSingle.AcusNever)
         self.setEolMode(QsciScintilla.EolMode.EolWindows)
         self.setEolVisibility(False)
+        self.setEdgeMode(QsciScintilla.EdgeMode.EdgeLine)
+        self.setEdgeColumn(120)
+        self.setCaretLineVisible(True)
         self.setCallTipsStyle(QsciScintilla.CallTipsStyle.CallTipsContext)
         self.setCallTipsVisible(0)
         self.setCallTipsPosition(QsciScintilla.CallTipsPosition.CallTipsAboveText)
-        self.setCallTipsBackgroundColor(QColor(0xff, 0xff, 0xff, 0xff))
-        self.setCallTipsForegroundColor(QColor(0x50, 0x50, 0x50, 0xff))
-        self.setCallTipsHighlightColor(QColor(0xff, 0x00, 0x00, 0xff))
 
         self._file_name = file_name
 
         self.cursorPositionChanged.connect(self.getAutoCompletions)
-        #self.textChanged.connect(self.getAutoCompletions)
 
         self.createLexer()
         self.createMargins()
@@ -70,11 +69,7 @@ class Editor(QsciScintilla):
         self.setMarginsFont(QFont('JetBrains Mono'))
         self.setMarginLineNumbers(0, True)
         self.setMarginSensitivity(0, True)
-        self.setMarginsBackgroundColor(QColor('#121212'))
-        self.setMarginsForegroundColor(QColor('#454545'))
-
         self.setFolding(QsciScintilla.FoldStyle.PlainFoldStyle, 1)
-        self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
 
         down_triangle = QPixmap('resources/icons/ui/triangle_down_icon.svg').scaled(18, 18)
         right_triangle = QPixmap('resources/icons/ui/triangle_right_icon.svg').scaled(18, 18)
@@ -85,23 +80,24 @@ class Editor(QsciScintilla):
         self.setMarginWidth(1, 45)
 
     def createStyle(self):
+        self.setMarginsBackgroundColor(QColor('#121212'))
+        self.setMarginsForegroundColor(QColor('#454545'))
         self.setIndentationGuidesBackgroundColor(QColor('#383838'))
         self.setIndentationGuidesForegroundColor(QColor('#383838'))
-        self.setEdgeColor(QColor('#383838'))
-        self.setEdgeMode(QsciScintilla.EdgeMode.EdgeLine)
+        self.setFoldMarginColors(QColor('#121212'), QColor('#121212'))
         self.setWhitespaceBackgroundColor(QColor('#383838'))
         self.setWhitespaceForegroundColor(QColor('#ffffff'))
         self.setSelectionBackgroundColor(QColor('#214283'))
         self.setCaretForegroundColor(QColor('#ffffff'))
         self.setCaretLineBackgroundColor(QColor('#2b2b2b'))
-        self.setCaretLineVisible(True)
         self.setMatchedBraceBackgroundColor(QColor('#505050'))
         self.setMatchedBraceForegroundColor(QColor('#ffffff'))
         self.setUnmatchedBraceBackgroundColor(QColor('#505050'))
         self.setUnmatchedBraceForegroundColor(QColor('#ff0000'))
-        self.setCallTipsBackgroundColor(QColor('#1e1e1e'))
+        self.setCallTipsBackgroundColor(QColor('#1e1e1e00'))
         self.setCallTipsForegroundColor(QColor('#61afef'))
         self.setCallTipsHighlightColor(QColor('#abb2bf'))
+        self.setEdgeColor(QColor('#383838'))
 
         # fix the braces being too small
         font = QFont('JetBrains Mono', 14)
