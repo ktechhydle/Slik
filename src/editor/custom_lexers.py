@@ -94,23 +94,23 @@ class BaseLexer(QsciLexerCustom):
     def generateTokens(self, text: str):
         p = re.compile(r'[*]\/|\/[*]|\s+|\w+|\W')
 
-        self.token_list = [(token, len(bytearray(token, 'utf-8'))) for token in p.findall(text)]
+        self._token_list = [(token, len(bytearray(token, 'utf-8'))) for token in p.findall(text)]
 
     def nextToken(self, skip: int = None):
-        if len(self.token_list) > 0:
+        if len(self._token_list) > 0:
             if skip is not None and skip != 0:
                 for _ in range(skip - 1):
-                    if len(self.token_list) > 0:
-                        self.token_list.pop(0)
+                    if len(self._token_list) > 0:
+                        self._token_list.pop(0)
 
-            return self.token_list.pop(0)
+            return self._token_list.pop(0)
 
         else:
             return None
 
     def peekToken(self, n=0):
         try:
-            return self.token_list[n]
+            return self._token_list[n]
 
         except IndexError:
             return ['']
@@ -131,7 +131,7 @@ class BaseLexer(QsciLexerCustom):
     def createStyle(self):
         pass
 
-    def applyFolding(self):
+    def applyFolding(self, start: int, end: int):
         pass
 
     def setKeywords(self, keywords: list[str]):
@@ -178,8 +178,7 @@ class PythonLexer(BaseLexer):
         self.setColor(QColor('#98c379'), PythonLexer.STRING)
 
     def styleText(self, start, end):
-        raw_bytes = self.editor().bytes(start, end)
-        text = raw_bytes.data().decode('utf-8')
+        text = self.editor().text()[start:end]
         self.generateTokens(text)
 
         string_flag = False
@@ -316,7 +315,7 @@ class PythonLexer(BaseLexer):
 
         self.applyFolding(start, end)
 
-    def applyFolding(self, start, end):
+    def applyFolding(self, start: int, end: int):
         start_line = self.editor().SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
         end_line = self.editor().SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, end)
 
@@ -342,6 +341,12 @@ class PythonLexer(BaseLexer):
 class RustLexer(BaseLexer):
     def __init__(self, editor):
         super().__init__(editor, 'Rust')
+        self.setKeywords([
+            'fn', 'struct', 'enum', 'impl'
+        ])
+        self.setBuiltinNames([
+            ''
+        ])
 
     def createStyle(self):
         normal = QColor('#abb2bf')
@@ -362,8 +367,6 @@ class RustLexer(BaseLexer):
 
     def styleText(self, start, end):
         self.startStyling(start)
-
-        text = self.editor.text()[start:end]
 
 
 class PlainTextLexer(BaseLexer):
