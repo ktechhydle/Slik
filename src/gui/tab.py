@@ -66,8 +66,5 @@ class Tab(QWidget):
     def basename(self) -> str:
         return os.path.basename(self._file_name)
 
-    def filetype(self) -> int:
-        return self._file_type
-
     def editor(self) -> Editor:
         return self._editor
