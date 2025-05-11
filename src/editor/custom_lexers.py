@@ -1,5 +1,6 @@
+import slik
 import tree_sitter_python as PYTHON
-from tree_sitter import Parser, Node, Language
+from tree_sitter import Parser, Language, Query
 from PyQt6.Qsci import QsciLexerCustom, QsciScintilla
 from PyQt6.QtGui import QColor, QFont
 
@@ -96,7 +97,24 @@ class PythonLexer(BaseLexer):
     def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
 
-        self.parser = Parser(Language(PYTHON.language()))
+        self.language = Language(PYTHON.language())
+        self.parser = Parser(self.language)
+        self.query = Query(
+            self.language,
+            slik.read('resources/tree_sitter/python_highlights.scm')
+        )
+        self.query_captures = {
+            'keyword': PythonLexer.KEYWORD,
+            'keyword.operator': PythonLexer.KEYWORD,
+            'keyword.definition': PythonLexer.KEYWORD,
+            'constant': PythonLexer.CONSTANTS,
+            'function_definition.name': PythonLexer.FUNCTION_DEF,
+            'class_definition.name': PythonLexer.CLASS_DEF,
+            'string': PythonLexer.STRING,
+            'comment': PythonLexer.COMMENTS,
+            'function.call': PythonLexer.TYPES,
+            'punctuation.bracket': PythonLexer.BRACKETS,
+        }
 
     def createStyle(self):
         normal = QColor('#abb2bf')
@@ -110,7 +128,6 @@ class PythonLexer(BaseLexer):
         self.setColor(QColor('#7f848e'), PythonLexer.COMMENTS)
         self.setColor(QColor('#c678dd'), PythonLexer.KEYWORD)
         self.setColor(QColor('#e5C07b'), PythonLexer.CLASS_DEF)
-        self.setColor(QColor('#61afef'), PythonLexer.FUNCTIONS)
         self.setColor(QColor('#61afef'), PythonLexer.FUNCTION_DEF)
         self.setColor(QColor('#56b6c2'), PythonLexer.TYPES)
         self.setColor(QColor('#d19a66'), PythonLexer.CONSTANTS)
@@ -118,58 +135,20 @@ class PythonLexer(BaseLexer):
 
     def styleText(self, start, end):
         self.startStyling(start)
-
-        raw_bytes = self.editor.bytes(start, end)
-        text = raw_bytes.data().decode('utf-8').replace('\0', '')
+        text = self.editor.text(start, end)
         tree = self.parser.parse(bytes(text, 'utf-8'))
-        print(tree.root_node)
+        root_node = tree.root_node
+        matches = self.query.captures(root_node)
 
-        highlights = []
-        self.buildHighlights(tree.root_node, highlights)
-        highlights.sort(key=lambda h: h[0]) # sort by start byte
+        for capture_name, nodes in matches.items():
+            for node in nodes:
+                style = self.query_captures.get(capture_name, PythonLexer.DEFAULT)
+                length = node.end_byte - node.start_byte
+                print(length, style)
 
-        for start_byte, end_byte, style in highlights:
-            print(f'Start byte: {start_byte}, Line length: {end_byte}, Style: {style}')
-            self.setStyling(end_byte, style)
+                self.setStyling(length, style)
 
         self.applyFolding(start, end)
-
-    def buildHighlights(self, node: Node, highlights: list):
-        for child in node.children:
-            style = None
-
-            if child.type == 'comment':
-                style = PythonLexer.COMMENTS
-
-            elif child.type == 'string':
-                style = PythonLexer.STRING
-
-            elif child.type == 'call':
-                # builtins
-                style = PythonLexer.TYPES
-
-            elif child.type == 'function_definition':
-                style = PythonLexer.FUNCTION_DEF
-
-            elif child.type == 'class_definition':
-                style = PythonLexer.CLASS_DEF
-
-            elif child.type == 'keyword':
-                style = PythonLexer.KEYWORD
-
-            elif child.type == 'integer':
-                style = PythonLexer.CONSTANTS
-
-            elif child.text in ('(', ')', '{', '}', '[', ']'):
-                style = PythonLexer.BRACKETS
-
-            else:
-                style = PythonLexer.DEFAULT
-
-            if style:
-                highlights.append((child.start_byte, child.end_byte, style))
-
-            self.buildHighlights(child, highlights)
 
     def applyFolding(self, start, end):
         start_line = self.editor.SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
