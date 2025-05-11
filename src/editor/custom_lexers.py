@@ -19,12 +19,14 @@ class BaseLexer(QsciLexerCustom):
     FUNCTIONS = 8
     CLASS_DEF = 9
     FUNCTION_DEF = 10
+    DECORATOR = 11
     DEFAULT_NAMES = [
         'default',
         'keyword',
         'class_def',
         'functions',
         'function_def',
+        'decorator',
         'string',
         'types',
         'keyargs',
@@ -53,7 +55,7 @@ class BaseLexer(QsciLexerCustom):
         self.createStyle()
 
     def language(self):
-        return self.language_name
+        return self._language_name
 
     def description(self, style):
         if style == self.DEFAULT:
@@ -88,6 +90,9 @@ class BaseLexer(QsciLexerCustom):
 
         elif style == self.FUNCTION_DEF:
             return 'FUNCTION_DEF'
+
+        elif style == self.DECORATOR:
+            return 'DECORATOR'
 
         return ''
 
@@ -173,6 +178,7 @@ class PythonLexer(BaseLexer):
         self.setColor(QColor('#c678dd'), PythonLexer.KEYWORD)
         self.setColor(QColor('#e5C07b'), PythonLexer.CLASS_DEF)
         self.setColor(QColor('#61afef'), PythonLexer.FUNCTION_DEF)
+        self.setColor(QColor('#d19a66'), PythonLexer.DECORATOR)
         self.setColor(QColor('#56b6c2'), PythonLexer.TYPES)
         self.setColor(QColor('#d19a66'), PythonLexer.CONSTANTS)
         self.setColor(QColor('#98c379'), PythonLexer.STRING)
@@ -245,6 +251,17 @@ class PythonLexer(BaseLexer):
                     self.setStyling(tok_len, PythonLexer.KEYWORD)
 
                     continue
+
+            elif tok.strip() == '@' and self.peekToken()[0].isidentifier():
+                self.setStyling(tok_len, PythonLexer.DECORATOR)
+
+                curr_token = self.nextToken()
+                tok = curr_token[0]
+                tok_len = curr_token[1]
+
+                self.setStyling(tok_len, PythonLexer.DECORATOR)
+
+                continue
 
             elif tok in self.keywordList():
                 self.setStyling(tok_len, PythonLexer.KEYWORD)
