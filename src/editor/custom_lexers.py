@@ -298,6 +298,10 @@ class PythonLexer(BaseLexer):
                         break
 
                     next_tok = self.nextToken()
+
+                    if next_tok is None:
+                        break
+
                     comment_text += next_tok[0]
                     comment_len += next_tok[1]
 
