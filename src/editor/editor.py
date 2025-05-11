@@ -30,8 +30,10 @@ class Editor(QsciScintilla):
         self.setCallTipsPosition(QsciScintilla.CallTipsPosition.CallTipsAboveText)
 
         self._file_name = file_name
+        self._lexer = None
 
         self.cursorPositionChanged.connect(self.getAutoCompletions)
+        self.textChanged.connect(self.textModified)
 
         self.createLexer()
         self.createMargins()
@@ -46,21 +48,21 @@ class Editor(QsciScintilla):
 
     def createLexer(self):
         if self._file_name.endswith('.py'):
-            self.lexer = PythonLexer(self)
+            self._lexer = PythonLexer(self)
 
         elif self._file_name.endswith('.rs'):
-            self.lexer = RustLexer(self)
+            self._lexer = RustLexer(self)
 
         elif self._file_name.endswith('.md'):
-            self.lexer = PlainTextLexer(self)
+            self._lexer = PlainTextLexer(self)
 
         else:
-            self.lexer = PlainTextLexer(self)
+            self._lexer = PlainTextLexer(self)
             self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsDocument)
 
-        self.setLexer(self.lexer)
+        self.setLexer(self._lexer)
 
-        self.api = QsciAPIs(self.lexer)
+        self.api = QsciAPIs(self._lexer)
         self.auto_completer = AutoCompleter(self._file_name, self.api)
         self.auto_completer.finished.connect(self.loadAutoCompletions)
 
@@ -186,6 +188,10 @@ class Editor(QsciScintilla):
 
     def loadAutoCompletions(self):
         pass
+
+    def textModified(self):
+        if self._lexer:
+            self._lexer.startStyling(0, self.length())
 
     def setFileName(self, file_name: str):
         self._file_name = file_name
