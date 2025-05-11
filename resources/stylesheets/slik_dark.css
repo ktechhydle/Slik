@@ -1,3 +1,16 @@
+/*
+!CSS RULES
+
+This defines the syntax rules for CSS throughout MP Software
+
+<widget-style> {
+    <style-attr>;
+^^^^            ^
+4 space indent, always end with semicolon
+}
+
+*/
+
 QMainWindow {
     background-color: #1c1c1c;
     color: white;
@@ -161,21 +174,6 @@ QComboBox QAbstractItemView {
     selection-background-color: #4772b3;
 }
 
-
-QProgressBar {
-    background-color: #3d3d3d;
-    border: 2px solid #747474;
-    border-radius: 6px;
-    height: 20px;
-    text-align: center;
-    color: #ffffff;
-}
-
-QProgressBar::chunk {
-    background-color: #4772b3;
-    border-radius: 4px;
-}
-
 QCheckBox {
     spacing: 5px;
     background-color: transparent;
@@ -239,33 +237,6 @@ QPushButton:checked {
 }
 
 QPushButton:checked:hover {
-    background-color: #628bca;
-}
-
-QDialog {
-    background-color: #202020;
-}
-
-QDialogButtonBox QPushButton {
-    border: none;
-    border-radius: 4px;
-    min-width: 120px;
-    min-height: 25px;
-    font-size: 15px;
-    color: #d2d2d2;
-}
-
-QDialogButtonBox QPushButton:hover {
-    background-color: #656565;
-    color: white;
-}
-
-QDialogButtonBox QPushButton:default {
-    background-color: #4772b3;
-    color: white;
-}
-
-QDialogButtonBox QPushButton:default:hover {
     background-color: #628bca;
 }
 
