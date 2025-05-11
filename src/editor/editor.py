@@ -25,6 +25,7 @@ class Editor(QsciScintilla):
         self.setEdgeMode(QsciScintilla.EdgeMode.EdgeLine)
         self.setEdgeColumn(120)
         self.setCaretLineVisible(True)
+        self.setCaretWidth(3)
         self.setCallTipsStyle(QsciScintilla.CallTipsStyle.CallTipsContext)
         self.setCallTipsVisible(0)
         self.setCallTipsPosition(QsciScintilla.CallTipsPosition.CallTipsAboveText)

@@ -159,10 +159,7 @@ class PythonLexer(BaseLexer):
     def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
         self.setKeywords(keyword.kwlist + ['self'])
-        self.setBuiltinNames([
-                                 name for name, obj in vars(builtins).items() if
-                                 isinstance(obj, types.BuiltinFunctionType)
-                             ] + ['super'])
+        self.setBuiltinNames([name for name, obj in vars(builtins).items()])
 
     def createStyle(self):
         normal = QColor('#abb2bf')
