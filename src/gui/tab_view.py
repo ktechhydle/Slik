@@ -1,6 +1,6 @@
 import os
 from PyQt6.QtGui import QAction, QKeySequence
-from PyQt6.QtWidgets import QTabWidget
+from PyQt6.QtWidgets import QTabWidget, QWidget
 from src.managers.project_manager import ProjectManager
 from src.gui.tab import Tab
 
@@ -111,7 +111,7 @@ class TabView(QTabWidget):
         self._project_manager.openProject(path)
         self.clear()
 
-    def tabs(self) -> list[str]:
+    def tabs(self) -> list[QWidget]:
         return self._tabs
 
     def projectManager(self) -> ProjectManager:

@@ -3,16 +3,16 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 
-class MarkdownViewer(QWebEngineView):
+class HtmlViewer(QWebEngineView):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
 
     def setMarkdown(self, md: str):
-        # Convert Markdown to HTML
+        # convert md to html
         html_body = markdown.markdown(md)
 
-        # Define your CSS styles
+        # add CSS style
         css = '''
             <style>
                 body {
@@ -58,8 +58,6 @@ class MarkdownViewer(QWebEngineView):
                 }
             </style>
         '''
-
-        # Combine CSS and HTML into a full HTML document
         html = f'<!DOCTYPE html><html><head>{css}</head><body>{html_body}</body></html>'
 
         self.setHtml(html)

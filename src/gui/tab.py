@@ -3,7 +3,7 @@ import os
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QSplitter, QVBoxLayout
 from src.editor.editor import Editor
-from src.editor.markdown_viewer import MarkdownViewer
+from src.editor.html_viewer import HtmlViewer
 
 
 class Tab(QWidget):
@@ -19,33 +19,32 @@ class Tab(QWidget):
         self.updateUI()
 
     def createUI(self):
-        self.container = QSplitter(self)
-        self.container.setHandleWidth(2)
-        self.container.setOrientation(Qt.Orientation.Horizontal)
+        self._splitter = QSplitter(self)
+        self._splitter.setHandleWidth(2)
+        self._splitter.setOrientation(Qt.Orientation.Horizontal)
 
         self._editor = Editor(self._file_name, self)
 
         if os.path.exists(self._file_name):
             self._editor.setText(slik.read(self._file_name))
 
-        self.container.addWidget(self._editor)
-        self.layout().addWidget(self.container)
+        self._splitter.addWidget(self._editor)
+        self.layout().addWidget(self._splitter)
 
     def updateUI(self):
-        if self.basename().endswith('.md'):
-            # add a markdown viewer
-            viewer = MarkdownViewer(self)
+        if self.basename().endswith(('.md', '.html', '.svg')):
+            viewer = HtmlViewer(self)
             viewer.setMarkdown(self._editor.text())
             self._editor.textChanged.connect(lambda: viewer.setMarkdown(self._editor.text()))
 
-            self.container.addWidget(viewer)
+            self._splitter.addWidget(viewer)
 
         else:
             # remove the markdown viewer (if existent)
-            for i in range(self.container.count()):
-                widget = self.container.widget(i)
+            for i in range(self._splitter.count()):
+                widget = self._splitter.widget(i)
 
-                if isinstance(widget, MarkdownViewer):
+                if isinstance(widget, HtmlViewer):
                     widget.close()
                     del widget
 
