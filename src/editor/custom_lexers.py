@@ -255,11 +255,32 @@ class PythonLexer(BaseLexer):
             elif tok.strip() == '@' and self.peekToken()[0].isidentifier():
                 self.setStyling(tok_len, PythonLexer.DECORATOR)
 
-                curr_token = self.nextToken()
-                tok = curr_token[0]
-                tok_len = curr_token[1]
+                while True:
+                    curr_token = self.nextToken()
 
-                self.setStyling(tok_len, PythonLexer.DECORATOR)
+                    if curr_token is None:
+                        break
+
+                    tok = curr_token[0]
+                    tok_len = curr_token[1]
+                    self.setStyling(tok_len, PythonLexer.DECORATOR)
+
+                    peek = self.peekToken()
+
+                    if peek is None or (peek[0] != '.' and not peek[0].isidentifier()):
+                        break
+
+                    elif peek[0] == '.':
+                        next_dot_token = self.nextToken()
+
+                        if next_dot_token:
+                            self.setStyling(next_dot_token[1], PythonLexer.DECORATOR)
+
+                            if not self.peekToken() or not self.peekToken()[0].isidentifier():
+                                break
+
+                    elif not peek[0].isidentifier():
+                        break
 
                 continue
 
