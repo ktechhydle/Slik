@@ -85,7 +85,7 @@
      inkscape:deskcolor="#505050"
      inkscape:zoom="4.02"
      inkscape:cx="34.328358"
-     inkscape:cy="15.422886"
+     inkscape:cy="15.298507"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -99,9 +99,9 @@
 		.s0 { fill: #c0c0c0 } 
 	</style>
   <circle
-     style="fill:#c2c2c2;fill-opacity:1;stroke:#c2c2c2;stroke-width:12.5;stroke-linecap:round;stroke-linejoin:round"
+     style="fill:#c2c2c2;fill-opacity:1;stroke:#c2c2c2;stroke-width:10.2075;stroke-linecap:round;stroke-linejoin:round"
      id="path1"
      cx="50"
      cy="50"
-     r="33.084576" />
+     r="27.01689" />
 </svg>
