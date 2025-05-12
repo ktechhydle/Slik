@@ -14,6 +14,7 @@ class TerminalView(QTabWidget):
         self.setTabsClosable(True)
 
         self._project_manager = project_manager
+        self._project_manager.fileBrowser().projectDirChanged.connect(self.clear)
 
         self.tabBar().tabBarDoubleClicked.connect(self.newTerminal)
         self.tabCloseRequested.connect(self.closeTerminal)
