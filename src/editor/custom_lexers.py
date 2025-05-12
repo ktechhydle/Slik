@@ -277,6 +277,11 @@ class PythonLexer(BaseLexer):
 
                 continue
 
+            elif tok in ('f', 'b', 'r', 'br'):
+                self.setStyling(tok_len, PythonLexer.STRING)
+
+                continue
+
             elif tok.strip() == '@' and self.peekToken()[0].isidentifier():
                 self.setStyling(tok_len, PythonLexer.DECORATOR)
 
