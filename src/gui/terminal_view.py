@@ -23,6 +23,19 @@ class TerminalView(QTabWidget):
     def newTerminal(self):
         self.openTerminal(self._project_dir)
 
+    def terminalFromCommand(self, command: str):
+        if self.currentTab().hasCurrentProcess():
+            # create a new terminal with the process
+            terminal = Terminal(self._project_dir, self)
+
+            self.addTab(terminal, 'Local')
+            self.setCurrentIndex(self.indexOf(terminal))
+
+            terminal.run(command)
+
+        else:
+            self.currentTab().run(command)
+
     def openTerminal(self, cwd: str):
         terminal = Terminal(cwd, self)
 
@@ -61,3 +74,7 @@ class TerminalView(QTabWidget):
 
     def projectDir(self) -> str:
         return self._project_dir
+
+    def currentTab(self) -> Terminal:
+        return self.widget(self.currentIndex())
+

@@ -109,9 +109,13 @@ class Terminal(QWidget):
 
         prompt_input.setFocus()
 
-    def run(self, prompt_input: QLineEdit):
-        prompt_input.setReadOnly(True)
-        text = prompt_input.text()
+    def run(self, prompt_input: QLineEdit | str):
+        if isinstance(prompt_input, QLineEdit):
+            prompt_input.setReadOnly(True)
+            text = prompt_input.text()
+
+        else:
+            text = prompt_input
 
         if text.rstrip() == '':
             self.newPrompt()

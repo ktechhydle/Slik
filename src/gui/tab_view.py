@@ -1,5 +1,4 @@
 import os
-from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import QTabWidget, QWidget
 from src.gui.tab import Tab
 
@@ -88,13 +87,6 @@ class TabView(QTabWidget):
     def defaultTab(self):
         self.openTab('resources/default/start.md')
 
-    def run(self):
-        if self.currentWidget().filename().endswith('.py'):
-            pass
-
-    def runCurrent(self):
-        pass
-
     def setProjectDir(self, dir: str):
         self._project_dir = dir
 
@@ -113,5 +105,5 @@ class TabView(QTabWidget):
     def projectDir(self) -> str:
         return self._project_dir
 
-    def currentWidget(self) -> Tab:
+    def currentTab(self) -> Tab:
         return self.widget(self.currentIndex())
