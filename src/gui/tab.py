@@ -1,19 +1,21 @@
 import slik
 import os
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QSplitter, QVBoxLayout
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QWidget, QSplitter, QVBoxLayout, QTabWidget
 from src.editor.editor import Editor
 from src.editor.html_viewer import HtmlViewer
 
 
 class Tab(QWidget):
-    def __init__(self, file_name: str, tab_view, parent=None):
+    def __init__(self, file_name: str, tab_view: QTabWidget, parent=None):
         super().__init__(parent)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._file_name = file_name
         self.tab_view = tab_view
+        self._saved = True
 
         self.createUI()
         self.updateUI()
@@ -24,6 +26,7 @@ class Tab(QWidget):
         self._splitter.setOrientation(Qt.Orientation.Horizontal)
 
         self._editor = Editor(self._file_name, self)
+        self._editor.textChanged.connect(self.setUnsaved)
 
         if os.path.exists(self._file_name):
             self._editor.setText(slik.read(self._file_name))
@@ -57,6 +60,21 @@ class Tab(QWidget):
 
     def save(self):
         slik.write(self._file_name, self._editor.text())
+
+        self.setSaved()
+
+    def setSaved(self):
+        self._saved = True
+        self.tab_view.setTabIcon(self.tab_view.indexOf(self), QIcon(''))
+
+    def setUnsaved(self):
+        if self._editor.text() != slik.read(self._file_name):
+            self._saved = False
+            self.tab_view.setTabIcon(self.tab_view.indexOf(self), QIcon('resources/icons/ui/unsaved_icon.svg'))
+
+            return
+
+        self.setSaved()
 
     def setFileName(self, name: str):
         self._file_name = name
