@@ -69,9 +69,8 @@ class ProjectManager:
                 self._terminal_view.terminalFromCommand('python main.py')
 
             else:
-                message = MessageDialog('No "main" file',
-                                        "The project runner couldn't find a 'main.py' "
-                                                          "entry point.",
+                message = MessageDialog("No 'main.py' File",
+                                        "The project runner couldn't find a 'main.py' entry point.",
                                         (MessageDialog.OkButton,),
                                         self._tab_view)
                 message.exec()
