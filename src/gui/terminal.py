@@ -77,6 +77,7 @@ class Terminal(QWidget):
 
         self._cwd = cwd
         self.tab_view = tab_view
+        self._current_input = None
 
         self.createUI()
         self.newPrompt()
@@ -99,23 +100,22 @@ class Terminal(QWidget):
         command_line.layout().setContentsMargins(0, 0, 0, 0)
 
         label = QLabel(f'{self._cwd}>', self)
-        prompt_input = QLineEdit(self)
-        prompt_input.returnPressed.connect(lambda: self.run(prompt_input))
+        self._current_input = QLineEdit(self)
+        self._current_input.returnPressed.connect(lambda: self.run)
 
         command_line.layout().addWidget(label)
-        command_line.layout().addWidget(prompt_input)
+        command_line.layout().addWidget(self._current_input)
 
         self._container.layout().insertWidget(self._container.layout().count() - 1, command_line)
 
-        prompt_input.setFocus()
+        self._current_input.setFocus()
 
-    def run(self, prompt_input: QLineEdit | str):
-        if isinstance(prompt_input, QLineEdit):
-            prompt_input.setReadOnly(True)
-            text = prompt_input.text()
+    def run(self, input=None):
+        if input:
+            self._current_input.setText(input)
 
-        else:
-            text = prompt_input
+        self._current_input.setReadOnly(True)
+        text = self._current_input.text()
 
         if text.rstrip() == '':
             self.newPrompt()
