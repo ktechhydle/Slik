@@ -101,7 +101,7 @@ class Terminal(QWidget):
 
         label = QLabel(f'{self._cwd}>', self)
         self._current_input = QLineEdit(self)
-        self._current_input.returnPressed.connect(lambda: self.run)
+        self._current_input.returnPressed.connect(lambda: self.run())
 
         command_line.layout().addWidget(label)
         command_line.layout().addWidget(self._current_input)

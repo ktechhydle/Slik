@@ -79,7 +79,13 @@ class ProjectManager:
             self._terminal_view.terminalFromCommand('cargo run')
 
     def runCurrent(self):
-        pass
+        file = self._tab_view.currentTab().filename()
+
+        if file.endswith('.py'):
+            self._terminal_view.terminalFromCommand(f'python {file}')
+
+        elif file.endswith('.rs'):
+            self._terminal_view.terminalFromCommand('cargo run')
 
     def tabView(self) -> TabView:
         return self._tab_view
