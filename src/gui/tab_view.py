@@ -1,7 +1,6 @@
 import os
 from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import QTabWidget, QWidget
-from src.managers.project_manager import ProjectManager
 from src.gui.tab import Tab
 
 
@@ -13,11 +12,9 @@ class TabView(QTabWidget):
         self.setTabsClosable(True)
 
         self._tabs = []
+        self._project_dir = ''
 
         self.tabCloseRequested.connect(self.closeTab)
-
-        self.createManagers()
-        self.createActions()
 
     def clear(self, no_default=False):
         super().clear()
@@ -28,26 +25,6 @@ class TabView(QTabWidget):
             return
 
         self.defaultTab()
-
-    def createManagers(self):
-        self._project_manager = ProjectManager(self)
-
-    def createActions(self):
-        save_action = QAction('Save', self)
-        save_action.setShortcut(QKeySequence('Ctrl+S'))
-        save_action.triggered.connect(lambda: self.currentWidget().save())
-
-        toggle_collapse_action = QAction('Toggle Collapse', self)
-        toggle_collapse_action.setShortcut(QKeySequence('Ctrl+F'))
-        toggle_collapse_action.triggered.connect(lambda: self.currentWidget().editor().foldAll(True))
-
-        file_browser_action = QAction('File Browser', self)
-        file_browser_action.setShortcut(QKeySequence('Ctrl+Q'))
-        file_browser_action.triggered.connect(self._project_manager.showFileBrowser)
-
-        self.addAction(save_action)
-        self.addAction(toggle_collapse_action)
-        self.addAction(file_browser_action)
 
     def openTab(self, filename: str, insert=False):
         filename = os.path.abspath(filename)
@@ -96,9 +73,6 @@ class TabView(QTabWidget):
 
         self.removeTab(index)
 
-    def defaultTab(self):
-        self.openTab('resources/default/start.md')
-
     def updateTab(self, old_name: str, new_name: str):
         old_path = os.path.abspath(old_name)
         new_path = os.path.abspath(new_name)
@@ -111,12 +85,33 @@ class TabView(QTabWidget):
 
                 break
 
-    def openProject(self, path: str):
-        self._project_manager.openProject(path)
-        self.clear()
+    def defaultTab(self):
+        self.openTab('resources/default/start.md')
+
+    def run(self):
+        if self.currentWidget().filename().endswith('.py'):
+            pass
+
+    def runCurrent(self):
+        pass
+
+    def setProjectDir(self, dir: str):
+        self._project_dir = dir
+
+        readme_path = f'{dir}/README.md'
+
+        if os.path.exists(readme_path):
+            self.clear(no_default=True)
+            self.openTab(readme_path)
+
+        else:
+            self.clear()
 
     def tabs(self) -> list[QWidget]:
         return self._tabs
 
-    def projectManager(self) -> ProjectManager:
-        return self._project_manager
+    def projectDir(self) -> str:
+        return self._project_dir
+
+    def currentWidget(self) -> Tab:
+        return self.widget(self.currentIndex())

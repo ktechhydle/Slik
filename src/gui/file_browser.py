@@ -300,15 +300,6 @@ class FileBrowser(QMenu):
             if path:
                 self.setPath(path)
 
-                readme_path = f'{path}/README.md'
-
-                if os.path.exists(readme_path):
-                    self.tab_view.clear(no_default=True)
-                    self.tab_view.openTab(readme_path)
-
-                else:
-                    self.tab_view.clear()
-
     def setPath(self, path: str):
         self._path = path
         self._project_dir_label.setText(f'Project Dir: {self._path}')

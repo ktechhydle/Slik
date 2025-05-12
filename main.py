@@ -4,6 +4,8 @@ import slik
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QFontDatabase
 from PyQt6.QtWidgets import QMainWindow, QSplitter, QApplication
+
+from managers.project_manager import ProjectManager
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
 from src.gui.terminal_view import TerminalView
@@ -23,13 +25,11 @@ class Slik(QMainWindow):
         splitter.setHandleWidth(2)
         splitter.setOrientation(Qt.Orientation.Vertical)
 
-        self.tab_view = TabView()
-        self.tab_view.openProject(os.path.abspath('./'))
-        self.tab_view.defaultTab()
-        self.tab_view.openTab('src/lib.rs', insert=True)
+        self.tab_view = TabView(self)
+        self.terminal_view = TerminalView(self)
 
-        self.terminal_view = TerminalView(self.tab_view.projectManager(), self)
-        self.terminal_view.newTerminal()
+        self.project_manager = ProjectManager(self.tab_view, self.terminal_view)
+        self.project_manager.openProject(os.path.abspath('.'))
 
         splitter.addWidget(self.tab_view)
         splitter.addWidget(self.terminal_view)

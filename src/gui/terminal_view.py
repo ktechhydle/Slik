@@ -1,18 +1,16 @@
 from PyQt6.QtWidgets import QTabWidget
 from src.gui.terminal import Terminal
 from src.gui.message_dialog import MessageDialog
-from src.managers.project_manager import ProjectManager
 
 
 class TerminalView(QTabWidget):
-    def __init__(self, project_manager: ProjectManager, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setDocumentMode(True)
         self.setMovable(True)
         self.setTabsClosable(True)
 
-        self._project_manager = project_manager
-        self._project_manager.fileBrowser().projectDirChanged.connect(self.clear)
+        self._project_dir = ''
 
         self.tabBar().tabBarDoubleClicked.connect(self.newTerminal)
         self.tabCloseRequested.connect(self.closeTerminal)
@@ -23,7 +21,7 @@ class TerminalView(QTabWidget):
         self.newTerminal()
 
     def newTerminal(self):
-        self.openTerminal(self._project_manager.projectDir())
+        self.openTerminal(self._project_dir)
 
     def openTerminal(self, cwd: str):
         terminal = Terminal(cwd, self)
@@ -55,3 +53,11 @@ class TerminalView(QTabWidget):
             return
 
         self.removeTab(index)
+
+    def setProjectDir(self, dir: str):
+        self._project_dir = dir
+
+        self.clear()
+
+    def projectDir(self) -> str:
+        return self._project_dir
