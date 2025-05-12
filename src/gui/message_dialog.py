@@ -13,8 +13,13 @@ class MessageDialog(QMenu):
 
     def __init__(self, title: str, message: str, standard_buttons: tuple, parent=None):
         super().__init__(parent)
-        self.setWindowFlag(Qt.WindowType.CoverWindow)
+        self.setWindowFlags(self.windowFlags()
+                            | Qt.WindowType.CoverWindow
+                            | Qt.WindowType.FramelessWindowHint
+                            | Qt.WindowType.NoDropShadowWindowHint
+                            | Qt.WindowType.WindowType_Mask)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setObjectName('popup')
 
         self._title = title
