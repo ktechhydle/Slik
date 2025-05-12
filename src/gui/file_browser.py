@@ -299,7 +299,15 @@ class FileBrowser(QMenu):
 
             if path:
                 self.setPath(path)
-                self.tab_view.clear()
+
+                readme_path = f'{path}/README.md'
+
+                if os.path.exists(readme_path):
+                    self.tab_view.clear(no_default=True)
+                    self.tab_view.openTab(readme_path)
+
+                else:
+                    self.tab_view.clear()
 
     def setPath(self, path: str):
         self._path = path

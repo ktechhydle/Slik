@@ -19,10 +19,14 @@ class TabView(QTabWidget):
         self.createManagers()
         self.createActions()
 
-    def clear(self):
+    def clear(self, no_default=False):
         super().clear()
 
         self._tabs.clear()
+
+        if no_default:
+            return
+
         self.defaultTab()
 
     def createManagers(self):
