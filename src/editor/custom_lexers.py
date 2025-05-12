@@ -10,7 +10,7 @@ from PyQt6.QtGui import QColor, QFont
 class BaseLexer(QsciLexerCustom):
     DEFAULT = 0
     KEYWORD = 1
-    TYPES = 2
+    BUILTINS = 2
     STRING = 3
     KEYARGS = 4
     BRACKETS = 5
@@ -20,6 +20,7 @@ class BaseLexer(QsciLexerCustom):
     CLASS_DEF = 9
     FUNCTION_DEF = 10
     DECORATOR = 11
+    TYPES = 12
     DEFAULT_NAMES = [
         'default',
         'keyword',
@@ -43,6 +44,7 @@ class BaseLexer(QsciLexerCustom):
         self._tokens = []
         self._keywords = []
         self._builtins = []
+        self._types = []
 
         defaults = {}
         defaults['color'] = '#ffffff'
@@ -64,8 +66,8 @@ class BaseLexer(QsciLexerCustom):
         elif style == self.KEYWORD:
             return 'KEYWORD'
 
-        elif style == self.TYPES:
-            return 'TYPES'
+        elif style == self.BUILTINS:
+            return 'BUILTINS'
 
         elif style == self.STRING:
             return 'STRING'
@@ -93,6 +95,9 @@ class BaseLexer(QsciLexerCustom):
 
         elif style == self.DECORATOR:
             return 'DECORATOR'
+
+        elif style == self.TYPES:
+            return 'TYPES'
 
         return ''
 
@@ -145,11 +150,17 @@ class BaseLexer(QsciLexerCustom):
     def setBuiltinNames(self, builtin_names: list[str]):
         self._builtins = builtin_names
 
+    def setTypes(self, types: list[str]):
+        self._types = types
+
     def keywordList(self) -> list[str]:
         return self._keywords
 
     def builtinList(self) -> list[str]:
         return self._builtins
+
+    def typeList(self) -> list[str]:
+        return self._types
 
     def editor(self) -> QsciScintilla:
         return self._editor
@@ -159,7 +170,8 @@ class PythonLexer(BaseLexer):
     def __init__(self, editor: QsciScintilla):
         super().__init__(editor, 'Python')
         self.setKeywords(keyword.kwlist + ['self'])
-        self.setBuiltinNames([name for name, obj in vars(builtins).items()])
+        self.setBuiltinNames([name for name, obj in vars(builtins).items() if isinstance(obj, types.BuiltinFunctionType)])
+        self.setTypes([name for name, obj in vars(builtins).items() if isinstance(obj, type)])
 
     def createStyle(self):
         normal = QColor('#abb2bf')
@@ -176,6 +188,7 @@ class PythonLexer(BaseLexer):
         self.setColor(QColor('#e5C07b'), PythonLexer.CLASS_DEF)
         self.setColor(QColor('#61afef'), PythonLexer.FUNCTION_DEF)
         self.setColor(QColor('#d19a66'), PythonLexer.DECORATOR)
+        self.setColor(QColor('#56b6c2'), PythonLexer.BUILTINS)
         self.setColor(QColor('#56b6c2'), PythonLexer.TYPES)
         self.setColor(QColor('#d19a66'), PythonLexer.CONSTANTS)
         self.setColor(QColor('#98c379'), PythonLexer.STRING)
@@ -277,40 +290,28 @@ class PythonLexer(BaseLexer):
 
                 continue
 
-            elif tok in ('f', 'b', 'r', 'br'):
-                self.setStyling(tok_len, PythonLexer.STRING)
-
-                continue
-
-            elif tok.strip() == '@' and self.peekToken()[0].isidentifier():
-                self.setStyling(tok_len, PythonLexer.DECORATOR)
+            elif tok == '@':
+                decorator_text = tok
+                decorator_len = tok_len
 
                 while True:
-                    curr_token = self.nextToken()
-
-                    if curr_token is None:
-                        break
-
-                    tok = curr_token[0]
-                    tok_len = curr_token[1]
-                    self.setStyling(tok_len, PythonLexer.DECORATOR)
-
                     peek = self.peekToken()
 
-                    if peek is None or (peek[0] != '.' and not peek[0].isidentifier()):
+                    if peek is None or '\n' in peek[0]:
                         break
 
-                    elif peek[0] == '.':
-                        next_dot_token = self.nextToken()
+                    next_tok = self.nextToken()
 
-                        if next_dot_token:
-                            self.setStyling(next_dot_token[1], PythonLexer.DECORATOR)
-
-                            if not self.peekToken() or not self.peekToken()[0].isidentifier():
-                                break
-
-                    elif not peek[0].isidentifier():
+                    if next_tok is None:
                         break
+
+                    decorator_text += next_tok[0]
+                    decorator_len += next_tok[1]
+
+                self.setStyling(decorator_len, PythonLexer.DECORATOR)
+
+            elif tok in ('f', 'b', 'r', 'br'):
+                self.setStyling(tok_len, PythonLexer.STRING)
 
                 continue
 
@@ -345,6 +346,11 @@ class PythonLexer(BaseLexer):
                 continue
 
             elif tok in self.builtinList():
+                self.setStyling(tok_len, PythonLexer.BUILTINS)
+
+                continue
+
+            elif tok in self.typeList():
                 self.setStyling(tok_len, PythonLexer.TYPES)
 
                 continue
@@ -381,31 +387,214 @@ class RustLexer(BaseLexer):
     def __init__(self, editor):
         super().__init__(editor, 'Rust')
         self.setKeywords([
-            'fn', 'struct', 'enum', 'impl'
+            'abstract', 'as', 'async', 'await', 'become', 'box', 'break',
+            'const', 'continue', 'crate', 'do', 'dyn', 'else', 'enum', 'extern',
+            'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
+            'macro', 'match', 'mod', 'move', 'mut', 'override', 'priv', 'pub',
+            'ref', 'return', 'self', 'Self', 'static', 'struct', 'super', 'trait',
+            'true', 'try', 'type', 'typeof', 'unsafe', 'unsized', 'use', 'virtual',
+            'where', 'while', 'yield'
         ])
         self.setBuiltinNames([
-            ''
+            'assert!', 'assert_eq!', 'assert_ne!', 'cfg!', 'column!', 'compile_error!',
+            'concat!', 'concat_idents!', 'env!', 'eprint!', 'eprintln!', 'file!',
+            'format!', 'format_args!', 'include!', 'include_bytes!', 'include_str!',
+            'is_x86_feature_detected!', 'line!', 'local_path!', 'module_path!',
+            'option_env!', 'panic!', 'print!', 'println!', 'stringify!', 'todo!',
+            'unimplemented!', 'unreachable!', 'vec!'
+        ])
+        self.setTypes([
+            'i32'
         ])
 
     def createStyle(self):
         normal = QColor('#abb2bf')
-        italic = QFont('JetBrains Mono', 14)
+        font = QFont('JetBrains Mono', 14)
+        italic = font
         italic.setItalic(True)
 
         self.setFont(italic, RustLexer.COMMENTS)
         self.setColor(normal, RustLexer.DEFAULT)
         self.setColor(normal, RustLexer.BRACKETS)
+        self.setColor(QColor(normal), RustLexer.FUNCTIONS)
         self.setColor(QColor('#7f848e'), RustLexer.COMMENTS)
         self.setColor(QColor('#c678dd'), RustLexer.KEYWORD)
         self.setColor(QColor('#e5C07b'), RustLexer.CLASS_DEF)
-        self.setColor(QColor('#61afef'), RustLexer.FUNCTIONS)
         self.setColor(QColor('#61afef'), RustLexer.FUNCTION_DEF)
+        self.setColor(QColor('#d19a66'), RustLexer.DECORATOR)
+        self.setColor(QColor('#56b6c2'), RustLexer.BUILTINS)
         self.setColor(QColor('#56b6c2'), RustLexer.TYPES)
         self.setColor(QColor('#d19a66'), RustLexer.CONSTANTS)
         self.setColor(QColor('#98c379'), RustLexer.STRING)
 
     def styleText(self, start, end):
-        self.startStyling(start)
+        text = self.editor().text()[start:end]
+        self.generateTokens(text)
+
+        string_flag = False
+        comment_flag = False
+
+        if start > 0:
+            previous_style_nr = self.editor().SendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
+
+            if previous_style_nr == RustLexer.COMMENTS:
+                comment_flag = False
+
+        while True:
+            curr_token = self.nextToken()
+
+            if curr_token is None:
+                break
+
+            tok = curr_token[0]
+            tok_len = curr_token[1]
+
+            if comment_flag:
+                self.setStyling(tok_len, RustLexer.COMMENTS)
+
+                if tok.endswith('\n') or tok.startswith('\n'):
+                    comment_flag = False
+
+                continue
+
+            if string_flag:
+                self.setStyling(curr_token[1], RustLexer.STRING)
+
+                if tok == '"' or tok == "'":
+                    string_flag = False
+
+                continue
+
+            if tok in ('struct', 'enum'):
+                name, ni = self.skipSpacesPeek()
+                brac, _ = self.skipSpacesPeek(ni)
+
+                if name[0].isidentifier() and brac[0] == '{':
+                    self.setStyling(tok_len, RustLexer.KEYWORD)
+                    _ = self.nextToken(ni)
+                    self.setStyling(name[1] + 1, RustLexer.CLASS_DEF)
+
+                    continue
+
+                else:
+                    self.setStyling(tok_len, RustLexer.KEYWORD)
+
+                    continue
+
+            elif tok == 'fn':
+                name, ni = self.skipSpacesPeek()
+
+                if name[0].isidentifier():
+                    self.setStyling(tok_len, RustLexer.KEYWORD)
+                    _ = self.nextToken(ni)
+                    self.setStyling(name[1] + 1, RustLexer.FUNCTION_DEF)
+
+                    continue
+
+                else:
+                    self.setStyling(tok_len, RustLexer.KEYWORD)
+
+                    continue
+
+            elif tok == "'" or tok == '"':
+                self.setStyling(tok_len, RustLexer.STRING)
+                string_flag = True
+
+                continue
+
+            elif tok == '/':
+                comment_text = tok
+                comment_len = tok_len
+
+                while True:
+                    peek = self.peekToken()
+
+                    if peek is None or '\n' in peek[0]:
+                        break
+
+                    next_tok = self.nextToken()
+
+                    if next_tok is None:
+                        break
+
+                    comment_text += next_tok[0]
+                    comment_len += next_tok[1]
+
+                self.setStyling(comment_len, RustLexer.COMMENTS)
+
+                continue
+
+            elif tok == '#':
+                attribute_text = tok
+                attribute_len = tok_len
+
+                while True:
+                    peek = self.peekToken()
+
+                    if peek is None or '\n' in peek[0]:
+                        break
+
+                    next_tok = self.nextToken()
+
+                    if next_tok is None:
+                        break
+
+                    attribute_text += next_tok[0]
+                    attribute_len += next_tok[1]
+
+                self.setStyling(attribute_len, RustLexer.DECORATOR)
+
+            elif tok.isnumeric():
+                self.setStyling(tok_len, RustLexer.CONSTANTS)
+
+                continue
+
+            elif tok in ['(', ')', '{', '}', '[', ']']:
+                self.setStyling(tok_len, RustLexer.BRACKETS)
+
+                continue
+
+            elif tok in self.keywordList():
+                self.setStyling(tok_len, RustLexer.KEYWORD)
+
+                continue
+
+            elif tok in self.builtinList():
+                self.setStyling(tok_len, RustLexer.BUILTINS)
+
+                continue
+
+            elif tok in self.typeList():
+                self.setStyling(tok_len, RustLexer.TYPES)
+
+                continue
+
+            else:
+                self.setStyling(tok_len, RustLexer.DEFAULT)
+
+        self.applyFolding(start, end)
+
+    def applyFolding(self, start: int, end: int):
+        start_line = self.editor().SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
+        end_line = self.editor().SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, end)
+
+        for line_num in range(start_line, end_line + 1):
+            line_text = self.editor().text(line_num)
+            indent = self.editor().SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION, line_num)
+            level = QsciScintilla.SC_FOLDLEVELBASE + indent // 4
+
+            is_blank = not line_text.strip()
+
+            if line_text.strip().startswith((
+                    'def', 'class', 'if', 'elif', 'else', 'with',
+                    'async', 'match', 'case', 'for', 'while',
+                    'try', 'except', 'finally')):
+                level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
+
+            if is_blank:
+                level |= QsciScintilla.SC_FOLDLEVELWHITEFLAG
+
+            self.editor().SendScintilla(QsciScintilla.SCI_SETFOLDLEVEL, line_num, level)
 
 
 class PlainTextLexer(BaseLexer):
@@ -422,4 +611,4 @@ class PlainTextLexer(BaseLexer):
 
         text = self.editor().text()[start:end]
 
-        self.setStyling(len(text), PythonLexer.DEFAULT)
+        self.setStyling(len(text), PlainTextLexer.DEFAULT)

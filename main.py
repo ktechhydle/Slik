@@ -26,7 +26,7 @@ class Slik(QMainWindow):
         self.tab_view = TabView()
         self.tab_view.openProject(os.path.abspath('./'))
         self.tab_view.defaultTab()
-        self.tab_view.openTab('test.py', insert=True)
+        self.tab_view.openTab('src/lib.rs', insert=True)
 
         self.terminal_view = TerminalView(self.tab_view.projectManager(), self)
         self.terminal_view.newTerminal()
