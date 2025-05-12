@@ -1,6 +1,4 @@
-import os
-from PyQt6.QtGui import QAction, QKeySequence, QIcon
-from PyQt6.QtWidgets import QTabWidget, QToolButton, QPushButton
+from PyQt6.QtWidgets import QTabWidget
 from src.gui.terminal import Terminal
 from src.gui.message_dialog import MessageDialog
 from src.managers.project_manager import ProjectManager
