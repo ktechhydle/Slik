@@ -396,15 +396,20 @@ class RustLexer(BaseLexer):
             'where', 'while', 'yield'
         ])
         self.setBuiltinNames([
-            'assert!', 'assert_eq!', 'assert_ne!', 'cfg!', 'column!', 'compile_error!',
-            'concat!', 'concat_idents!', 'env!', 'eprint!', 'eprintln!', 'file!',
-            'format!', 'format_args!', 'include!', 'include_bytes!', 'include_str!',
-            'is_x86_feature_detected!', 'line!', 'local_path!', 'module_path!',
-            'option_env!', 'panic!', 'print!', 'println!', 'stringify!', 'todo!',
-            'unimplemented!', 'unreachable!', 'vec!'
+            'assert', 'assert_eq', 'assert_ne', 'cfg', 'column', 'compile_error',
+            'concat', 'concat_idents', 'env', 'eprint', 'eprintln', 'file',
+            'format', 'format_args', 'include', 'include_bytes', 'include_str',
+            'is_x86_feature_detected', 'line', 'local_path', 'module_path',
+            'option_env', 'panic', 'print', 'println', 'stringify', 'todo',
+            'unimplemented', 'unreachable', 'vec'
         ])
         self.setTypes([
-            'i32'
+            'i8', 'i16', 'i32', 'i64', 'i128', 'isize',
+            'u8', 'u16', 'u32', 'u64', 'u128', 'usize',
+            'f32', 'f64',
+            'bool', 'char', 'str',
+            'Option', 'Result', 'Vec', 'String',
+            'Box', '&',
         ])
 
     def createStyle(self):
@@ -503,26 +508,27 @@ class RustLexer(BaseLexer):
                 continue
 
             elif tok == '/':
-                comment_text = tok
-                comment_len = tok_len
+                if self.peekToken()[0] == '/': # this is a comment hence the '//'
+                    comment_text = tok
+                    comment_len = tok_len
 
-                while True:
-                    peek = self.peekToken()
+                    while True:
+                        peek = self.peekToken()
 
-                    if peek is None or '\n' in peek[0]:
-                        break
+                        if peek is None or '\n' in peek[0]:
+                            break
 
-                    next_tok = self.nextToken()
+                        next_tok = self.nextToken()
 
-                    if next_tok is None:
-                        break
+                        if next_tok is None:
+                            break
 
-                    comment_text += next_tok[0]
-                    comment_len += next_tok[1]
+                        comment_text += next_tok[0]
+                        comment_len += next_tok[1]
 
-                self.setStyling(comment_len, RustLexer.COMMENTS)
+                    self.setStyling(comment_len, RustLexer.COMMENTS)
 
-                continue
+                    continue
 
             elif tok == '#':
                 attribute_text = tok
