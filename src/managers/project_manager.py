@@ -27,7 +27,7 @@ class ProjectIndexer(QThread):
     def projectDir(self) -> str:
         return self._project_dir
 
-    def result(self) -> list[str]:
+    def result(self) -> list[tuple[str, str]]:
         return self._result
 
 
@@ -94,10 +94,33 @@ class ProjectManager:
         self.indexProject()
 
     def indexFinished(self):
-        new_index = self._project_indexer.result()
+        new_index_list = self._project_indexer.result()
+        old_index_list = self._old_index
 
-        for old_name, new_name in zip(self._old_index, new_index):
+        old_index = dict(old_index_list)  # {filename: hash}
+        new_index = dict(new_index_list)  # {filename: hash}
+
+        renamed = []
+        matched_old_files = set()
+        matched_new_files = set()
+
+        for old_name, old_hash in old_index.items():
+            for new_name, new_hash in new_index.items():
+                if old_hash == new_hash and old_name != new_name:
+                    renamed.append((old_name, new_name))
+                    matched_old_files.add(old_name)
+                    matched_new_files.add(new_name)
+                    break
+
+        deleted_files = set(old_index.keys()) - matched_old_files - set(new_index.keys())
+
+        for old_name, new_name in renamed:
             self._tab_view.updateTab(old_name, new_name)
+
+        for deleted in deleted_files:
+            self._tab_view.updateTab(deleted, '')
+
+        self._old_index = new_index_list
 
     def run(self):
         file = self._tab_view.currentTab().filename()

@@ -76,15 +76,15 @@ class TabView(QTabWidget):
 
     def updateTab(self, old_name: str, new_name: str):
         old_name = os.path.abspath(old_name)
-        new_name = os.path.abspath(new_name)
 
         for i, tab in enumerate(self._tabs):
             if tab.filename() == old_name:
-                if os.path.exists(new_name):
-                    tab.setFileName(new_name)
+                if new_name and os.path.exists(new_name):
+                    tab.setFileName(os.path.abspath(new_name))
                     self._tabs[i] = tab
 
                 else:
+                    # tab filename is deleted, remove it
                     self.closeTab(i)
 
                 break

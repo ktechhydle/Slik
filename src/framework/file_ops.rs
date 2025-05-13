@@ -1,6 +1,8 @@
 use pyo3::prelude::*;
+use sha1::{Digest, Sha1};
 use std::fs;
 use std::io::{BufReader, Read};
+use std::path::Path;
 use walkdir::{DirEntry, WalkDir};
 
 #[pyfunction]
@@ -18,25 +20,26 @@ pub fn write(file_name: &str, contents: &str) -> PyResult<()> {
 }
 
 #[pyfunction]
-pub fn index(dir: &str) -> PyResult<Vec<String>> {
-    let mut paths = Vec::new();
+pub fn index(dir: &str) -> PyResult<Vec<(String, String)>> {
+    let mut results = Vec::new();
 
     for entry in WalkDir::new(dir)
         .into_iter()
-        .filter_entry(|e| !should_skip_dir(e)) // only skip __pycache__
+        .filter_entry(|e| !should_skip_dir(e))
         .filter_map(Result::ok)
     {
         let path = entry.path();
 
         if entry.file_type().is_file() && !is_binary_file(path) {
-            paths.push(path.display().to_string());
+            if let Ok(hash) = hash_file(path) {
+                results.push((path.display().to_string(), hash));
+            }
         }
     }
 
-    Ok(paths)
+    Ok(results)
 }
 
-// skip dirs
 fn should_skip_dir(entry: &DirEntry) -> bool {
     entry.file_type().is_dir()
         && entry
@@ -61,13 +64,11 @@ fn should_skip_dir(entry: &DirEntry) -> bool {
             .unwrap_or(false)
 }
 
-// check if a file contains binary content
-fn is_binary_file(path: &std::path::Path) -> bool {
+fn is_binary_file(path: &Path) -> bool {
     if let Ok(file) = fs::File::open(path) {
         let mut reader = BufReader::new(file);
         let mut buffer = [0; 1024];
         if let Ok(n) = reader.read(&mut buffer) {
-            // try to decode as UTF-8
             std::str::from_utf8(&buffer[..n]).is_err()
         } else {
             true
@@ -75,4 +76,21 @@ fn is_binary_file(path: &std::path::Path) -> bool {
     } else {
         true
     }
+}
+
+fn hash_file(path: &Path) -> Result<String, std::io::Error> {
+    let mut file = fs::File::open(path)?;
+    let mut hasher = Sha1::new();
+    let mut buffer = [0; 8192];
+    let mut reader = BufReader::new(file);
+
+    loop {
+        let bytes_read = reader.read(&mut buffer)?;
+        if bytes_read == 0 {
+            break;
+        }
+        hasher.update(&buffer[..bytes_read]);
+    }
+
+    Ok(format!("{:x}", hasher.finalize()))
 }
