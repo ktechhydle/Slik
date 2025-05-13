@@ -97,8 +97,7 @@ class ProjectManager:
         new_index = self._project_indexer.result()
 
         for old_name, new_name in zip(self._old_index, new_index):
-            if old_name != new_name:
-                self._tab_view.updateTab(old_name, new_name)
+            self._tab_view.updateTab(old_name, new_name)
 
     def run(self):
         file = self._tab_view.currentTab().filename()

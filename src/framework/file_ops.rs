@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use std::fs;
+use std::io::{BufReader, Read};
 use walkdir::{DirEntry, WalkDir};
 
 #[pyfunction]
@@ -20,20 +21,56 @@ pub fn write(file_name: &str, contents: &str) -> PyResult<()> {
 pub fn index(dir: &str) -> PyResult<Vec<String>> {
     let mut paths = Vec::new();
 
-    fn is_hidden_dir(entry: &DirEntry) -> bool {
-        // only ignore directories starting with "."
-        entry.file_type().is_dir() && entry.file_name().to_str().map(|s| s.starts_with(".")).unwrap_or(false)
-    }
-
     for entry in WalkDir::new(dir)
         .into_iter()
-        .filter_entry(|e| !is_hidden_dir(e)) // filter out hidden dirs
+        .filter_entry(|e| !should_skip_dir(e)) // only skip __pycache__
         .filter_map(Result::ok)
     {
-        if entry.file_type().is_file() {
-            paths.push(entry.path().display().to_string());
+        let path = entry.path();
+
+        if entry.file_type().is_file() && !is_binary_file(path) {
+            paths.push(path.display().to_string());
         }
     }
 
     Ok(paths)
+}
+
+// skip dirs
+fn should_skip_dir(entry: &DirEntry) -> bool {
+    entry.file_type().is_dir()
+        && entry
+            .file_name()
+            .to_str()
+            .map(|name| {
+                [
+                    "__pycache__",
+                    "git",
+                    "idea",
+                    "vscode",
+                    "venv",
+                    "env",
+                    "target",
+                    "build",
+                    "dist",
+                ]
+                .contains(&name)
+            })
+            .unwrap_or(false)
+}
+
+// check if a file contains binary content
+fn is_binary_file(path: &std::path::Path) -> bool {
+    if let Ok(file) = fs::File::open(path) {
+        let mut reader = BufReader::new(file);
+        let mut buffer = [0; 1024];
+        if let Ok(n) = reader.read(&mut buffer) {
+            // try to decode as UTF-8
+            std::str::from_utf8(&buffer[..n]).is_err()
+        } else {
+            true
+        }
+    } else {
+        true
+    }
 }

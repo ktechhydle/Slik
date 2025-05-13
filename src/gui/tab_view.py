@@ -1,4 +1,6 @@
 import os
+
+from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QTabWidget, QWidget
 from src.gui.tab import Tab
 
@@ -78,9 +80,12 @@ class TabView(QTabWidget):
 
         for i, tab in enumerate(self._tabs):
             if tab.filename() == old_name:
-                if new_name != old_name:
+                if os.path.exists(new_name):
                     tab.setFileName(new_name)
                     self._tabs[i] = tab
+
+                else:
+                    self.closeTab(i)
 
                 break
 
