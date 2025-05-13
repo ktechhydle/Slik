@@ -92,10 +92,10 @@ class TabView(QTabWidget):
     def defaultTab(self):
         self.openTab('resources/default/start.md')
 
-    def setProjectDir(self, dir: str):
-        self._project_dir = dir
+    def setProjectDir(self, path: str):
+        self._project_dir = path
 
-        readme_path = f'{dir}/README.md'
+        readme_path = f'{path}/README.md'
 
         if os.path.exists(readme_path):
             self.clear(no_default=True)

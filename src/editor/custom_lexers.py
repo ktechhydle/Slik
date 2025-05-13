@@ -592,7 +592,7 @@ class RustLexer(BaseLexer):
             is_blank = not line_text.strip()
 
             if line_text.strip().startswith((
-                    'fn', 'struct', 'enum', 'impl', 'trait', 'if', 'else',
+                    'pub', 'fn', 'struct', 'enum', 'impl', 'trait', 'if', 'else',
                     'async', 'match', 'for', 'while', 'loop')):
                 level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
 

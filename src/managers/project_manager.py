@@ -21,8 +21,8 @@ class ProjectIndexer(QThread):
 
         self.finished.emit()
 
-    def setProjectDir(self, dir: str):
-        self._project_dir = dir
+    def setProjectDir(self, path: str):
+        self._project_dir = path
 
     def projectDir(self) -> str:
         return self._project_dir
