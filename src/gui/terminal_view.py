@@ -16,7 +16,8 @@ class TerminalView(QTabWidget):
         self.tabCloseRequested.connect(self.closeTerminal)
 
     def clear(self):
-        super().clear()
+        for i in range(self.count()):
+            self.closeTerminal(i)
 
         self.newTerminal()
 
@@ -43,23 +44,23 @@ class TerminalView(QTabWidget):
         self.setCurrentIndex(self.indexOf(terminal))
 
     def closeTerminal(self, index: int):
+        terminal = self.widget(index)
+
+        if terminal.hasCurrentProcess():
+            message = MessageDialog('Quit Process',
+                                    'A process is currently running in this '
+                                    'terminal. Do you want to close it?',
+                                    (MessageDialog.YesButton, MessageDialog.NoButton),
+                                    self)
+            message.exec()
+
+            if not message.result() == MessageDialog.Accepted:
+                return
+
+            else:
+                terminal.quit()
+
         if self.count() == 1:
-            terminal = self.widget(index)
-
-            if terminal.hasCurrentProcess():
-                message = MessageDialog('Quit Process',
-                                        'A process is currently running in this '
-                                                        'terminal. Do you want to close it?',
-                                        (MessageDialog.YesButton, MessageDialog.NoButton),
-                                        self)
-                message.exec()
-
-                if not message.result() == MessageDialog.Accepted:
-                    return
-
-                else:
-                    terminal.quit()
-
             self.removeTab(index)
             self.newTerminal()
 

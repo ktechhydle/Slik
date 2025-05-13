@@ -4,8 +4,7 @@ import slik
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QFontDatabase
 from PyQt6.QtWidgets import QMainWindow, QSplitter, QApplication
-
-from managers.project_manager import ProjectManager
+from src.managers.project_manager import ProjectManager
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
 from src.gui.terminal_view import TerminalView
