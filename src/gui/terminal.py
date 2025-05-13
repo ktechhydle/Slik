@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLa
 
 class CommandRunner(QThread):
     outputReady = pyqtSignal(str)
+    inputRequested = pyqtSignal(str)  # optional prompt message
 
     def __init__(self, command, terminal):
         super().__init__()
@@ -15,6 +16,7 @@ class CommandRunner(QThread):
         self._command = command
         self._terminal = terminal
         self._process = None
+        self._stdin_buffer = []
 
     def run(self):
         try:
@@ -35,13 +37,13 @@ class CommandRunner(QThread):
                     self.outputReady.emit(line.rstrip())
 
             self._process.stdout.close()
-            self._process.wait()
+            exit_code = self._process.wait()
+
+            # exit code after process finishes
+            self.outputReady.emit(f'Process finished with exit code {exit_code}')
 
         except Exception as e:
             self.outputReady.emit(str(e))
-
-        # TODO: add exit code
-        # self.outputReady.emit(f'Process finished with exit code {1}')
 
     def quit(self):
         if self._process:
@@ -156,7 +158,7 @@ class Terminal(QWidget):
         self._container.layout().insertWidget(self._container.layout().count() - 1, output_widget)
 
         self._command_runner = CommandRunner(text, self)
-        self._command_runner.outputReady.connect(lambda line: output_widget.appendPlainText(line))
+        self._command_runner.outputReady.connect(output_widget.appendPlainText)
         self._command_runner.finished.connect(output_widget.scrollToTop)
         self._command_runner.finished.connect(self.newPrompt)
         self._command_runner.start()
