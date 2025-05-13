@@ -40,6 +40,9 @@ class CommandRunner(QThread):
         except Exception as e:
             self.outputReady.emit(str(e))
 
+        # TODO: add exit code
+        # self.outputReady.emit(f'Process finished with exit code {1}')
+
     def quit(self):
         if self._process:
             self._process.kill()
@@ -54,6 +57,8 @@ class OutputTextEdit(QPlainTextEdit):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.textChanged.connect(self.updateSize)
+
+        self.updateSize()
 
     def updateSize(self):
         doc_height = self.document().size().height()
