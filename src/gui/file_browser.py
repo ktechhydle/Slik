@@ -26,6 +26,18 @@ class FileSystemModel(QFileSystemModel):
             elif file_path.endswith('.rs'):
                 return make_icon('resources/icons/logos/rust_icon.svg')
 
+            elif file_path.endswith('.html'):
+                return make_icon('resources/icons/logos/html_icon.svg')
+
+            elif file_path.endswith('.css'):
+                return make_icon('resources/icons/logos/css_icon.svg')
+
+            elif file_path.endswith(('.toml', '.lock')):
+                return make_icon('resources/icons/logos/toml_icon.svg')
+
+            elif file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
+                return make_icon('resources/icons/logos/image_icon.svg')
+
             elif os.path.isdir(file_path):
                 return make_icon('resources/icons/ui/folder_icon.svg')
 
