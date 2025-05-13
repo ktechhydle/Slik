@@ -9,4 +9,5 @@ name = "slik"
 crate-type = ["cdylib"]
 
 [dependencies]
+walkdir = "2"
 pyo3 = { version = "0.24.0", features = ["extension-module"] }
