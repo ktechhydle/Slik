@@ -14,11 +14,10 @@ class ProjectIndexer(QThread):
         super().__init__()
 
         self._project_dir = ''
-        self._indexed_project = []
+        self._result = []
 
     def run(self):
-        self._indexed_project = slik.index(self._project_dir)
-        print(self._indexed_project)
+        self._result = slik.index(self._project_dir)
 
         self.finished.emit()
 
@@ -29,13 +28,16 @@ class ProjectIndexer(QThread):
         return self._project_dir
 
     def result(self) -> list[str]:
-        return self._indexed_project
+        return self._result
+
 
 class ProjectManager:
     def __init__(self, tab_view: QTabWidget, terminal_view: QTabWidget):
         self._tab_view = tab_view
         self._terminal_view = terminal_view
         self._project_indexer = ProjectIndexer()
+        self._project_indexer.finished.connect(self.indexFinished)
+        self._old_index = []
 
         self.createDialogs()
         self.createActions()
@@ -82,16 +84,21 @@ class ProjectManager:
         self._file_browser.setPath(path)
 
     def indexProject(self):
-        self._project_indexer.quit() # kill the indexing if it's still happening
-        self._project_indexer.run()
+        if self._project_indexer.isRunning():
+            self._project_indexer.terminate() # kill the indexing if it's still happening
+
+        self._project_indexer.start()
 
     def updateProject(self):
-        # detect the changed files/dirs and update tabs based on changes
-        old = self._project_indexer.result()
-
+        self._old_index = self._project_indexer.result()
         self.indexProject()
 
-        new = self._project_indexer.result()
+    def indexFinished(self):
+        new_index = self._project_indexer.result()
+
+        for old_name, new_name in zip(self._old_index, new_index):
+            if old_name != new_name:
+                self._tab_view.updateTab(old_name, new_name)
 
     def run(self):
         file = self._tab_view.currentTab().filename()
