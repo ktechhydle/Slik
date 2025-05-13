@@ -2,7 +2,7 @@ import re
 import types
 import builtins
 import keyword
-from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerCSS
+from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerHTML, QsciLexerCSS, QsciLexerMarkdown
 from PyQt6.QtGui import QColor, QFont
 
 
@@ -601,6 +601,27 @@ class RustLexer(BaseLexer):
             self.editor().SendScintilla(QsciScintilla.SCI_SETFOLDLEVEL, line_num, level)
 
 
+class HTMLLexer(QsciLexerHTML):
+    def __init__(self):
+        super().__init__()
+        self.setDefaultColor(QColor('#ffffff'))
+        self.setDefaultPaper(QColor('#1e1e1e'))
+        self.setDefaultFont(QFont('JetBrains Mono', 14))
+        self.setFoldCompact(False)
+
+        self.createStyle()
+
+    def createStyle(self):
+        normal = QColor('#abb2bf')
+        font = QFont('JetBrains Mono', 14)
+        italic = QFont('JetBrains Mono', 14)
+        italic.setItalic(True)
+
+        self.setFont(italic, HTMLLexer.HTMLComment)
+        self.setColor(normal, HTMLLexer.Default)
+        self.setColor(QColor('#7f848e'), HTMLLexer.HTMLComment)
+
+
 class CSSLexer(QsciLexerCSS):
     def __init__(self):
         super().__init__()
@@ -635,6 +656,40 @@ class CSSLexer(QsciLexerCSS):
         self.setColor(QColor('#56b6c2'), CSSLexer.PseudoClass)
         self.setColor(QColor('#98c379'), CSSLexer.DoubleQuotedString)
         self.setColor(QColor('#98c379'), CSSLexer.SingleQuotedString)
+
+
+class MarkdownLexer(QsciLexerMarkdown):
+    def __init__(self):
+        super().__init__()
+        self.setDefaultColor(QColor('#ffffff'))
+        self.setDefaultPaper(QColor('#1e1e1e'))
+        self.setDefaultFont(QFont('JetBrains Mono', 14))
+
+        self.createStyle()
+
+    def createStyle(self):
+        normal = QColor('#abb2bf')
+        font = QFont('JetBrains Mono', 14)
+        italic = QFont('JetBrains Mono', 14)
+        italic.setItalic(True)
+
+        self.setFont(font, MarkdownLexer.Default)
+        self.setFont(font, MarkdownLexer.Header1)
+        self.setFont(font, MarkdownLexer.Header2)
+        self.setFont(font, MarkdownLexer.Header3)
+        self.setFont(font, MarkdownLexer.Header4)
+        self.setFont(font, MarkdownLexer.Header5)
+        self.setFont(font, MarkdownLexer.CodeBlock)
+        self.setFont(italic, MarkdownLexer.EmphasisUnderscores)
+        self.setFont(italic, MarkdownLexer.StrongEmphasisUnderscores)
+        self.setColor(normal, MarkdownLexer.Default)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.Header1)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.Header2)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.Header3)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.Header4)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.Header5)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.EmphasisUnderscores)
+        self.setColor(QColor('#d19a66'), MarkdownLexer.StrongEmphasisUnderscores)
 
 
 class PlainTextLexer(BaseLexer):

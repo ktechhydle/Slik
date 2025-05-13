@@ -1,10 +1,8 @@
 from PyQt6.Qsci import QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeyEvent, QFont, QPixmap
-
-from editor.custom_lexers import CSSLexer
 from src.editor.auto_completer import AutoCompleter
-from src.editor.custom_lexers import PythonLexer, PlainTextLexer, RustLexer
+from src.editor.custom_lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
 
 
 class Editor(QsciScintilla):
@@ -56,11 +54,14 @@ class Editor(QsciScintilla):
         elif self._file_name.endswith('.rs'):
             self._lexer = RustLexer(self)
 
+        elif self._file_name.endswith('.html'):
+            self._lexer = HTMLLexer()
+
         elif self._file_name.endswith('.css'):
             self._lexer = CSSLexer()
 
         elif self._file_name.endswith('.md'):
-            self._lexer = PlainTextLexer(self)
+            self._lexer = MarkdownLexer()
 
         else:
             self._lexer = PlainTextLexer(self)
