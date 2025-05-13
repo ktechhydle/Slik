@@ -1,6 +1,8 @@
 from PyQt6.Qsci import QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeyEvent, QFont, QPixmap
+
+from editor.custom_lexers import CSSLexer
 from src.editor.auto_completer import AutoCompleter
 from src.editor.custom_lexers import PythonLexer, PlainTextLexer, RustLexer
 
@@ -53,6 +55,9 @@ class Editor(QsciScintilla):
 
         elif self._file_name.endswith('.rs'):
             self._lexer = RustLexer(self)
+
+        elif self._file_name.endswith('.css'):
+            self._lexer = CSSLexer()
 
         elif self._file_name.endswith('.md'):
             self._lexer = PlainTextLexer(self)
@@ -197,7 +202,8 @@ class Editor(QsciScintilla):
             start = self.positionFromLineIndex(line, 0)
             end = self.positionFromLineIndex(line, column)
 
-            self._lexer.startStyling(start, end)
+            if hasattr(self._lexer, 'startStyling'): # only custom lexers have the "startStyling" method
+                self._lexer.startStyling(start, end)
 
     def setFileName(self, file_name: str):
         self._file_name = file_name

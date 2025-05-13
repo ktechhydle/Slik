@@ -29,6 +29,7 @@ class Slik(QMainWindow):
 
         self.project_manager = ProjectManager(self.tab_view, self.terminal_view)
         self.project_manager.openProject(os.path.abspath('.'))
+        self.tab_view.openTab('resources/stylesheets/slik_dark.css')
 
         splitter.addWidget(self.tab_view)
         splitter.addWidget(self.terminal_view)

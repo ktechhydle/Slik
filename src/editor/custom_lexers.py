@@ -1,9 +1,8 @@
 import re
-import slik
 import types
 import builtins
 import keyword
-from PyQt6.Qsci import QsciLexerCustom, QsciScintilla
+from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerCSS
 from PyQt6.QtGui import QColor, QFont
 
 
@@ -600,6 +599,42 @@ class RustLexer(BaseLexer):
                 level |= QsciScintilla.SC_FOLDLEVELWHITEFLAG
 
             self.editor().SendScintilla(QsciScintilla.SCI_SETFOLDLEVEL, line_num, level)
+
+
+class CSSLexer(QsciLexerCSS):
+    def __init__(self):
+        super().__init__()
+        self.setDefaultColor(QColor('#ffffff'))
+        self.setDefaultPaper(QColor('#1e1e1e'))
+        self.setDefaultFont(QFont('JetBrains Mono', 14))
+        self.setFoldComments(True)
+        self.setFoldCompact(False)
+
+        self.createStyle()
+
+    def createStyle(self):
+        normal = QColor('#abb2bf')
+        font = QFont('JetBrains Mono', 14)
+        italic = QFont('JetBrains Mono', 14)
+        italic.setItalic(True)
+
+        self.setFont(italic, CSSLexer.Comment)
+        self.setFont(font, CSSLexer.Tag)
+        self.setColor(normal, CSSLexer.Default)
+        self.setColor(normal, CSSLexer.Operator)
+        self.setColor(normal, CSSLexer.CSS1Property)
+        self.setColor(normal, CSSLexer.CSS2Property)
+        self.setColor(normal, CSSLexer.CSS3Property)
+        self.setColor(normal, CSSLexer.UnknownProperty)
+        self.setColor(QColor('#7f848e'), CSSLexer.Comment)
+        self.setColor(QColor('#c678dd'), CSSLexer.Tag)
+        self.setColor(QColor('#d19a66'), CSSLexer.Value)
+        self.setColor(QColor('#e06c75'), CSSLexer.Variable)
+        self.setColor(QColor('#56b6c2'), CSSLexer.IDSelector)
+        self.setColor(QColor('#56b6c2'), CSSLexer.UnknownPseudoClass)
+        self.setColor(QColor('#56b6c2'), CSSLexer.PseudoClass)
+        self.setColor(QColor('#98c379'), CSSLexer.DoubleQuotedString)
+        self.setColor(QColor('#98c379'), CSSLexer.SingleQuotedString)
 
 
 class PlainTextLexer(BaseLexer):
