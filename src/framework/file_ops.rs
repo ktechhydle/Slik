@@ -79,7 +79,7 @@ fn is_binary_file(path: &Path) -> bool {
 }
 
 fn hash_file(path: &Path) -> Result<String, std::io::Error> {
-    let mut file = fs::File::open(path)?;
+    let file = fs::File::open(path)?;
     let mut hasher = Sha1::new();
     let mut buffer = [0; 8192];
     let mut reader = BufReader::new(file);
