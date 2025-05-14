@@ -41,27 +41,26 @@ pub fn index(dir: &str) -> PyResult<Vec<(String, String)>> {
 }
 
 fn should_skip_dir(entry: &DirEntry) -> bool {
-    entry.file_type().is_dir()
-        && entry
-            .file_name()
-            .to_str()
-            .map(|name| {
-                [
-                    "__pycache__",
-                    "git",
-                    "idea",
-                    "vscode",
-                    ".venv",
-                    "venv",
-                    ".env",
-                    "env",
-                    "target",
-                    "build",
-                    "dist",
-                ]
-                .contains(&name)
-            })
-            .unwrap_or(false)
+    let name = entry.file_name().to_str();
+
+    let is_named_to_skip = name
+        .map(|name| {
+            [
+                "__pycache__",
+                ".git",
+                ".idea",
+                ".vscode",
+                "target",
+                "build",
+                "dist",
+            ]
+            .contains(&name)
+        })
+        .unwrap_or(false);
+
+    let is_venv = is_virtualenv_dir(entry.path());
+
+    entry.file_type().is_dir() && (is_named_to_skip || is_venv)
 }
 
 fn is_binary_file(path: &Path) -> bool {
@@ -76,6 +75,10 @@ fn is_binary_file(path: &Path) -> bool {
     } else {
         true
     }
+}
+
+fn is_virtualenv_dir(path: &Path) -> bool {
+    path.join("pyvenv.cfg").exists()
 }
 
 fn hash_file(path: &Path) -> Result<String, std::io::Error> {

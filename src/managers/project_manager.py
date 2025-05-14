@@ -84,15 +84,15 @@ class ProjectManager:
     def openProject(self, path: str):
         self._file_browser.setPath(path)
 
+    def updateProject(self):
+        self._old_index = self._project_indexer.result()
+        self.indexProject()
+
     def indexProject(self):
         if self._project_indexer.isRunning():
             self._project_indexer.terminate() # kill the indexing if it's still happening
 
         self._project_indexer.start()
-
-    def updateProject(self):
-        self._old_index = self._project_indexer.result()
-        self.indexProject()
 
     def indexFinished(self):
         new_index_list = self._project_indexer.result()
