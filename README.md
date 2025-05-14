@@ -17,10 +17,6 @@ Slik is based on three key points:
 3. Hidden Until You Need It
 > Slik's user interface is task specific, with dialogs being activated by key strokes _(try `Ctrl+Q` to see the file browser!)_
 
-- **Creative UI** Slik's user interface is task specific, with all dialogs being activated by key strokes. This means code focus without the distraction of multiple widgets and windows.
-- **Auto Runner** Slik will automatically detect a main entrypoint and run code from there.
-- **No IDE directory** Slik doesn't need ".vscode" like directories for IDE specific features.
-
 ## Free And Open Source
 Slik is 100% free with no drawbacks or limitations. There is no "premium" version; you get the latest and greatest,
 all licensed under the GPL. Slik currently only supports Windows, but can be run on macOS and Linux by cloning this

@@ -115,14 +115,15 @@ class TabView(QTabWidget):
                 break
 
     def updateTabContents(self):
+        if hasattr(self, '_tab_content_indexer'):
+            self._tab_content_indexer.quit() # we need to quit the thread just in case
+
         self._tab_content_indexer = TabContentIndexer(self._tabs)
 
         def update_tab(results: list[tuple[Tab, str]]):
             if results:
                 for tab, contents in results:
-                    tab.editor().setText(contents)
-
-            del self._tab_content_indexer
+                    tab.editor().setText(contents, preserve=True)
 
         self._tab_content_indexer.finished.connect(update_tab)
         self._tab_content_indexer.start()

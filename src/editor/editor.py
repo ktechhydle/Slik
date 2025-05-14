@@ -47,6 +47,15 @@ class Editor(QsciScintilla):
         else:
             super().keyPressEvent(event)
 
+    def setText(self, text: str, preserve=False):
+        x, y = self.horizontalScrollBar().value(), self.verticalScrollBar().value()
+
+        super().setText(text)
+
+        if preserve:
+            self.horizontalScrollBar().setValue(x)
+            self.verticalScrollBar().setValue(y)
+
     def createLexer(self):
         if self._file_name.endswith('.py'):
             self._lexer = PythonLexer(self)
