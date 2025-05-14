@@ -48,6 +48,7 @@ class ProjectManager:
         self._file_browser.projectDirChanged.connect(self._tab_view.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._project_indexer.setProjectDir)
         self._file_browser.projectDirChanged.connect(self.indexProject)
+        self._file_browser.projectChanged.connect(self._tab_view.updateTabContents)
         self._file_browser.projectChanged.connect(self.updateProject)
 
     def createActions(self):

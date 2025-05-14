@@ -1,8 +1,30 @@
 import os
-
-from PyQt6.QtGui import QColor
+import slik
+from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QTabWidget, QWidget
 from src.gui.tab import Tab
+
+
+class TabContentIndexer(QThread):
+    finished = pyqtSignal(list)
+
+    def __init__(self, tabs: list[Tab]):
+        super().__init__()
+
+        self._tabs = tabs
+        self._results = []
+
+    def run(self):
+        for tab in self._tabs:
+            old_contents = tab.editor().text()
+            new_contents = slik.read(tab.filename())
+
+            if old_contents != new_contents:
+                self._results.append((tab, new_contents))
+
+        self.finished.emit(self._results)
+
+        self._results.clear()
 
 
 class TabView(QTabWidget):
@@ -87,7 +109,23 @@ class TabView(QTabWidget):
                     # tab filename is deleted, remove it
                     self.closeTab(i)
 
+                    if tab in self._tabs:
+                        self._tabs.remove(tab)
+
                 break
+
+    def updateTabContents(self):
+        self._tab_content_indexer = TabContentIndexer(self._tabs)
+
+        def update_tab(results: list[tuple[Tab, str]]):
+            if results:
+                for tab, contents in results:
+                    tab.editor().setText(contents)
+
+            del self._tab_content_indexer
+
+        self._tab_content_indexer.finished.connect(update_tab)
+        self._tab_content_indexer.start()
 
     def defaultTab(self):
         self.openTab('resources/default/start.md')
