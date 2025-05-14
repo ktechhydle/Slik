@@ -49,6 +49,7 @@ class Tab(QWidget):
 
             if file_ext in ('.md', '.svg'):
                 # needs custom properties
+                self._viewer.setHtml(slik.read('resources/html/markdown_template.html'))
                 self._viewer.setMarkdown(self._editor.text())
                 self._editor.textChanged.connect(lambda: self._viewer.setMarkdown(self._editor.text()))
 
