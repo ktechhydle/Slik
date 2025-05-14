@@ -45,17 +45,19 @@ class Tab(QWidget):
         file_ext = os.path.splitext(self.basename())[1]
 
         if file_ext in ('.md', '.html', '.svg'):
-            viewer = HtmlViewer(self)
+            self._viewer = HtmlViewer(self.tab_view.projectDir(), self)
 
             if file_ext in ('.md', '.svg'):
-                viewer.setMarkdown(self._editor.text())
-                self._editor.textChanged.connect(lambda: viewer.setMarkdown(self._editor.text()))
+                # needs custom properties
+                self._viewer.setMarkdown(self._editor.text())
+                self._editor.textChanged.connect(lambda: self._viewer.setMarkdown(self._editor.text()))
 
             else:
-                viewer.setHtml(self._editor.text())
-                self._editor.textChanged.connect(lambda: viewer.setHtml(self._editor.text()))
+                # plain html doc, just read it
+                self._viewer.setHtml(self._editor.text())
+                self._editor.textChanged.connect(lambda: self._viewer.setHtml(self._editor.text()))
 
-            self._splitter.addWidget(viewer)
+            self._splitter.addWidget(self._viewer)
 
         self._editor.setFileName(self._file_name)
 
