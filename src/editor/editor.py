@@ -44,6 +44,16 @@ class Editor(QsciScintilla):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.enter(event)
 
+        elif event.key() in (
+                Qt.Key.Key_ParenLeft,
+                Qt.Key.Key_BracketLeft,
+                Qt.Key.Key_BraceLeft,
+                Qt.Key.Key_QuoteDbl,
+                Qt.Key.Key_Apostrophe,
+                Qt.Key.Key_QuoteLeft,
+        ):
+            self.wrapSelected(event)
+
         else:
             super().keyPressEvent(event)
 
@@ -126,23 +136,28 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
     def enter(self, event: QKeyEvent):
+        line, index = self.getCursorPosition()
+        current_line_text = self.text(line)[:index].rstrip()
+        indent = self.indentation(line)
+
         # python style indents
         if self.filename().endswith('.py'):
-            line, index = self.getCursorPosition()
-            current_line_text = self.text(line)[:index].rstrip()
-            indent = self.indentation(line)
-
             if current_line_text.endswith(':'):
                 indent += self.tabWidth()
 
-            elif any(keyword in self.text(line).rstrip().split('#')[0].strip() for keyword in (
+            elif any(keyword in current_line_text for keyword in (
                     'return',
                     'pass',
                     'break',
                     'continue',
-                    'raise', 
+                    'raise',
                     '...')):
                 indent -= self.tabWidth()
+
+            else:
+                super().keyPressEvent(event)
+
+                return
 
             self.beginUndoAction()
             self.insert('\n')
@@ -152,10 +167,6 @@ class Editor(QsciScintilla):
 
         # bracket style indentation
         elif self.filename().endswith(('.rs', '.css', '.qss', '.json')):
-            line, index = self.getCursorPosition()
-            current_line_text = self.text(line)[:index].rstrip()
-            indent = self.indentation(line)
-
             self.beginUndoAction()
 
             if current_line_text.endswith('{'):
@@ -175,27 +186,31 @@ class Editor(QsciScintilla):
         else:
             super().keyPressEvent(event)
 
-    def backspace(self):
-        line, column = self.getCursorPosition()
+    def wrapSelected(self, event: QKeyEvent):
+        pairs = {
+            Qt.Key.Key_ParenLeft: ('(', ')'),
+            Qt.Key.Key_BracketLeft: ('[', ']'),
+            Qt.Key.Key_BraceLeft: ('{', '}'),
+            Qt.Key.Key_QuoteDbl: ('"', '"'),
+            Qt.Key.Key_Apostrophe: ("'", "'"),
+            Qt.Key.Key_QuoteLeft: ('`', '`'),
+        }
 
-        if column > 0:
-            prev_char = self.text(line)[column - 1]
-            next_char = self.text(line)[column] if column < len(self.text(line)) else ''
+        left, right = pairs[event.key()]
+        selected = self.selectedText()
 
-            pairs = {
-                "'": "'",
-                '"': '"',
-                '(': ')',
-                '{': '}',
-                '[': ']',
-                '`': '`'
-            }
+        if selected:
+            self.beginUndoAction()
 
-            if prev_char in pairs and next_char == pairs[prev_char]:
-                self.setSelection(line, column, line, column + 1)
-                self.removeSelectedText()
+            start_line, start_column, end_line, end_column = self.getSelection()
 
-                return
+            self.replaceSelectedText(f'{left}{selected}{right}')
+
+            self.endUndoAction()
+            self.setSelection(start_line, start_column + 1, end_line, end_column + 1)
+
+        else:
+            super().keyPressEvent(event)
 
     def getAutoCompletions(self):
         if not self.selectedText():
