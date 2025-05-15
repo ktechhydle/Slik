@@ -1,8 +1,9 @@
 import os
 import shutil
 import slik
-from PyQt6.QtCore import Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, QDir
-from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction
+from PyQt6.QtCore import Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, QDir, \
+    QUrl
+from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
     QPushButton, QWidgetAction, QFileDialog)
 from src.gui.input_dialog import InputDialog
@@ -99,12 +100,21 @@ class FileSystemViewer(QTreeView):
             delete_action = QAction('Delete', self)
             delete_action.triggered.connect(self.removeSelected)
 
+            open_in_explorer_action = QAction('Open In Explorer', self)
+            open_in_explorer_action.triggered.connect(self.openExplorer)
+
+            open_in_application_action = QAction('Open In Associated App', self)
+            open_in_application_action.triggered.connect(self.openAssociated)
+
             self.menu.addAction(new_file_action)
             self.menu.addAction(new_dir_action)
             self.menu.addSeparator()
             self.menu.addAction(rename_action)
             self.menu.addSeparator()
             self.menu.addAction(delete_action)
+            self.menu.addSeparator()
+            self.menu.addAction(open_in_explorer_action)
+            self.menu.addAction(open_in_application_action)
 
         self.menu.exec(self.mapToGlobal(pos))
 
@@ -144,31 +154,54 @@ class FileSystemViewer(QTreeView):
         if not model.isDir(index):
             self.tab_view.openTab(filepath, insert=True)
 
+    def openExplorer(self):
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
+
+            if not index.isValid():
+                return
+
+            filepath = self.model().filePath(index)
+
+            if self.model().isDir(index):
+                QDesktopServices.openUrl(QUrl(filepath))
+
+            else:
+                QDesktopServices.openUrl(QUrl(os.path.dirname(filepath)))
+
+    def openAssociated(self):
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
+
+            if not index.isValid():
+                return
+
+            filepath = self.model().filePath(index)
+            QDesktopServices.openUrl(QUrl(filepath))
+
     def renameSelected(self):
-        if len(self.selectedIndexes()) > 1:
-            return
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
 
-        index = self.currentIndex()
+            if not index.isValid():
+                return
 
-        if not index.isValid():
-            return
+            model = self.model()
+            old_path = model.filePath(index)
+            old_name = os.path.basename(old_path)
+            dir_path = os.path.dirname(old_path)
 
-        model = self.model()
-        old_path = model.filePath(index)
-        old_name = os.path.basename(old_path)
-        dir_path = os.path.dirname(old_path)
+            new_name, ok = QInputDialog.getText(self.tab_view, 'Rename', 'New name:', text=old_name)
 
-        new_name, ok = QInputDialog.getText(self.tab_view, 'Rename', 'New name:', text=old_name)
+            if ok and new_name:
+                new_path = os.path.join(dir_path, new_name)
 
-        if ok and new_name:
-            new_path = os.path.join(dir_path, new_name)
+                try:
+                    os.rename(old_path, new_path)
+                    self.file_browser.updateFileBrowser()
 
-            try:
-                os.rename(old_path, new_path)
-                self.file_browser.updateFileBrowser()
-
-            except Exception as e:
-                raise e
+                except Exception as e:
+                    raise e
 
     def removeSelected(self):
         indexes = self.selectedIndexes()
