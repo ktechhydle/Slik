@@ -138,7 +138,19 @@ class ProjectManager:
                 message.exec()
 
         elif file.endswith('.rs'):
-            self._terminal_view.terminalFromCommand('cargo run')
+            if os.path.exists(f'{self.projectDir()}/Cargo.toml'):
+                self._terminal_view.terminalFromCommand('cargo run')
+
+            else:
+                message = MessageDialog("No 'Cargo.toml' File",
+                                        "The project runner couldn't find a 'Cargo.toml' entry point.",
+                                        (MessageDialog.OkButton,),
+                                        self._tab_view)
+                message.exec()
+
+        else:
+            # TODO: run Python/Rust (chosen by the user) no matter what file they are currently viewing
+            pass
 
     def runCurrent(self):
         file = self._tab_view.currentTab().filename()
