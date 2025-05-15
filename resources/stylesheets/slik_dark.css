@@ -456,6 +456,23 @@ QToolTip {
     text-decoration: underline;
 }
 
+#popup QLineEdit {
+    background-color: #707070;
+    font-family: 'JetBrains Mono';
+    font-size: 14px;
+    border-radius: 5px;
+    padding: 2px;
+    color: #ffffff;
+}
+
+#popup QLineEdit:hover {
+    background-color: #797979;
+}
+
+#popup QLineEdit:focus {
+    background-color: #303030;
+}
+
 #terminal {
     background-color: #262525;
 }

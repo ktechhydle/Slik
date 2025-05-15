@@ -1,9 +1,11 @@
 import os
 import shutil
+import slik
 from PyQt6.QtCore import Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, QDir
 from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
     QPushButton, QWidgetAction, QFileDialog)
+from src.gui.input_dialog import InputDialog
 from src.gui.message_dialog import MessageDialog
 
 
@@ -107,7 +109,30 @@ class FileSystemViewer(QTreeView):
         self.menu.exec(self.mapToGlobal(pos))
 
     def newFile(self):
-        pass
+        if len(self.selectedIndexes()) > 1:
+            return
+
+        index = self.currentIndex()
+
+        if not index.isValid():
+            return
+
+        filepath = self.model().filePath(index)
+        dir_path = os.path.dirname(filepath) if os.path.isfile(filepath) else filepath
+
+        input_dialog = InputDialog('New File', 'Name:', (InputDialog.OkButton, InputDialog.CancelButton), self.tab_view)
+        input_dialog.exec()
+
+        if input_dialog.result() == InputDialog.Accepted:
+            filename = os.path.join(dir_path, input_dialog.value())
+
+            if os.path.exists(os.path.abspath(filename)):
+                message = MessageDialog('Overwrite Error', f"A file with the name '{os.path.basename(filename)}' already exists.", (InputDialog.OkButton,), self.tab_view)
+                message.exec()
+
+                return
+
+            slik.write(os.path.abspath(filename), '')
 
     def newDir(self):
         pass
