@@ -1,10 +1,32 @@
 import slik
 import os
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QSplitter, QVBoxLayout, QTabWidget
 from src.editor.editor import Editor
 from src.editor.html_viewer import HtmlViewer
+
+
+class TabChangeIndexer(QThread):
+    finished = pyqtSignal(bool)
+
+    def __init__(self, current_contents: str, filename: str):
+        super().__init__()
+
+        self._current_contents = current_contents
+        self._filename = filename
+        self._result = False
+
+    def run(self):
+        if self._current_contents != slik.read(self._filename):
+            self._result = True
+
+        self.finished.emit(self._result)
+
+        self._result = False
+
+    def result(self) -> bool:
+        return self._result
 
 
 class Tab(QWidget):
@@ -72,13 +94,22 @@ class Tab(QWidget):
         self.tab_view.setTabIcon(self.tab_view.indexOf(self), QIcon(''))
 
     def setUnsaved(self):
-        if self._editor.text() != slik.read(self._file_name):
-            self._saved = False
-            self.tab_view.setTabIcon(self.tab_view.indexOf(self), QIcon('resources/icons/ui/unsaved_icon.svg'))
+        if hasattr(self, '_change_indexer'):
+            self._change_indexer.quit()
 
-            return
+        self._change_indexer = TabChangeIndexer(self._editor.text(), self._file_name)
 
-        self.setSaved()
+        def update_tab(result: bool):
+            print('indexing finished!')
+            if result:
+                self._saved = False
+                self.tab_view.setTabIcon(self.tab_view.indexOf(self), QIcon('resources/icons/ui/unsaved_icon.svg'))
+
+            else:
+                self.setSaved()
+
+        self._change_indexer.finished.connect(update_tab)
+        self._change_indexer.start()
 
     def setFileName(self, name: str):
         self._file_name = name
