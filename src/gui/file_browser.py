@@ -35,6 +35,9 @@ class FileSystemModel(QFileSystemModel):
             elif file_path.endswith('.md'):
                 return make_icon('resources/icons/logos/markdown_icon.svg')
 
+            elif file_path.endswith('.svg'):
+                return make_icon('resources/icons/logos/svg_icon.svg')
+
             elif file_path.endswith(('LICENSE', 'LICENSE.txt')):
                 return make_icon('resources/icons/logos/license_icon.svg')
 
