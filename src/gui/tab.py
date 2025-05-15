@@ -95,12 +95,11 @@ class Tab(QWidget):
 
     def setUnsaved(self):
         if hasattr(self, '_change_indexer'):
-            self._change_indexer.quit()
+            self._change_indexer.wait()
 
         self._change_indexer = TabChangeIndexer(self._editor.text(), self._file_name)
 
         def update_tab(result: bool):
-            print('indexing finished!')
             if result:
                 self._saved = False
                 self.tab_view.setTabIcon(self.tab_view.indexOf(self), QIcon('resources/icons/ui/unsaved_icon.svg'))

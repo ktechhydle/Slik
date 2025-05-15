@@ -90,7 +90,7 @@ class ProjectManager:
 
     def indexProject(self):
         if self._project_indexer.isRunning():
-            self._project_indexer.terminate() # kill the indexing if it's still happening
+            self._project_indexer.wait()
 
         self._project_indexer.start()
 
