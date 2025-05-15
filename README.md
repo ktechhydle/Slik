@@ -1,7 +1,7 @@
 <img src="resources\icons\logos\slik_icon.svg" width="125">
 
 # Slik
-Originally started as a personal project, Slik _is_ the IDE for MP Software developers.
+Slik is the official IDE for MP Software developers.
 
 <img src="resources/screenshots/startup.png">
 
@@ -11,7 +11,7 @@ Slik is based on three key points:
 1. Fully Automatic: 
 > Slik will detect virtual environments, main entrypoints, and index file system changes.
 
-2. Optimized And Quick
+2. Optimized For Success
 > Slik uses a GUI implemented in PyQt, with a Rust backend handling the majority of IDE related tasks.
 
 3. Hidden Until You Need It

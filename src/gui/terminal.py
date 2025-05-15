@@ -76,14 +76,14 @@ class OutputTextEdit(QPlainTextEdit):
 
 
 class Terminal(QWidget):
-    def __init__(self, cwd: str, tab_view: QTabWidget, parent=None):
+    def __init__(self, cwd: str, terminal_view: QTabWidget, parent=None):
         super().__init__(parent)
         self.setObjectName('terminal')
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._cwd = cwd
-        self.tab_view = tab_view
+        self._terminal_view = terminal_view
         self._current_input = None
 
         self.createUI()
@@ -145,8 +145,7 @@ class Terminal(QWidget):
             return
 
         elif text.startswith('exit'):
-            self.tab_view.removeTab(self.tab_view.indexOf(self))
-            self.tab_view.newTerminal()
+            self._terminal_view.closeTerminal(self._terminal_view.indexOf(self))
 
             return
 
@@ -186,6 +185,9 @@ class Terminal(QWidget):
 
     def cwd(self) -> str:
         return self._cwd
+
+    def currentInput(self) -> QLineEdit:
+        return self._current_input
 
     def hasCurrentProcess(self) -> bool:
         return hasattr(self, '_command_runner') and self._command_runner.isRunning()
