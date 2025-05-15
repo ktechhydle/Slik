@@ -2,7 +2,7 @@ import re
 import types
 import builtins
 import keyword
-from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerHTML, QsciLexerCSS, QsciLexerMarkdown
+from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerHTML, QsciLexerCSS, QsciLexerMarkdown, QsciLexerPython
 from PyQt6.QtGui import QColor, QFont
 
 
@@ -16,6 +16,7 @@ class Style:
     COLOR_BUILTIN = QColor('#56b6c2')
     COLOR_STRING = QColor('#98c379')
     COLOR_CONSTANT = QColor('#d19a66')
+    COLOR_ERROR = QColor('#ff0000')
     COLOR_LINK = QColor('#5f9bfa')
     FONT_NORMAL = QFont('JetBrains Mono', 14)
     FONT_ITALIC = QFont('JetBrains Mono', 14)
@@ -180,216 +181,78 @@ class BaseLexer(QsciLexerCustom):
         return self._editor
 
 
-class PythonLexer(BaseLexer):
-    def __init__(self, editor: QsciScintilla):
-        super().__init__(editor, 'Python')
-        self.setKeywords(keyword.kwlist + ['self'])
-        self.setBuiltinNames([name for name, obj in vars(builtins).items() if isinstance(obj, types.BuiltinFunctionType)])
-        self.setTypes([name for name, obj in vars(builtins).items() if isinstance(obj, type)])
+class PythonLexer(QsciLexerPython):
+    def __init__(self):
+        super().__init__()
+        self.setDefaultColor(QColor('#ffffff'))
+        self.setDefaultPaper(Style.COLOR_BG)
+        self.setDefaultFont(Style.FONT_NORMAL)
+        self.setFoldCompact(False)
+        self.setFoldQuotes(True)
+        self.setFoldComments(True)
+
+        self.createStyle()
+
+    def keywords(self, key_set: int):
+        keywords = ''
+
+        if key_set == 1:
+            keyword_list = keyword.kwlist
+            keyword_list.append('self')
+
+            for kw in keyword.kwlist:
+                keywords += kw + ' ' # seperate by a space
+
+        elif key_set == 2:
+            built_ins = [name for name, obj in vars(builtins).items()]
+
+            for remove in ['exec', 'exit']:
+                if remove in built_ins:
+                    built_ins.remove(remove)
+
+            for built_in in built_ins:
+                keywords += built_in + ' '
+
+        return keywords
 
     def createStyle(self):
-        self.setFont(Style.FONT_ITALIC, PythonLexer.COMMENTS)
-        self.setColor(Style.COLOR_NORMAL, PythonLexer.DEFAULT)
-        self.setColor(Style.COLOR_NORMAL, PythonLexer.BRACKETS)
-        self.setColor(Style.COLOR_NORMAL, PythonLexer.FUNCTIONS)
-        self.setColor(Style.COLOR_COMMENT, PythonLexer.COMMENTS)
-        self.setColor(Style.COLOR_KEYWORD, PythonLexer.KEYWORD)
-        self.setColor(Style.COLOR_CLASS_DEF, PythonLexer.CLASS_DEF)
-        self.setColor(Style.COLOR_FUNCTION_DEF, PythonLexer.FUNCTION_DEF)
-        self.setColor(Style.COLOR_CONSTANT, PythonLexer.DECORATOR)
-        self.setColor(Style.COLOR_BUILTIN, PythonLexer.BUILTINS)
-        self.setColor(Style.COLOR_BUILTIN, PythonLexer.TYPES)
-        self.setColor(Style.COLOR_CONSTANT, PythonLexer.CONSTANTS)
-        self.setColor(Style.COLOR_STRING, PythonLexer.STRING)
-
-    def styleText(self, start, end):
-        text = self.editor().text()[start:end]
-        self.generateTokens(text)
-
-        string_flag = False
-        comment_flag = False
-
-        if start > 0:
-            previous_style_nr = self.editor().SendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
-
-            if previous_style_nr == PythonLexer.COMMENTS:
-                comment_flag = False
-
-        while True:
-            curr_token = self.nextToken()
-
-            if curr_token is None:
-                break
-
-            tok = curr_token[0]
-            tok_len = curr_token[1]
-
-            if comment_flag:
-                self.setStyling(tok_len, PythonLexer.COMMENTS)
-
-                if tok.endswith('\n') or tok.startswith('\n'):
-                    comment_flag = False
-
-                continue
-
-            if string_flag:
-                self.setStyling(curr_token[1], PythonLexer.STRING)
-
-                if tok == '"' or tok == "'":
-                    string_flag = False
-
-                continue
-
-            if tok == 'class':
-                name, ni = self.skipSpacesPeek()
-                brac_or_colon, _ = self.skipSpacesPeek(ni)
-
-                if name[0].isidentifier() and brac_or_colon[0] in (':', '('):
-                    self.setStyling(tok_len, PythonLexer.KEYWORD)
-                    _ = self.nextToken(ni)
-                    self.setStyling(name[1] + 1, PythonLexer.CLASS_DEF)
-
-                    continue
-
-                else:
-                    self.setStyling(tok_len, PythonLexer.KEYWORD)
-
-                    continue
-
-            elif tok == 'def':
-                name, ni = self.skipSpacesPeek()
-
-                if name[0].isidentifier():
-                    self.setStyling(tok_len, PythonLexer.KEYWORD)
-                    _ = self.nextToken(ni)
-                    self.setStyling(name[1] + 1, PythonLexer.FUNCTION_DEF)
-
-                    continue
-
-                else:
-                    self.setStyling(tok_len, PythonLexer.KEYWORD)
-
-                    continue
-
-            elif tok == "'" or tok == '"':
-                self.setStyling(tok_len, PythonLexer.STRING)
-                string_flag = True
-
-                continue
-
-            elif tok == '#':
-                comment_text = tok
-                comment_len = tok_len
-
-                while True:
-                    peek = self.peekToken()
-
-                    if peek is None or '\n' in peek[0]:
-                        break
-
-                    next_tok = self.nextToken()
-
-                    if next_tok is None:
-                        break
-
-                    comment_text += next_tok[0]
-                    comment_len += next_tok[1]
-
-                self.setStyling(comment_len, PythonLexer.COMMENTS)
-
-                continue
-
-            elif tok == '@':
-                decorator_text = tok
-                decorator_len = tok_len
-
-                while True:
-                    peek = self.peekToken()
-
-                    if peek is None or '\n' in peek[0]:
-                        break
-
-                    next_tok = self.nextToken()
-
-                    if next_tok is None:
-                        break
-
-                    decorator_text += next_tok[0]
-                    decorator_len += next_tok[1]
-
-                self.setStyling(decorator_len, PythonLexer.DECORATOR)
-
-            elif tok in ('f', 'b', 'r', 'br'):
-                self.setStyling(tok_len, PythonLexer.STRING)
-
-                continue
-
-            elif tok.strip() == '.' and self.peekToken()[0].isidentifier():
-                self.setStyling(tok_len, PythonLexer.DEFAULT)
-
-                curr_token = self.nextToken()
-                tok = curr_token[0]
-                tok_len = curr_token[1]
-
-                if self.peekToken()[0] == '(':
-                    self.setStyling(tok_len, PythonLexer.FUNCTIONS)
-
-                else:
-                    self.setStyling(tok_len, PythonLexer.DEFAULT)
-
-                continue
-
-            elif tok.isnumeric():
-                self.setStyling(tok_len, PythonLexer.CONSTANTS)
-
-                continue
-
-            elif tok in ['(', ')', '{', '}', '[', ']']:
-                self.setStyling(tok_len, PythonLexer.BRACKETS)
-
-                continue
-
-            elif tok in self.keywordList():
-                self.setStyling(tok_len, PythonLexer.KEYWORD)
-
-                continue
-
-            elif tok in self.builtinList():
-                self.setStyling(tok_len, PythonLexer.BUILTINS)
-
-                continue
-
-            elif tok in self.typeList():
-                self.setStyling(tok_len, PythonLexer.TYPES)
-
-                continue
-
-            else:
-                self.setStyling(tok_len, PythonLexer.DEFAULT)
-
-        self.applyFolding(start, end)
-
-    def applyFolding(self, start: int, end: int):
-        start_line = self.editor().SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, start)
-        end_line = self.editor().SendScintilla(QsciScintilla.SCI_LINEFROMPOSITION, end)
-
-        for line_num in range(start_line, end_line + 1):
-            line_text = self.editor().text(line_num)
-            indent = self.editor().SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION, line_num)
-            level = QsciScintilla.SC_FOLDLEVELBASE + indent // 4
-
-            is_blank = not line_text.strip()
-
-            if line_text.strip().startswith((
-                    'def', 'class', 'if', 'elif', 'else', 'with',
-                    'async', 'match', 'case', 'for', 'while',
-                    'try', 'except', 'finally')):
-                level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
-
-            if is_blank:
-                level |= QsciScintilla.SC_FOLDLEVELWHITEFLAG
-
-            self.editor().SendScintilla(QsciScintilla.SCI_SETFOLDLEVEL, line_num, level)
+        self.setFont(Style.FONT_ITALIC, PythonLexer.Comment)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.Default)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.Keyword)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.Identifier)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.Operator)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.ClassName)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.FunctionMethodName)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.SingleQuotedString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.SingleQuotedFString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.DoubleQuotedString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.DoubleQuotedFString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.TripleSingleQuotedString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.TripleSingleQuotedFString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.TripleDoubleQuotedString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.TripleDoubleQuotedFString)
+        self.setFont(Style.FONT_NORMAL, PythonLexer.UnclosedString)
+
+        self.setColor(Style.COLOR_NORMAL, PythonLexer.Default)
+        self.setColor(Style.COLOR_NORMAL, PythonLexer.Identifier)
+        self.setColor(Style.COLOR_BUILTIN, PythonLexer.HighlightedIdentifier)
+        self.setColor(Style.COLOR_NORMAL, PythonLexer.Operator)
+        self.setColor(Style.COLOR_COMMENT, PythonLexer.Comment)
+        self.setColor(Style.COLOR_COMMENT, PythonLexer.CommentBlock)
+        self.setColor(Style.COLOR_KEYWORD, PythonLexer.Keyword)
+        self.setColor(Style.COLOR_CLASS_DEF, PythonLexer.ClassName)
+        self.setColor(Style.COLOR_FUNCTION_DEF, PythonLexer.FunctionMethodName)
+        self.setColor(Style.COLOR_CONSTANT, PythonLexer.Decorator)
+        self.setColor(Style.COLOR_CONSTANT, PythonLexer.Number)
+        self.setColor(Style.COLOR_STRING, PythonLexer.SingleQuotedString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.SingleQuotedFString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.DoubleQuotedString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.DoubleQuotedFString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.TripleSingleQuotedString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.TripleSingleQuotedFString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.TripleDoubleQuotedString)
+        self.setColor(Style.COLOR_STRING, PythonLexer.TripleDoubleQuotedFString)
+        self.setColor(Style.COLOR_ERROR, PythonLexer.UnclosedString)
 
 
 class RustLexer(BaseLexer):

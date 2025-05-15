@@ -68,7 +68,7 @@ class Editor(QsciScintilla):
 
     def createLexer(self):
         if self._file_name.endswith('.py'):
-            self._lexer = PythonLexer(self)
+            self._lexer = PythonLexer()
 
         elif self._file_name.endswith('.rs'):
             self._lexer = RustLexer(self)
