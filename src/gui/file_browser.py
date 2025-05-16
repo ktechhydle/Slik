@@ -3,7 +3,7 @@ import shutil
 import slik
 from PyQt6.QtCore import Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, QDir, \
     QUrl
-from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices
+from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
     QPushButton, QWidgetAction, QFileDialog)
 from src.gui.input_dialog import InputDialog
@@ -225,34 +225,31 @@ class FileSystemViewer(QTreeView):
                     raise e
 
     def removeSelected(self):
-        indexes = self.selectedIndexes()
+        if self.selectedIndexes():
+            indexes = self.selectedIndexes()
+            model = self.model()
+            paths = list(set(model.filePath(index) for index in indexes))
 
-        if not indexes:
-            return
+            if not paths:
+                return
 
-        model = self.model()
-        paths = list(set(model.filePath(index) for index in indexes if index.column() == 0))
+            message = MessageDialog('Remove',
+                                    f'Are you sure you want to delete the {len(paths)} selected items?',
+                                    (MessageDialog.YesButton, MessageDialog.NoButton),
+                                    self.tab_view)
+            message.exec()
 
-        if not paths:
-            return
+            if message.result() == MessageDialog.Accepted:
+                for path in paths:
+                    try:
+                        if os.path.isfile(path):
+                            os.remove(path)
 
-        message = MessageDialog('Remove',
-                                f'Are you sure you want to delete the {len(paths)} selected items?',
-                                (MessageDialog.YesButton, MessageDialog.NoButton),
-                                self.tab_view)
-        message.exec()
+                        elif os.path.isdir(path):
+                            shutil.rmtree(path)
 
-        if message.result() == MessageDialog.Accepted:
-            for path in paths:
-                try:
-                    if os.path.isfile(path):
-                        os.remove(path)
-
-                    elif os.path.isdir(path):
-                        shutil.rmtree(path)
-
-                except Exception as e:
-                    raise e
+                    except Exception as e:
+                        raise e
 
 
 class FileBrowser(QMenu):
