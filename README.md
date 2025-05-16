@@ -3,7 +3,7 @@
 # Slik
 Slik is the official IDE for MP Software developers.
 
-<img src="resources/screenshots/startup.png">
+<img src="resources/screenshots/slik_startup.png" style="border-radius: 5px; width: auto;">
 
 ## Overview
 Slik is based on three key points:
