@@ -19,6 +19,9 @@ class HtmlViewer(QWebEngineView):
 
         super().setHtml(html, QUrl.fromLocalFile(self._project_dir + '/'))
 
+    def setSvg(self, svg: str):
+        self.page().runJavaScript(f"updateContent({json.dumps(svg)});")
+
     def setMarkdown(self, md: str):
         # convert md to html
         html_body = markdown.markdown(md)

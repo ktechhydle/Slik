@@ -73,14 +73,14 @@ class Editor(QsciScintilla):
         elif self._file_name.endswith('.rs'):
             self._lexer = RustLexer(self)
 
-        elif self._file_name.endswith('.html'):
-            self._lexer = HTMLLexer()
-
         elif self._file_name.endswith('.css'):
             self._lexer = CSSLexer()
 
         elif self._file_name.endswith('.md'):
             self._lexer = MarkdownLexer()
+
+        elif self._file_name.endswith(('.html', '.svg', '.xml')):
+            self._lexer = HTMLLexer()
 
         else:
             self._lexer = PlainTextLexer(self)

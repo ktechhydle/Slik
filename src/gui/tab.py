@@ -57,6 +57,8 @@ class Tab(QWidget):
         self.layout().addWidget(self._splitter)
 
     def updateUI(self):
+        self._editor.setFileName(self._file_name)
+
         # remove the html viewer (if existent)
         for i in range(self._splitter.count()):
             widget = self._splitter.widget(i)
@@ -69,11 +71,16 @@ class Tab(QWidget):
         if file_ext in ('.md', '.html', '.svg'):
             self._viewer = HtmlViewer(self.tab_view.projectDir(), self)
 
-            if file_ext in ('.md', '.svg'):
+            if file_ext.endswith('.md'):
                 # needs custom properties
                 self._viewer.setHtml(slik.read('resources/html/markdown_template.html'))
                 self._viewer.setMarkdown(self._editor.text())
                 self._editor.textChanged.connect(lambda: self._viewer.setMarkdown(self._editor.text()))
+
+            elif file_ext.endswith('.svg'):
+                self._viewer.setHtml(slik.read('resources/html/markdown_template.html'))
+                self._viewer.setSvg(self._editor.text())
+                self._editor.textChanged.connect(lambda: self._viewer.setSvg(self._editor.text()))
 
             else:
                 # plain html doc, just read it
@@ -81,8 +88,6 @@ class Tab(QWidget):
                 self._editor.textChanged.connect(lambda: self._viewer.setHtml(self._editor.text()))
 
             self._splitter.addWidget(self._viewer)
-
-        self._editor.setFileName(self._file_name)
 
     def save(self):
         slik.write(self._file_name, self._editor.text())
