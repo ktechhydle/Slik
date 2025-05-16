@@ -9,7 +9,7 @@ class RunTypeSelector(QComboBox):
         QApplication.setEffectEnabled(Qt.UIEffect.UI_AnimateCombo, False)
 
         self._run_configs = {
-            'Python [main]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+main.py'),
+            'Python [main]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+MAINPY'),
             'Python [current]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+CURRENTFILEPY'),
             'Rust [cargo]': ('resources/icons/logos/rust_icon.svg', 'cargo+run'),
         }

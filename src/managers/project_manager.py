@@ -182,6 +182,18 @@ class ProjectManager:
                 else:
                     return
 
+            elif arg == 'MAINPY':
+                arg = 'main.py'
+
+                if not os.path.exists(f'{self.projectDir()}/{arg}'):
+                    message = MessageDialog("No 'main.py' File",
+                                            "The project runner couldn't find a 'main.py' entry point.",
+                                            (MessageDialog.OkButton,),
+                                            self._tab_view)
+                    message.exec()
+
+                    return
+
             command += arg + ' '
 
         return command
