@@ -1,6 +1,14 @@
-from PyQt6.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QWidget, QLabel, QWidgetAction, QLineEdit
+from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtWidgets import QVBoxLayout, QWidget, QLabel, QWidgetAction, QLineEdit
 from src.gui.title_bar import TitleBar
 from src.gui.message_dialog import MessageDialog
+
+
+class Input(QLineEdit):
+    def showEvent(self, event):
+        super().showEvent(event)
+
+        QTimer.singleShot(0, self.setFocus)
 
 
 class InputDialog(MessageDialog):
@@ -14,7 +22,7 @@ class InputDialog(MessageDialog):
         self._title_bar = TitleBar(self)
         self._message_label = QLabel(self._message)
         self._message_label.setWordWrap(True)
-        self._input = QLineEdit()
+        self._input = Input()
         self._input.setFixedHeight(30)
 
         self._container.layout().addWidget(self._title_bar)

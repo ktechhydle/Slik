@@ -119,33 +119,54 @@ class FileSystemViewer(QTreeView):
         self.menu.exec(self.mapToGlobal(pos))
 
     def newFile(self):
-        if len(self.selectedIndexes()) > 1:
-            return
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
 
-        index = self.currentIndex()
-
-        if not index.isValid():
-            return
-
-        filepath = self.model().filePath(index)
-        dir_path = os.path.dirname(filepath) if os.path.isfile(filepath) else filepath
-
-        input_dialog = InputDialog('New File', 'Name:', (InputDialog.OkButton, InputDialog.CancelButton), self.tab_view)
-        input_dialog.exec()
-
-        if input_dialog.result() == InputDialog.Accepted:
-            filename = os.path.join(dir_path, input_dialog.value())
-
-            if os.path.exists(os.path.abspath(filename)):
-                message = MessageDialog('Overwrite Error', f"A file with the name '{os.path.basename(filename)}' already exists.", (InputDialog.OkButton,), self.tab_view)
-                message.exec()
-
+            if not index.isValid():
                 return
 
-            slik.write(os.path.abspath(filename), '')
+            filepath = self.model().filePath(index)
+            dir_path = os.path.dirname(filepath) if os.path.isfile(filepath) else filepath
+
+            input_dialog = InputDialog('New File', 'Name:', (InputDialog.OkButton, InputDialog.CancelButton), self.tab_view)
+            input_dialog.exec()
+
+            if input_dialog.result() == InputDialog.Accepted:
+                filename = os.path.join(dir_path, input_dialog.value())
+
+                if os.path.exists(os.path.abspath(filename)):
+                    message = MessageDialog('Overwrite Error', f"A file with the name '{os.path.basename(filename)}' already exists.", (InputDialog.OkButton,), self.tab_view)
+                    message.exec()
+
+                    return
+
+                slik.write(os.path.abspath(filename), '')
 
     def newDir(self):
-        pass
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
+
+            if not index.isValid():
+                return
+
+            filepath = self.model().filePath(index)
+            dir_path = os.path.dirname(filepath) if os.path.isfile(filepath) else filepath
+
+            input_dialog = InputDialog('New Directory', 'Name:', (InputDialog.OkButton, InputDialog.CancelButton), self.tab_view)
+            input_dialog.exec()
+
+            if input_dialog.result() == InputDialog.Accepted:
+                filename = os.path.join(dir_path, input_dialog.value())
+
+                if os.path.exists(os.path.abspath(filename)):
+                    message = MessageDialog('Overwrite Error',
+                                            f"A directory with the name '{os.path.basename(filename)}' already exists.",
+                                            (InputDialog.OkButton,), self.tab_view)
+                    message.exec()
+
+                    return
+
+                os.mkdir(os.path.abspath(filename))
 
     def openFile(self, index: QModelIndex):
         model = self.model()
