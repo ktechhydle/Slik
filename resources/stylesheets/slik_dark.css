@@ -483,6 +483,9 @@ QToolTip {
     background-color: #303030;
 }
 
+#configureBar {
+}
+
 #terminal {
     background-color: #262525;
 }
