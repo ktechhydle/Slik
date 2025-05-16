@@ -9,7 +9,7 @@ class TerminalManager:
         os.system(f'start cmd.exe /k "cd /d {self._project_dir}"')
 
     def terminalFromCommand(self, command: str):
-        os.system(f'start cmd.exe /c "cd /d {self._project_dir} && {command}"')
+        os.system(f'start cmd.exe /k "cd /d {self._project_dir} && {command}"')
 
     def setProjectDir(self, directory: str):
         if directory != self._project_dir:
