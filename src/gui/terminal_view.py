@@ -47,7 +47,7 @@ class TerminalView(QTabWidget):
     def closeTerminal(self, index: int):
         terminal = self.widget(index)
 
-        if terminal.hasCurrentProcess():
+        if terminal and terminal.hasCurrentProcess():
             message = MessageDialog('Quit Process',
                                     'A process is currently running in this '
                                     'terminal. Do you want to close it?',

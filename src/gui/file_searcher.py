@@ -104,6 +104,7 @@ class FileSearcher(QMenu):
         self.animation.start()
 
         self._results_list.clearSelection()
+        self.runSearch()
         self.show()
 
     def createUI(self):
@@ -166,8 +167,11 @@ class FileSearcher(QMenu):
         self._search_indexer.start()
 
     def setProjectDir(self, directory: str):
-        self._project_dir = directory
-        self._project_dir_label.setText(f"Search '{os.path.basename(directory)}'")
+        if directory != self._project_dir:
+            self._project_dir = directory
+            self._project_dir_label.setText(f"Search '{os.path.basename(directory)}'")
+
+            self.runSearch()
 
     def projectDir(self) -> str:
         return self._project_dir

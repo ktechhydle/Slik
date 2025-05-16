@@ -3,10 +3,10 @@ import slik
 from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QTabWidget, QComboBox
 from PyQt6.QtGui import QAction, QKeySequence
+from src.managers.terminal_manager import TerminalManager
 from src.gui.file_searcher import FileSearcher
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
-from src.gui.terminal_view import TerminalView
 from src.gui.file_browser import FileBrowser
 
 
@@ -33,9 +33,9 @@ class ProjectIndexer(QThread):
 
 
 class ProjectManager:
-    def __init__(self, tab_view: QTabWidget, terminal_view: QTabWidget, run_type_selector: QComboBox):
+    def __init__(self, tab_view: QTabWidget, terminal_manager: TerminalManager, run_type_selector: QComboBox):
         self._tab_view = tab_view
-        self._terminal_view = terminal_view
+        self._terminal_manager = terminal_manager
         self._run_type_selector = run_type_selector
         self._project_indexer = ProjectIndexer()
         self._project_indexer.finished.connect(self.indexFinished)
@@ -49,7 +49,7 @@ class ProjectManager:
         self._file_searcher = FileSearcher(self._tab_view, self._tab_view)
 
         self._file_browser = FileBrowser('', self._tab_view, self._tab_view)
-        self._file_browser.projectDirChanged.connect(self._terminal_view.setProjectDir)
+        self._file_browser.projectDirChanged.connect(self._terminal_manager.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._tab_view.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._file_searcher.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._project_indexer.setProjectDir)
@@ -82,12 +82,17 @@ class ProjectManager:
         run_current_file_action.setShortcut(QKeySequence('Ctrl+Shift+R'))
         run_current_file_action.triggered.connect(self.runCurrent)
 
+        new_terminal_action = QAction('New Terminal', self._tab_view)
+        new_terminal_action.setShortcut(QKeySequence('Ctrl+N'))
+        new_terminal_action.triggered.connect(self._terminal_manager.newTerminal)
+
         self._tab_view.addAction(save_action)
         self._tab_view.addAction(toggle_collapse_action)
         self._tab_view.addAction(file_browser_action)
         self._tab_view.addAction(file_searcher_action)
         self._tab_view.addAction(run_project_action)
         self._tab_view.addAction(run_current_file_action)
+        self._tab_view.addAction(new_terminal_action)
 
     def showFileBrowser(self):
         self._file_browser.exec()
@@ -142,17 +147,17 @@ class ProjectManager:
         command = self.parseRunType()
 
         if command:
-            self._terminal_view.terminalFromCommand(command)
+            self._terminal_manager.terminalFromCommand(command)
 
     def runCurrent(self):
         file = self._tab_view.currentTab().filename()
 
         if file.endswith('.py'):
-            self._terminal_view.terminalFromCommand(f'{self._python_path} {file}')
+            self._terminal_manager.terminalFromCommand(f'{self._python_path} {file}')
 
         elif file.endswith('.rs'):
             if os.path.exists(f'{self.projectDir()}/Cargo.toml'):
-                self._terminal_view.terminalFromCommand('cargo run')
+                self._terminal_manager.terminalFromCommand('cargo run')
 
             else:
                 message = MessageDialog("No 'Cargo.toml' File",
@@ -187,8 +192,8 @@ class ProjectManager:
     def tabView(self) -> TabView:
         return self._tab_view
 
-    def terminalView(self) -> TerminalView:
-        return self._terminal_view
+    def terminalManager(self) -> TerminalManager:
+        return self._terminal_manager
 
     def fileBrowser(self) -> FileBrowser:
         return self._file_browser
