@@ -1,10 +1,12 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap
-from PyQt6.QtWidgets import QComboBox
+from PyQt6.QtWidgets import QComboBox, QApplication
 
 
 class RunTypeSelector(QComboBox):
     def __init__(self, parent=None):
         super().__init__(parent)
+        QApplication.setEffectEnabled(Qt.UIEffect.UI_AnimateCombo, False)
 
         self._run_configs = {
             'Python [main]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+main.py'),
