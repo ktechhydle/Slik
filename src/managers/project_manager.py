@@ -38,6 +38,7 @@ class ProjectManager:
         self._project_indexer = ProjectIndexer()
         self._project_indexer.finished.connect(self.indexFinished)
         self._old_index = []
+        self._python_path = 'python'
 
         self.createDialogs()
         self.createActions()
@@ -124,18 +125,22 @@ class ProjectManager:
         self._old_index = new_index_list
 
     def run(self):
+        # TODO: run Python/Rust main entry point (chosen by the user) no matter what file they are currently viewing
+        if os.path.exists(f'{self.projectDir()}/main.py'):
+            self._terminal_view.terminalFromCommand(f'{self._python_path} main.py')
+
+        else:
+            message = MessageDialog("No 'main.py' File",
+                                    "The project runner couldn't find a 'main.py' entry point.",
+                                    (MessageDialog.OkButton,),
+                                    self._tab_view)
+            message.exec()
+
+    def runCurrent(self):
         file = self._tab_view.currentTab().filename()
 
         if file.endswith('.py'):
-            if os.path.exists(f'{self.projectDir()}/main.py'):
-                self._terminal_view.terminalFromCommand('python main.py')
-
-            else:
-                message = MessageDialog("No 'main.py' File",
-                                        "The project runner couldn't find a 'main.py' entry point.",
-                                        (MessageDialog.OkButton,),
-                                        self._tab_view)
-                message.exec()
+            self._terminal_view.terminalFromCommand(f'{self._python_path} {file}')
 
         elif file.endswith('.rs'):
             if os.path.exists(f'{self.projectDir()}/Cargo.toml'):
@@ -148,18 +153,8 @@ class ProjectManager:
                                         self._tab_view)
                 message.exec()
 
-        else:
-            # TODO: run Python/Rust (chosen by the user) no matter what file they are currently viewing
-            pass
-
-    def runCurrent(self):
-        file = self._tab_view.currentTab().filename()
-
-        if file.endswith('.py'):
-            self._terminal_view.terminalFromCommand(f'python {file}')
-
-        elif file.endswith('.rs'):
-            self._terminal_view.terminalFromCommand('cargo run')
+    def setPythonPath(self, path: str):
+        self._python_path = path
 
     def tabView(self) -> TabView:
         return self._tab_view
@@ -172,3 +167,6 @@ class ProjectManager:
 
     def projectDir(self) -> str:
         return self._file_browser.path()
+
+    def pythonPath(self) -> str:
+        return self._python_path

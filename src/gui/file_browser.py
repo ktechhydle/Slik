@@ -1,8 +1,8 @@
 import os
 import shutil
 import slik
-from PyQt6.QtCore import Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, QDir, \
-    QUrl
+from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, 
+    QDir, QUrl)
 from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
     QPushButton, QWidgetAction, QFileDialog)
