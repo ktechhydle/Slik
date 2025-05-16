@@ -4,6 +4,7 @@ import slik
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QFontDatabase
 from PyQt6.QtWidgets import QMainWindow, QSplitter, QApplication
+from src.gui.run_type_selector import RunTypeSelector
 from src.managers.project_manager import ProjectManager
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
@@ -26,8 +27,10 @@ class Slik(QMainWindow):
 
         self.tab_view = TabView(self)
         self.terminal_view = TerminalView(self)
+        self.run_type_selector = RunTypeSelector(self)
+        self.tab_view.setCornerWidget(self.run_type_selector)
 
-        self.project_manager = ProjectManager(self.tab_view, self.terminal_view)
+        self.project_manager = ProjectManager(self.tab_view, self.terminal_view, self.run_type_selector)
         self.project_manager.openProject(os.path.abspath('.'))
 
         splitter.addWidget(self.tab_view)

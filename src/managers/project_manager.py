@@ -1,7 +1,7 @@
 import os
 import slik
 from PyQt6.QtCore import QThread
-from PyQt6.QtWidgets import QTabWidget
+from PyQt6.QtWidgets import QTabWidget, QComboBox
 from PyQt6.QtGui import QAction, QKeySequence
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
@@ -32,9 +32,10 @@ class ProjectIndexer(QThread):
 
 
 class ProjectManager:
-    def __init__(self, tab_view: QTabWidget, terminal_view: QTabWidget):
+    def __init__(self, tab_view: QTabWidget, terminal_view: QTabWidget, run_type_selector: QComboBox):
         self._tab_view = tab_view
         self._terminal_view = terminal_view
+        self._run_type_selector = run_type_selector
         self._project_indexer = ProjectIndexer()
         self._project_indexer.finished.connect(self.indexFinished)
         self._old_index = []
@@ -125,16 +126,10 @@ class ProjectManager:
         self._old_index = new_index_list
 
     def run(self):
-        # TODO: run Python/Rust main entry point (chosen by the user) no matter what file they are currently viewing
-        if os.path.exists(f'{self.projectDir()}/main.py'):
-            self._terminal_view.terminalFromCommand(f'{self._python_path} main.py')
+        command = self.parseRunType()
 
-        else:
-            message = MessageDialog("No 'main.py' File",
-                                    "The project runner couldn't find a 'main.py' entry point.",
-                                    (MessageDialog.OkButton,),
-                                    self._tab_view)
-            message.exec()
+        if command:
+            self._terminal_view.terminalFromCommand(command)
 
     def runCurrent(self):
         file = self._tab_view.currentTab().filename()
@@ -152,6 +147,26 @@ class ProjectManager:
                                         (MessageDialog.OkButton,),
                                         self._tab_view)
                 message.exec()
+
+    def parseRunType(self) -> str | None:
+        data = self._run_type_selector.itemData(self._run_type_selector.currentIndex())
+        args = data.split('+')
+        command = ''
+
+        for arg in args:
+            if arg == 'PYTHONPATH':
+                arg = self._python_path
+
+            elif arg == 'CURRENTFILEPY':
+                if self._tab_view.currentTab().filename().endswith('.py'):
+                    arg = self._tab_view.currentTab().filename()
+
+                else:
+                    return
+
+            command += arg + ' '
+
+        return command
 
     def setPythonPath(self, path: str):
         self._python_path = path
