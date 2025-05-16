@@ -2,7 +2,7 @@ from PyQt6.Qsci import QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeyEvent, QFont, QPixmap
 from src.editor.auto_completer import AutoCompleter
-from src.editor.custom_lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
+from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
 
 
 class Editor(QsciScintilla):
