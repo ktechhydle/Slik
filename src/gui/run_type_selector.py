@@ -1,3 +1,4 @@
+from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QComboBox
 
 
@@ -6,9 +7,9 @@ class RunTypeSelector(QComboBox):
         super().__init__(parent)
 
         self._run_configs = {
-            'Python [main]': 'PYTHONPATH+main.py',
-            'Python [current]': 'PYTHONPATH+CURRENTFILEPY',
-            'Rust [cargo]': 'cargo+run',
+            'Python [main]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+main.py'),
+            'Python [current]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+CURRENTFILEPY'),
+            'Rust [cargo]': ('resources/icons/logos/rust_icon.svg', 'cargo+run'),
         }
 
         self.createOptions()
@@ -16,5 +17,13 @@ class RunTypeSelector(QComboBox):
     def createOptions(self):
         self.clear()
 
-        for display, value in self._run_configs.items():
-            self.addItem(display, value)
+        for display, (icon, value) in self._run_configs.items():
+            def make_icon(path):
+                pixmap = QPixmap(path)
+                icon = QIcon()
+                icon.addPixmap(pixmap, QIcon.Mode.Normal)
+                icon.addPixmap(pixmap, QIcon.Mode.Selected)
+
+                return icon
+
+            self.addItem(make_icon(icon), display, value)

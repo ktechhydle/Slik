@@ -132,19 +132,22 @@ QTextEdit {
 }
 
 QComboBox {
-    color: #dfdfdf;
+    color: #c2c2c2;
     background-color: #303030;
-    selection-background-color: #4772b3;
-    border: 2px solid #3d3d3d;
-    border-radius: 6px;
+    border: 2px solid #383838;
+    border-radius: 5px;
     padding: 2px 25px 2px 8px;
     min-width: 75px;
     height: 20px;
     font-size: 13px;
 }
 
+QComboBox:hover {
+    color: white;
+}
+
 QComboBox:on {
-    background-color: #4772b3;
+    background-color: #505050;
 }
 
 QComboBox::drop-down {
@@ -155,23 +158,30 @@ QComboBox::drop-down {
     padding: 0px;
 }
 
-QComboBox:hover {
-    border-color: #464646;
-    color: white;
-}
-
 QComboBox::down-arrow {
     right: 3.3;
-    image: url('mp_software_stylesheets/assets/down_arrow_combo.png');
-    width: 25px;
-    height: 27px;
+    image: url('resources/icons/ui/combo_down_arrow_icon.svg');
+    width: 16px;
+    height: 16px;
     margin: 6px;
 }
 
 QComboBox QAbstractItemView {
-    color: white;
-    background: #181818;
-    selection-background-color: #4772b3;
+    background-color: #505050;
+    border-radius: 5px;
+    selection-background-color: #505050;
+    selection-color: #505050;
+}
+
+QComboBox QAbstractItemView::item {
+    border-radius: 5px;
+    padding: 2px;
+    margin: 3px;
+    color: #ffffff;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #707070;
 }
 
 QCheckBox {
