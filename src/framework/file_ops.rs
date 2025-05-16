@@ -20,6 +20,29 @@ pub fn write(file_name: &str, contents: &str) -> PyResult<()> {
 }
 
 #[pyfunction]
+pub fn search(project_dir: &str, query: &str) -> PyResult<Vec<(String, String)>> {
+    let mut results = Vec::new();
+
+    for entry in WalkDir::new(project_dir)
+        .into_iter()
+        .filter_entry(|e| !should_skip_dir(e))
+        .filter_map(Result::ok)
+    {
+        let path = entry.path();
+
+        if entry.file_type().is_file() && !is_binary_file(path) {
+            let file_name = path.display().to_string();
+
+            if file_name.contains(query.to_lowercase().as_str()) {
+                results.push((file_name.clone(), file_name.clone()));
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[pyfunction]
 pub fn index(dir: &str) -> PyResult<Vec<(String, String)>> {
     let mut results = Vec::new();
 

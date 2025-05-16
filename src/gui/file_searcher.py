@@ -1,0 +1,181 @@
+import os
+import slik
+from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
+                          QDir, QUrl, QThread, QTimer)
+from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
+from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
+                             QPushButton, QWidgetAction, QFileDialog, QListWidget, QLineEdit, QListWidgetItem)
+
+
+class FileSearchIndexer(QThread):
+    finished = pyqtSignal(list)
+
+    def __init__(self, search_query: str, project_dir: str):
+        super().__init__()
+
+        self._search_query = search_query
+        self._project_dir = project_dir
+        self._results = []
+
+    def run(self):
+        self._results = slik.search(self._project_dir, self._search_query)
+
+        self.finished.emit(self._results)
+
+    def results(self) -> list[tuple[str, str]]:
+        return self._results
+
+
+class FileSearcher(QMenu):
+    projectDirChanged = pyqtSignal(str)
+    projectChanged = pyqtSignal()
+
+    def __init__(self, tab_view: QTabWidget, parent=None):
+        super().__init__(parent)
+        self.setWindowFlag(Qt.WindowType.Popup)
+        self.setObjectName('popup')
+
+        self._project_dir = ''
+        self.tab_view = tab_view
+        self._initial_pos = None
+
+        self.createUI()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._initial_pos = event.position().toPoint()
+
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._initial_pos is not None:
+            delta = event.position().toPoint() - self._initial_pos
+            self.window().move(
+                self.window().x() + delta.x(),
+                self.window().y() + delta.y(),
+            )
+
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self._initial_pos = None
+
+    def showEvent(self, event):
+        super().showEvent(event)
+
+        QTimer.singleShot(0, lambda: (self._search_input.setFocus(), self._search_input.selectAll()))
+
+    def exec(self, pos=None):
+        if self.isVisible():
+            return
+
+        if pos:
+            super().exec(pos)
+            return
+
+        parent_center = self.parent().rect().center()
+        global_center = self.parent().mapToGlobal(parent_center)
+        target_width = 500
+        target_height = 200
+
+        start_rect = QRect(
+            global_center.x(),
+            global_center.y(),
+            1,
+            1
+        )
+        end_rect = QRect(
+            global_center.x() - target_width // 2,
+            global_center.y() - target_height // 2,
+            target_width,
+            target_height
+        )
+
+        self.setGeometry(start_rect)
+        self._container.setFixedSize(target_width - 5, target_height - 5)
+
+        self.animation = QPropertyAnimation(self, b'geometry')
+        self.animation.setDuration(250)
+        self.animation.setStartValue(start_rect)
+        self.animation.setEndValue(end_rect)
+        self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
+        self.animation.start()
+
+        self.show()
+
+    def createUI(self):
+        self._container = QWidget()
+        self._container.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self._container.setLayout(QVBoxLayout())
+
+        title_bar = QWidget()
+        title_bar.setLayout(QHBoxLayout())
+        title_bar.layout().setContentsMargins(0, 0, 0, 0)
+
+        self._project_dir_label = QLabel(f"Search '{os.path.basename(self._project_dir)}'")
+
+        title_bar.layout().addWidget(self._project_dir_label)
+        title_bar.layout().addStretch()
+
+        self._search_input = QLineEdit()
+        self._search_input.setPlaceholderText('Search Project...')
+        self._search_input.textChanged.connect(self.runSearch)
+        self._results_list = QListWidget()
+        self._results_list.itemClicked.connect(self.openFile)
+        self._results_list.itemActivated.connect(self.openFile)
+
+        self._container.layout().addWidget(title_bar)
+        self._container.layout().addWidget(self._search_input)
+        self._container.layout().addWidget(self._results_list)
+
+        action = QWidgetAction(self)
+        action.setDefaultWidget(self._container)
+        self.addAction(action)
+
+    def openFile(self, item: QListWidgetItem):
+        if hasattr(item, 'filename'):
+            self.tab_view.openTab(item.filename)
+
+        self.animateClose()
+
+    def runSearch(self):
+        if hasattr(self, '_search_indexer'):
+            self._search_indexer.wait()
+
+        self._search_indexer = FileSearchIndexer(self._search_input.text(), self._project_dir)
+
+        def search_finished(results: list[tuple[str, str]]):
+            self._results_list.clear()
+
+            for basename, filename in results:
+                item = QListWidgetItem(os.path.basename(basename))
+                item.filename = filename
+
+                self._results_list.addItem(item)
+
+        self._search_indexer.finished.connect(search_finished)
+        self._search_indexer.start()
+
+    def setProjectDir(self, directory: str):
+        self._project_dir = directory
+        self._project_dir_label.setText(f"Search '{os.path.basename(directory)}'")
+
+    def projectDir(self) -> str:
+        return self._project_dir
+
+    def animateClose(self):
+        current_geometry = self.geometry()
+        end_rect = QRect(
+            current_geometry.center().x(),
+            current_geometry.center().y(),
+            1,
+            1
+        )
+
+        self.close_animation = QPropertyAnimation(self, b'geometry')
+        self.close_animation.setDuration(200)
+        self.close_animation.setStartValue(current_geometry)
+        self.close_animation.setEndValue(end_rect)
+        self.close_animation.setEasingCurve(QEasingCurve.Type.InCubic)
+        self.close_animation.finished.connect(self.close)
+        self.close_animation.start()

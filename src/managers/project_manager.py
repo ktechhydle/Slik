@@ -3,6 +3,7 @@ import slik
 from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QTabWidget, QComboBox
 from PyQt6.QtGui import QAction, QKeySequence
+from src.gui.file_searcher import FileSearcher
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
 from src.gui.terminal_view import TerminalView
@@ -45,9 +46,12 @@ class ProjectManager:
         self.createActions()
 
     def createDialogs(self):
+        self._file_searcher = FileSearcher(self._tab_view, self._tab_view)
+
         self._file_browser = FileBrowser('', self._tab_view, self._tab_view)
         self._file_browser.projectDirChanged.connect(self._terminal_view.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._tab_view.setProjectDir)
+        self._file_browser.projectDirChanged.connect(self._file_searcher.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._project_indexer.setProjectDir)
         self._file_browser.projectDirChanged.connect(self.indexProject)
         self._file_browser.projectChanged.connect(self._tab_view.updateTabContents)
@@ -66,6 +70,10 @@ class ProjectManager:
         file_browser_action.setShortcut(QKeySequence('Ctrl+Q'))
         file_browser_action.triggered.connect(self.showFileBrowser)
 
+        file_searcher_action = QAction('File Searcher', self._tab_view)
+        file_searcher_action.setShortcut(QKeySequence('Ctrl+Shift+Q'))
+        file_searcher_action.triggered.connect(self.showFileSearcher)
+
         run_project_action = QAction('Run', self._tab_view)
         run_project_action.setShortcut(QKeySequence('Ctrl+R'))
         run_project_action.triggered.connect(self.run)
@@ -77,11 +85,15 @@ class ProjectManager:
         self._tab_view.addAction(save_action)
         self._tab_view.addAction(toggle_collapse_action)
         self._tab_view.addAction(file_browser_action)
+        self._tab_view.addAction(file_searcher_action)
         self._tab_view.addAction(run_project_action)
         self._tab_view.addAction(run_current_file_action)
 
     def showFileBrowser(self):
         self._file_browser.exec()
+
+    def showFileSearcher(self):
+        self._file_searcher.exec()
 
     def openProject(self, path: str):
         self._file_browser.setPath(path)
@@ -113,6 +125,7 @@ class ProjectManager:
                     renamed.append((old_name, new_name))
                     matched_old_files.add(old_name)
                     matched_new_files.add(new_name)
+
                     break
 
         deleted_files = set(old_index.keys()) - matched_old_files - set(new_index.keys())
