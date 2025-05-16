@@ -286,6 +286,8 @@ class FileBrowser(QMenu):
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+
         self._initial_pos = None
 
     def exec(self, pos=None):

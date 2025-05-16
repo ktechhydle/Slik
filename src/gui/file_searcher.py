@@ -2,7 +2,7 @@ import os
 import slik
 from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
                           QDir, QUrl, QThread, QTimer)
-from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
+from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence, QMouseEvent
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
                              QPushButton, QWidgetAction, QFileDialog, QListWidget, QLineEdit, QListWidgetItem)
 
@@ -32,7 +32,7 @@ class FileSearcher(QMenu):
 
     def __init__(self, tab_view: QTabWidget, parent=None):
         super().__init__(parent)
-        self.setWindowFlag(Qt.WindowType.Popup)
+        self.setWindowFlag(Qt.WindowType.CoverWindow)
         self.setObjectName('popup')
 
         self._project_dir = ''
@@ -58,6 +58,8 @@ class FileSearcher(QMenu):
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+        
         self._initial_pos = None
 
     def showEvent(self, event):
@@ -101,6 +103,7 @@ class FileSearcher(QMenu):
         self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
         self.animation.start()
 
+        self._results_list.clearSelection()
         self.show()
 
     def createUI(self):
@@ -114,8 +117,14 @@ class FileSearcher(QMenu):
 
         self._project_dir_label = QLabel(f"Search '{os.path.basename(self._project_dir)}'")
 
+        close_btn = QPushButton(QIcon('resources/icons/ui/close_icon.svg'), '', self)
+        close_btn.setObjectName('actionButton')
+        close_btn.setFixedSize(25, 25)
+        close_btn.clicked.connect(self.animateClose)
+
         title_bar.layout().addWidget(self._project_dir_label)
         title_bar.layout().addStretch()
+        title_bar.layout().addWidget(close_btn)
 
         self._search_input = QLineEdit()
         self._search_input.setPlaceholderText('Search Project...')
