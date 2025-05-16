@@ -10,6 +10,9 @@ class HtmlViewer(QWebEngineView):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
 
         self._project_dir = project_dir
+        self._pending_content = None
+
+        self.loadFinished.connect(self.loadingFinished)
 
     def setHtml(self, html, baseUrl=None):
         if baseUrl:
@@ -20,13 +23,20 @@ class HtmlViewer(QWebEngineView):
         super().setHtml(html, QUrl.fromLocalFile(self._project_dir + '/'))
 
     def setSvg(self, svg: str):
-        self.page().runJavaScript(f"updateContent({json.dumps(svg)});")
+        self._pending_content = json.dumps(svg)
 
     def setMarkdown(self, md: str):
         # convert md to html
         html_body = markdown.markdown(md)
 
-        self.page().runJavaScript(f"updateContent({json.dumps(html_body)});")
+        self._pending_content = json.dumps(html_body)
+
+    def loadingFinished(self, ok: bool):
+        if ok and self._pending_content:
+            js = f'updateContent({self._pending_content});'
+            self.page().runJavaScript(js)
+
+            self._pending_content = None
 
     def setProjectDir(self, directory: str):
         self._project_dir = directory
