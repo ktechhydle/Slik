@@ -169,11 +169,16 @@ class Editor(QsciScintilla):
         elif self.filename().endswith(('.rs', '.css', '.qss', '.json')):
             self.beginUndoAction()
 
-            if current_line_text.endswith('{'):
+            if current_line_text.endswith('{') and '}' in self.text(line):
                 self.insert('\n')
                 self.insert('\n')
                 self.setIndentation(line + 1, indent + self.tabWidth())
                 self.setIndentation(line + 2, indent)
+                self.setCursorPosition(line + 1, indent + self.tabWidth())
+
+            elif current_line_text.endswith('{'):
+                self.insert('\n')
+                self.setIndentation(line + 1, indent + self.tabWidth())
                 self.setCursorPosition(line + 1, indent + self.tabWidth())
 
             else:
