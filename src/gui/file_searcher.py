@@ -61,6 +61,18 @@ class FileSearcher(QMenu):
         super().mouseReleaseEvent(event)
         
         self._initial_pos = None
+        
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+
+        if event.key() == Qt.Key.Key_Down and self._results_list.count() > 0:
+            self._search_input.clearFocus()
+            self._results_list.setFocus()
+
+        elif event.key() == Qt.Key.Key_Up and self._results_list.currentRow() == 0:
+            self._results_list.clearSelection()
+            self._results_list.clearFocus()
+            self._search_input.setFocus()
 
     def showEvent(self, event):
         super().showEvent(event)
