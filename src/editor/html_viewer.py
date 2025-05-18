@@ -24,12 +24,14 @@ class HtmlViewer(QWebEngineView):
 
     def setSvg(self, svg: str):
         self._pending_content = json.dumps(svg)
+        self.updateContent()
 
     def setMarkdown(self, md: str):
         # convert md to html
         html_body = markdown.markdown(md)
 
         self._pending_content = json.dumps(html_body)
+        self.updateContent()
 
     def loadingFinished(self, ok: bool):
         if ok and self._pending_content:
@@ -37,6 +39,9 @@ class HtmlViewer(QWebEngineView):
             self.page().runJavaScript(js)
 
             self._pending_content = None
+
+    def updateContent(self):
+        self.page().runJavaScript(f'updateContent({self._pending_content});')
 
     def setProjectDir(self, directory: str):
         self._project_dir = directory
