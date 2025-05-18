@@ -42,6 +42,7 @@ class Slik(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    app.setEffectEnabled(Qt.UIEffect.UI_AnimateCombo, False)
     app.setStyleSheet(slik.read('resources/stylesheets/slik_dark.css'))
 
     QFontDatabase.addApplicationFont('resources/fonts/JetBrainsMono-Regular.ttf')

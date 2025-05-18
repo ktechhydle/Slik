@@ -484,6 +484,12 @@ QToolTip {
 }
 
 #configureBar {
+    background-color: transparent;
+}
+
+#configureBar QComboBox {
+    font-size: 12px;
+    font-family: 'JetBrains Mono';
 }
 
 #terminal {

@@ -1,6 +1,89 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout
-from src.gui.python_path_selector import PythonPathSelector
-from src.gui.run_type_selector import RunTypeSelector
+import os
+import slik
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtWidgets import QComboBox, QApplication, QWidget, QHBoxLayout
+
+
+class RunTypeSelector(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self._run_configs = {
+            'Python [main]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+MAINPY'),
+            'Python [current]': ('resources/icons/logos/python_icon.svg', 'PYTHONPATH+CURRENTFILEPY'),
+            'Rust [cargo]': ('resources/icons/logos/rust_icon.svg', 'cargo+run'),
+        }
+
+        self.createOptions()
+
+    def createOptions(self):
+        self.clear()
+
+        for display, (icon, value) in self._run_configs.items():
+            def make_icon(path):
+                pixmap = QPixmap(path)
+                icon = QIcon()
+                icon.addPixmap(pixmap, QIcon.Mode.Normal)
+                icon.addPixmap(pixmap, QIcon.Mode.Selected)
+
+                return icon
+
+            self.addItem(make_icon(icon), display, value)
+
+    def setRunConfigs(self, config: dict[str, tuple[str, str]]):
+        self._run_configs = config
+
+        self.createOptions()
+
+    def runConfigs(self) -> dict[str, tuple[str, str]]:
+        return self._run_configs
+
+    def runConfig(self) -> str:
+        return self.itemData(self.currentIndex())
+
+
+class PythonPathSelector(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        QApplication.setEffectEnabled(Qt.UIEffect.UI_AnimateCombo, False)
+
+        self._python_paths = {
+            'Python [system]': 'python'
+        }
+
+        self.createOptions()
+
+    def createOptions(self):
+        self.clear()
+
+        for display, value in self._python_paths.items():
+            self.addItem(display, value)
+
+    def getPythonPath(self, path: str):
+        self._python_paths.clear()
+
+        python_path = slik.get_python_path(path)
+
+        if os.path.exists(python_path): # we can add a virtual environment
+            self._python_paths['Python [system]'] = 'python'
+            self._python_paths['Python [venv]'] = python_path
+
+        else:
+            self._python_paths['Python [system]'] = python_path
+
+        self.createOptions()
+
+    def setPythonPaths(self, path: str):
+        self._python_paths = path
+
+        self.createOptions()
+
+    def pythonPaths(self) -> dict[str, str]:
+        return self._python_paths
+
+    def pythonPath(self) -> str:
+        return self.itemData(self.currentIndex())
 
 
 class ConfigureBar(QWidget):
