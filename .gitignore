@@ -1,6 +1,7 @@
 /target
 /.venv
 /.idea
+/.zed
 /build
 /dist
 /test.py

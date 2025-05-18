@@ -182,7 +182,7 @@ class BaseLexer(QsciLexerCustom):
 
 
 class PythonLexer(QsciLexerPython):
-    def __init__(self):
+    def __init__(self, editor: QsciScintilla):
         super().__init__()
         self.setDefaultColor(QColor('#ffffff'))
         self.setDefaultPaper(Style.COLOR_BG)
@@ -190,6 +190,8 @@ class PythonLexer(QsciLexerPython):
         self.setFoldCompact(False)
         self.setFoldQuotes(True)
         self.setFoldComments(True)
+
+        self._editor = editor
 
         self.createStyle()
 
@@ -253,6 +255,10 @@ class PythonLexer(QsciLexerPython):
         self.setColor(Style.COLOR_STRING, PythonLexer.TripleDoubleQuotedString)
         self.setColor(Style.COLOR_STRING, PythonLexer.TripleDoubleQuotedFString)
         self.setColor(Style.COLOR_ERROR, PythonLexer.UnclosedString)
+
+    def setHotSpotsEnabled(self, enabled: bool):
+        self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.ClassName, enabled)
+        self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.FunctionMethodName, enabled)
 
 
 class RustLexer(BaseLexer):

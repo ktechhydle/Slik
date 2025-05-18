@@ -1,6 +1,6 @@
 from PyQt6.Qsci import QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColor, QKeyEvent, QFont, QPixmap
+from PyQt6.QtGui import QColor, QKeyEvent, QMouseEvent, QFont, QPixmap
 from src.editor.auto_completer import AutoCompleter
 from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
 
@@ -35,10 +35,22 @@ class Editor(QsciScintilla):
 
         self.cursorPositionChanged.connect(self.getAutoCompletions)
         self.textChanged.connect(self.textModified)
+        self.SCN_HOTSPOTCLICK.connect(self.getDeclarationsAndUsages)
 
         self.createLexer()
         self.createMargins()
         self.createStyle()
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        super().mouseMoveEvent(event)
+
+        if event.modifiers() and Qt.KeyboardModifier.ControlModifier:
+            if isinstance(self._lexer, PythonLexer):
+                self._lexer.setHotSpotsEnabled(True)
+
+        else:
+            if isinstance(self._lexer, PythonLexer):
+                self._lexer.setHotSpotsEnabled(False)
 
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
@@ -68,7 +80,7 @@ class Editor(QsciScintilla):
 
     def createLexer(self):
         if self._file_name.endswith('.py'):
-            self._lexer = PythonLexer()
+            self._lexer = PythonLexer(self)
 
         elif self._file_name.endswith('.rs'):
             self._lexer = RustLexer(self)
@@ -222,6 +234,13 @@ class Editor(QsciScintilla):
             line, column = self.getCursorPosition()
             self.auto_completer.getCompletion(line + 1, column, self.text())
             self.autoCompleteFromAPIs()
+
+    def getDeclarationsAndUsages(self, position: int, modifiers: Qt.KeyboardModifier):
+        if modifiers and Qt.KeyboardModifier.ControlModifier:
+            print(f'Declaration requested here: {position}')
+
+        elif modifiers and Qt.KeyboardModifier.ShiftModifier:
+            print(f'Usage requested here: {position}')
 
     def loadAutoCompletions(self):
         pass
