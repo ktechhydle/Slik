@@ -29,3 +29,14 @@ class RunTypeSelector(QComboBox):
                 return icon
 
             self.addItem(make_icon(icon), display, value)
+
+    def setRunConfigs(self, config: dict[str, tuple[str, str]]):
+        self._run_configs = config
+
+        self.createOptions()
+
+    def runConfigs(self) -> dict[str, tuple[str, str]]:
+        return self._run_configs
+
+    def runConfig(self) -> str:
+        return self.itemData(self.currentIndex())

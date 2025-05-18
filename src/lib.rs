@@ -18,6 +18,7 @@ fn slik(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(framework::file_ops::write, m)?)?;
     m.add_function(wrap_pyfunction!(framework::file_ops::search, m)?)?;
     m.add_function(wrap_pyfunction!(framework::file_ops::index, m)?)?;
+    m.add_function(wrap_pyfunction!(framework::file_ops::get_python_path, m)?)?;
 
     Ok(())
 }

@@ -30,7 +30,10 @@ class Slik(QMainWindow):
         self.tab_view.setCornerWidget(self.configure_bar)
 
         self.terminal_manager = TerminalManager()
-        self.project_manager = ProjectManager(self.tab_view, self.terminal_manager, self.configure_bar.runTypeSelector())
+        self.project_manager = ProjectManager(self.tab_view,
+                                              self.terminal_manager,
+                                              self.configure_bar.runTypeSelector(),
+                                              self.configure_bar.pythonPathSelector())
         self.project_manager.openProject(os.path.abspath('.'))
 
         splitter.addWidget(self.tab_view)

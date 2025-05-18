@@ -33,14 +33,14 @@ class ProjectIndexer(QThread):
 
 
 class ProjectManager:
-    def __init__(self, tab_view: QTabWidget, terminal_manager: TerminalManager, run_type_selector: QComboBox):
+    def __init__(self, tab_view: QTabWidget, terminal_manager: TerminalManager, run_type_selector: QComboBox, python_path_selector: QComboBox):
         self._tab_view = tab_view
         self._terminal_manager = terminal_manager
         self._run_type_selector = run_type_selector
+        self._python_path_selector = python_path_selector
         self._project_indexer = ProjectIndexer()
         self._project_indexer.finished.connect(self.indexFinished)
         self._old_index = []
-        self._python_path = 'python'
 
         self.createDialogs()
         self.createActions()
@@ -53,6 +53,7 @@ class ProjectManager:
         self._file_browser.projectDirChanged.connect(self._tab_view.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._file_searcher.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._project_indexer.setProjectDir)
+        self._file_browser.projectDirChanged.connect(self._python_path_selector.getPythonPath)
         self._file_browser.projectDirChanged.connect(self.indexProject)
         self._file_browser.projectChanged.connect(self._tab_view.updateTabContents)
         self._file_browser.projectChanged.connect(self.updateProject)
@@ -144,7 +145,7 @@ class ProjectManager:
         self._old_index = new_index_list
 
     def run(self):
-        command = self.parseRunType()
+        command = self.parseRunConfig()
 
         if command:
             self._terminal_manager.terminalFromCommand(command)
@@ -166,14 +167,14 @@ class ProjectManager:
                                         self._tab_view)
                 message.exec()
 
-    def parseRunType(self) -> str | None:
-        data = self._run_type_selector.itemData(self._run_type_selector.currentIndex())
-        args = data.split('+')
+    def parseRunConfig(self) -> str | None:
+        config = self._run_type_selector.runConfig()
+        args = config.split('+')
         command = ''
 
         for arg in args:
             if arg == 'PYTHONPATH':
-                arg = self._python_path
+                arg = self._python_path_selector.pythonPath()
 
             elif arg == 'CURRENTFILEPY':
                 if self._tab_view.currentTab().filename().endswith('.py'):
@@ -196,10 +197,7 @@ class ProjectManager:
 
             command += arg + ' '
 
-        return command
-
-    def setPythonPath(self, path: str):
-        self._python_path = path
+        return command.strip()
 
     def tabView(self) -> TabView:
         return self._tab_view
@@ -212,6 +210,3 @@ class ProjectManager:
 
     def projectDir(self) -> str:
         return self._file_browser.path()
-
-    def pythonPath(self) -> str:
-        return self._python_path
