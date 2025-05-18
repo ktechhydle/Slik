@@ -67,14 +67,17 @@ pub fn index(dir: &str) -> PyResult<Vec<(String, String)>> {
 pub fn get_python_path(dir: &str) -> PyResult<String> {
     let mut python_path = String::new();
 
-    for entry in WalkDir::new(dir)
-        .into_iter()
-        .filter_map(Result::ok)
-    {
+    for entry in WalkDir::new(dir).into_iter().filter_map(Result::ok) {
         let path = entry.path();
 
         if is_virtualenv_dir(path) {
-            python_path.push_str(path.join("Scripts").join("python.exe").to_string_lossy().to_string().as_str());
+            python_path.push_str(
+                path.join("Scripts")
+                    .join("python.exe")
+                    .to_string_lossy()
+                    .to_string()
+                    .as_str(),
+            );
         }
     }
 

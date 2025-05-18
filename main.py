@@ -50,6 +50,8 @@ def main():
     window = Slik()
     window.show()
 
+    app.focusChanged.connect(window.tab_view.updateTabContents)
+
     # Crash handler
     def handle_exception(exctype, value, tb):
         message = MessageDialog('Error:(',
