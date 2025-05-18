@@ -380,7 +380,7 @@ class FileBrowser(QMenu):
             self._file_view.hideColumn(2)
             self._file_view.hideColumn(3)
 
-            self._watcher.changePath(os.path.abspath(self._path))
+            self._watcher.changePath(self._path)
 
     def openProject(self):
         message = MessageDialog('Open Project', 'Opening a project will clear '

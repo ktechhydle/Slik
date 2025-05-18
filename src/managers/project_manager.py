@@ -53,9 +53,10 @@ class ProjectManager:
         self._file_browser.projectDirChanged.connect(self._tab_view.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._file_searcher.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._project_indexer.setProjectDir)
-        self._file_browser.projectDirChanged.connect(self._python_path_selector.getPythonPath)
+        self._file_browser.projectDirChanged.connect(self._python_path_selector.setProjectDir)
         self._file_browser.projectDirChanged.connect(self.indexProject)
         self._file_browser.projectChanged.connect(self._tab_view.updateTabContents)
+        self._file_browser.projectChanged.connect(self._python_path_selector.updatePythonPaths)
         self._file_browser.projectChanged.connect(self.updateProject)
 
     def createActions(self):
