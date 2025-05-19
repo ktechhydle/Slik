@@ -59,9 +59,6 @@ class Editor(QsciScintilla):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.enter(event)
 
-        elif event.key() == Qt.Key.Key_D and (event.modifiers() and Qt.KeyboardModifier.ControlModifier): # override default Ctrl+D behaviour
-            self.duplicateLine()
-
         elif event.key() in (
                 Qt.Key.Key_ParenLeft,
                 Qt.Key.Key_BracketLeft,
@@ -269,18 +266,6 @@ class Editor(QsciScintilla):
             self.endUndoAction()
 
             self.setCursorPosition(line, len(indent) + (len(replace) - 1))
-
-    def duplicateLine(self):
-        line, column = self.getCursorPosition()
-        text = self.text(line)
-
-        if not text.endswith('\n'): # ensure the newline char
-            text += '\n'
-
-        self.beginUndoAction()
-        self.insertAt(text, line + 1, 0)
-        self.setCursorPosition(line + 1, column)
-        self.endUndoAction()
 
     def moveLineUp(self):
         self.beginUndoAction()
