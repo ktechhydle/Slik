@@ -30,6 +30,7 @@ class Editor(QsciScintilla):
         self.setCallTipsStyle(QsciScintilla.CallTipsStyle.CallTipsContext)
         self.setCallTipsVisible(0)
         self.setCallTipsPosition(QsciScintilla.CallTipsPosition.CallTipsAboveText)
+        self.SendScintilla(QsciScintilla.SCI_SETADDITIONALSELECTIONTYPING, 1) # enable multi-line editing
 
         self._file_name = file_name
         self._lexer = None
