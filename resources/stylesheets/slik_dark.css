@@ -484,6 +484,14 @@ QTreeView::item:selected {
     background-color: #303030;
 }
 
+#popup QListWidget {
+    outline: 0;
+}
+
+#popup QListWidget::item {
+    border: none;
+}
+
 #configureBar {
     background-color: transparent;
 }
