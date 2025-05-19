@@ -236,11 +236,13 @@ class Editor(QsciScintilla):
             self.autoCompleteFromAPIs()
 
     def getDeclarationsAndUsages(self, position: int, modifiers: Qt.KeyboardModifier):
+        line, column = self.lineIndexFromPosition(position)
+
         if modifiers and Qt.KeyboardModifier.ControlModifier:
-            print(f'Declaration requested here: {position}')
+            print(f'Declaration requested here: {line}:{column}')
 
         elif modifiers and Qt.KeyboardModifier.ShiftModifier:
-            print(f'Usage requested here: {position}')
+            print(f'Usage requested here: {line}:{column}')
 
     def loadAutoCompletions(self):
         pass
