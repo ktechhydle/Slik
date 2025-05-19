@@ -1,11 +1,11 @@
 import os
 import shutil
 import slik
-from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve, 
+from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
     QDir, QUrl)
 from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
-    QPushButton, QWidgetAction, QFileDialog)
+    QPushButton, QWidgetAction, QFileDialog, QApplication)
 from src.gui.input_dialog import InputDialog
 from src.gui.message_dialog import MessageDialog
 
@@ -100,6 +100,12 @@ class FileSystemViewer(QTreeView):
             delete_action = QAction('Delete', self)
             delete_action.triggered.connect(self.removeSelected)
 
+            copy_full_path_action = QAction('Copy Full Path', self)
+            copy_full_path_action.triggered.connect(self.copyPath)
+
+            copy_relative_path_action = QAction('Copy Relative Path', self)
+            copy_relative_path_action.triggered.connect(lambda: self.copyPath(relative=True))
+
             open_in_explorer_action = QAction('Open In Explorer', self)
             open_in_explorer_action.triggered.connect(self.openExplorer)
 
@@ -112,6 +118,9 @@ class FileSystemViewer(QTreeView):
             self.menu.addAction(rename_action)
             self.menu.addSeparator()
             self.menu.addAction(delete_action)
+            self.menu.addSeparator()
+            self.menu.addAction(copy_full_path_action)
+            self.menu.addAction(copy_relative_path_action)
             self.menu.addSeparator()
             self.menu.addAction(open_in_explorer_action)
             self.menu.addAction(open_in_application_action)
@@ -250,6 +259,21 @@ class FileSystemViewer(QTreeView):
 
                     except Exception as e:
                         raise e
+
+    def copyPath(self, relative=False):
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
+
+            if not index.isValid():
+                return
+
+            filepath = self.model().filePath(index)
+
+            if relative:
+                QApplication.clipboard().setText(os.path.relpath(self.file_browser.projectDir(), filepath).replace('\', '/'))
+
+            else:
+                QApplication.clipboard().setText(os.path.abspath(filepath).replace('\', '/'))
 
 
 class FileBrowser(QMenu):
