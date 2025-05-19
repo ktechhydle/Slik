@@ -132,7 +132,7 @@ class TabView(QTabWidget):
         self.openTab('resources/info/start.md')
 
     def shortcutsTab(self):
-        self.openTab('resources/info/start.md')
+        self.openTab('resources/info/shortcuts.md')
 
     def setProjectDir(self, directory: str):
         if directory != self._project_dir:

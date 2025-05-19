@@ -1,65 +1,98 @@
 <html>
-<head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            color: #ccc;
-            background-color: #1e1e1e;
-        }
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                color: #ccc;
+                background-color: #1e1e1e;
+            }
 
-        h1, h2, h3, h4, h5, p, li {
-            color: #ffffff;
-        }
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            p,
+            li {
+                color: #ffffff;
+            }
 
-        a {
-            color: #6b9bfa;
-            font-weight: bold;
-            text-decoration: none;
-        }
+            a {
+                color: #6b9bfa;
+                font-weight: bold;
+                text-decoration: none;
+            }
 
-        a:hover {
-            text-decoration: underline;
-        }
+            a:hover {
+                text-decoration: underline;
+            }
 
-        code {
-            background-color: #2d2d2d;
-            color: #dcdcdc;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
+            code {
+                background-color: #2d2d2d;
+                color: #dcdcdc;
+                padding: 2px 4px;
+                border-radius: 4px;
+                font-family: monospace;
+            }
 
-        pre {
-            background-color: #2d2d2d;
-            color: #dcdcdc;
-            padding: 12px;
-            overflow-x: auto;
-            border-radius: 6px;
-            line-height: 1.5;
-            font-size: 14px;
-            font-family: monospace;
-        }
+            pre {
+                background-color: #2d2d2d;
+                color: #dcdcdc;
+                padding: 12px;
+                overflow-x: auto;
+                border-radius: 6px;
+                line-height: 1.5;
+                font-size: 14px;
+                font-family: monospace;
+            }
 
-        pre code {
-            background: none; /* remove double background from <pre><code> */
-            padding: 0;
-        }
+            pre code {
+                background: none; /* remove double background from <pre><code> */
+                padding: 0;
+            }
 
-        blockquote {
-            margin: 10px 0;
-            padding-left: 10px;
-            border-left: 3px solid #666;
-            color: #aaa;
-        }
-    </style>
-</head>
-<body>
-    <div id="content"></div>
-    <script>
-        function updateContent(html) {
-            document.getElementById('content').innerHTML = html;
-        }
-    </script>
-</body>
+            blockquote {
+                margin: 10px 0;
+                padding-left: 10px;
+                border-left: 3px solid #666;
+                color: #aaa;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                background-color: #2a2a2a;
+                color: #ddd;
+                border: 1px solid #444;
+                font-size: 14px;
+            }
+
+            th,
+            td {
+                padding: 12px 15px;
+                border: 1px solid #444;
+                text-align: left;
+            }
+
+            th {
+                background-color: #333;
+                color: #fff;
+                font-weight: bold;
+            }
+
+            tr:nth-child(even) {
+                background-color: #242424;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content"></div>
+        <script>
+            function updateContent(html) {
+                document.getElementById("content").innerHTML = html;
+            }
+        </script>
+    </body>
 </html>

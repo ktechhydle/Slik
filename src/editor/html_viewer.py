@@ -28,7 +28,7 @@ class HtmlViewer(QWebEngineView):
 
     def setMarkdown(self, md: str):
         # convert md to html
-        html_body = markdown.markdown(md, extensions=['fenced_code'])
+        html_body = markdown.markdown(md, extensions=['fenced_code', 'tables'])
 
         self._pending_content = json.dumps(html_body)
         self.updateContent()

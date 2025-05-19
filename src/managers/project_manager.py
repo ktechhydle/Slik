@@ -88,6 +88,10 @@ class ProjectManager:
         new_terminal_action.setShortcut(QKeySequence('Ctrl+N'))
         new_terminal_action.triggered.connect(self._terminal_manager.newTerminal)
 
+        shortcut_help_action = QAction('Shortcut Help', self._tab_view)
+        shortcut_help_action.setShortcut(QKeySequence('Ctrl+H'))
+        shortcut_help_action.triggered.connect(self._tab_view.shortcutsTab)
+
         self._tab_view.addAction(save_action)
         self._tab_view.addAction(toggle_collapse_action)
         self._tab_view.addAction(file_browser_action)
@@ -95,6 +99,7 @@ class ProjectManager:
         self._tab_view.addAction(run_project_action)
         self._tab_view.addAction(run_current_file_action)
         self._tab_view.addAction(new_terminal_action)
+        self._tab_view.addAction(shortcut_help_action)
 
     def showFileBrowser(self):
         self._file_browser.exec()
