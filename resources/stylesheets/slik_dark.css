@@ -19,7 +19,7 @@ QMainWindow {
 QWidget {
     background-color: #1c1c1c;
     padding: 0px;
-    font-family: 'Segoe UI';
+    font-family: "Segoe UI";
     color: white;
 }
 
@@ -66,11 +66,11 @@ QMenu::icon {
 
 QMenu::indicator {
     padding-left: 5px;
-    image: url('');
+    image: url("");
 }
 
 QMenu::indicator:checked {
-    image: url('');
+    image: url("");
 }
 
 QMenu:separator {
@@ -101,7 +101,7 @@ QToolButton:checked {
 QLabel {
     color: #c2c2c2;
     background-color: transparent;
-    font-family: 'Segoe UI';
+    font-family: "Segoe UI";
 }
 
 QLineEdit {
@@ -160,7 +160,7 @@ QComboBox::drop-down {
 
 QComboBox::down-arrow {
     right: 3.3;
-    image: url('resources/icons/ui/combo_down_arrow_icon.svg');
+    image: url("resources/icons/ui/combo_down_arrow_icon.svg");
     width: 16px;
     height: 16px;
     margin: 6px;
@@ -206,23 +206,23 @@ QCheckBox::indicator:hover {
 }
 
 QCheckBox::indicator:checked {
-    image: url('mp_software_stylesheets/assets/check.svg');
+    image: url("mp_software_stylesheets/assets/check.svg");
     background: #4772b3;
     border-color: #4772b3;
 }
 
 QCheckBox::indicator:checked:hover {
-    image: url('mp_software_stylesheets/assets/check.svg');
+    image: url("mp_software_stylesheets/assets/check.svg");
     background: #4772b3;
 }
 
 QCheckBox::indicator:indeterminate {
-    image: url('mp_software_stylesheets/assets/check.svg');
+    image: url("mp_software_stylesheets/assets/check.svg");
     background: #c2c2c2;
 }
 
 QCheckBox::indicator:indeterminate:hover {
-    image: url('mp_software_stylesheets/assets/check.svg');
+    image: url("mp_software_stylesheets/assets/check.svg");
     background: white;
 }
 
@@ -310,14 +310,14 @@ QTabWidget::pane {
 QTabBar {
     background-color: transparent;
     border-bottom: 2px solid #2a2a2a;
-    qproperty-drawBase: 0;
+    qproperty-drawbase: 0;
 }
 
 QTabBar::tab {
     background-color: transparent;
     padding: 10px;
     color: #c2c2c2;
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 14px;
 }
 
@@ -331,7 +331,7 @@ QTabBar::tab:!selected:hover {
 }
 
 QTabBar::close-button {
-    image: url('resources/icons/ui/close_icon.svg');
+    image: url("resources/icons/ui/close_icon.svg");
     subcontrol-origin: padding;
     subcontrol-position: right;
     border-radius: 2px;
@@ -357,7 +357,7 @@ QListWidget {
     background-color: #121212;
     border: none;
     border-radius: 5px;
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
 }
 
 QListWidget::item {
@@ -384,7 +384,7 @@ QToolTip {
     background-color: #303030;
     color: white;
     border: 1px solid #606060;
-    font-family: 'Segoe UI';
+    font-family: "Segoe UI";
     padding: 1px;
 }
 
@@ -430,17 +430,18 @@ QToolTip {
     border: none;
     border-radius: 15px;
     padding: 5px;
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 15px;
     color: #c2c2c2;
 }
 
-#fileBrowser QTreeView::item:hover, QTreeView::item:selected {
+#fileBrowser QTreeView::item:hover,
+QTreeView::item:selected {
     color: #ffffff;
 }
 
 #fileBrowser QLabel {
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 14px;
 }
 
@@ -450,13 +451,13 @@ QToolTip {
 }
 
 #popup QLabel {
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 14px;
     color: #ffffff;
 }
 
 #popup QPushButton {
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 16px;
     border-radius: 5px;
     color: #ffffff;
@@ -468,7 +469,7 @@ QToolTip {
 
 #popup QLineEdit {
     background-color: #707070;
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 14px;
     border-radius: 5px;
     padding: 2px;
@@ -489,7 +490,7 @@ QToolTip {
 
 #configureBar QComboBox {
     font-size: 12px;
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
 }
 
 #terminal {
@@ -502,13 +503,13 @@ QToolTip {
 }
 
 #terminal QLabel {
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 16px;
     color: #ffffff;
 }
 
 #terminal QLineEdit {
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 16px;
     border: none;
     color: #ffffff;
@@ -516,7 +517,7 @@ QToolTip {
 
 #terminal QPlainTextEdit {
     background-color: #383838;
-    font-family: 'JetBrains Mono';
+    font-family: "JetBrains Mono";
     font-size: 16px;
     border: 2px solid #707070;
     color: #ffffff;
@@ -524,7 +525,7 @@ QToolTip {
 
 #actionButton {
     background-color: transparent;
-    font-family: 'Segoe UI';
+    font-family: "Segoe UI";
     font-size: 18px;
     width: 20px;
     height: 20px;

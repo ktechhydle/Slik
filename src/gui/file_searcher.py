@@ -59,15 +59,17 @@ class FileSearcher(QMenu):
 
     def mouseReleaseEvent(self, event):
         super().mouseReleaseEvent(event)
-        
+
         self._initial_pos = None
-        
+
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
 
         if event.key() == Qt.Key.Key_Down and self._results_list.count() > 0:
             self._search_input.clearFocus()
             self._results_list.setFocus()
+            self._results_list.setCurrentRow(0)
+            self._results_list.item(0).setSelected(True)
 
         elif event.key() == Qt.Key.Key_Up and self._results_list.currentRow() == 0:
             self._results_list.clearSelection()
@@ -140,7 +142,7 @@ class FileSearcher(QMenu):
         title_bar.layout().addWidget(close_btn)
 
         self._search_input = QLineEdit()
-        self._search_input.setPlaceholderText('Search Project...')
+        self._search_input.setPlaceholderText('Search Project Files...')
         self._search_input.textChanged.connect(self.runSearch)
         self._results_list = QListWidget()
         self._results_list.itemClicked.connect(self.openFile)
