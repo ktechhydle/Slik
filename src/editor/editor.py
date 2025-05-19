@@ -157,7 +157,17 @@ class Editor(QsciScintilla):
         replace_current_line_action.setShortcut(QKeySequence('Ctrl+Shift+V'))
         replace_current_line_action.triggered.connect(self.replaceCurrentLine)
 
+        move_line_up_action = QAction('Move Line Up', self)
+        move_line_up_action.setShortcut(QKeySequence('Ctrl+Shift+up'))
+        move_line_up_action.triggered.connect(self.moveLineUp)
+
+        move_line_down_action = QAction('Move Line Down', self)
+        move_line_down_action.setShortcut(QKeySequence('Ctrl+Shift+down'))
+        move_line_down_action.triggered.connect(self.moveLineDown)
+
         self.addAction(replace_current_line_action)
+        self.addAction(move_line_up_action)
+        self.addAction(move_line_down_action)
 
     def enter(self, event: QKeyEvent):
         line, index = self.getCursorPosition()
@@ -269,6 +279,16 @@ class Editor(QsciScintilla):
         self.beginUndoAction()
         self.insertAt(text, line + 1, 0)
         self.setCursorPosition(line + 1, column)
+        self.endUndoAction()
+
+    def moveLineUp(self):
+        self.beginUndoAction()
+        self.SendScintilla(QsciScintilla.SCI_MOVESELECTEDLINESUP)
+        self.endUndoAction()
+
+    def moveLineDown(self):
+        self.beginUndoAction()
+        self.SendScintilla(QsciScintilla.SCI_MOVESELECTEDLINESDOWN)
         self.endUndoAction()
 
     def getAutoCompletions(self):
