@@ -270,10 +270,10 @@ class FileSystemViewer(QTreeView):
             filepath = self.model().filePath(index)
 
             if relative:
-                QApplication.clipboard().setText(os.path.relpath(self.file_browser.projectDir(), filepath).replace('\', '/'))
+                QApplication.clipboard().setText(os.path.relpath(self.file_browser.projectDir(), filepath).replace('\\', '/'))
 
             else:
-                QApplication.clipboard().setText(os.path.abspath(filepath).replace('\', '/'))
+                QApplication.clipboard().setText(os.path.abspath(filepath).replace('\\', '/'))
 
 
 class FileBrowser(QMenu):

@@ -129,7 +129,10 @@ class TabView(QTabWidget):
         self._tab_content_indexer.start()
 
     def defaultTab(self):
-        self.openTab('resources/default/start.md')
+        self.openTab('resources/info/start.md')
+
+    def shortcutsTab(self):
+        self.openTab('resources/info/start.md')
 
     def setProjectDir(self, directory: str):
         if directory != self._project_dir:

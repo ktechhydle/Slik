@@ -259,6 +259,7 @@ class PythonLexer(QsciLexerPython):
     def setHotSpotsEnabled(self, enabled: bool):
         self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.ClassName, enabled)
         self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.FunctionMethodName, enabled)
+        self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.Identifier, enabled)
 
 
 class RustLexer(BaseLexer):

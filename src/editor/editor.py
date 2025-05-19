@@ -1,6 +1,7 @@
 from PyQt6.Qsci import QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColor, QKeyEvent, QMouseEvent, QFont, QPixmap
+from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction
+from PyQt6.QtWidgets import QApplication
 from src.editor.auto_completer import AutoCompleter
 from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
 
@@ -40,6 +41,7 @@ class Editor(QsciScintilla):
         self.createLexer()
         self.createMargins()
         self.createStyle()
+        self.createActions()
 
     def mouseMoveEvent(self, event: QMouseEvent):
         super().mouseMoveEvent(event)
@@ -147,6 +149,13 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciScintilla.STYLE_BRACEBAD, font.family().encode())
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
+    def createActions(self):
+        replace_current_line_action = QAction('Replace Current Line', self)
+        replace_current_line_action.setShortcut(QKeySequence('Ctrl+Shift+V'))
+        replace_current_line_action.triggered.connect(self.replaceCurrentLine)
+
+        self.addAction(replace_current_line_action)
+
     def enter(self, event: QKeyEvent):
         line, index = self.getCursorPosition()
         current_line_text = self.text(line)[:index].rstrip()
@@ -228,6 +237,24 @@ class Editor(QsciScintilla):
 
         else:
             super().keyPressEvent(event)
+
+    def replaceCurrentLine(self):
+        if not self.selectedText():
+            line, index = self.getCursorPosition()
+            indent = ' ' * self.indentation(line)
+            clipboard_text = QApplication.clipboard().text()
+
+            if not clipboard_text.endswith('\n'): # we need to endsure there is a newline char at the end of the pasted text
+                clipboard_text += '\n'
+
+            replace = f'{indent}{clipboard_text}'
+
+            self.beginUndoAction()
+            self.setSelection(line, 0, line, len(self.text(line)) - 1)
+            self.replaceSelectedText(replace)
+            self.endUndoAction()
+
+            self.setCursorPosition(line, len(indent) + (len(replace) - 1))
 
     def getAutoCompletions(self):
         if not self.selectedText():
