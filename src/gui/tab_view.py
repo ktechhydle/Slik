@@ -123,7 +123,8 @@ class TabView(QTabWidget):
         def update_tab(results: list[tuple[Tab, str]]):
             if results:
                 for tab, contents in results:
-                    tab.editor().setText(contents, preserve=True)
+                    if tab.saved(): # the tab is saved, so we can change it's contents
+                        tab.editor().setText(contents, preserve=True)
 
         self._tab_content_indexer.finished.connect(update_tab)
         self._tab_content_indexer.start()

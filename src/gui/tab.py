@@ -1,5 +1,5 @@
-import slik
 import os
+import slik
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QSplitter, QVBoxLayout, QTabWidget
@@ -126,6 +126,9 @@ class Tab(QWidget):
 
     def basename(self) -> str:
         return os.path.basename(self._file_name)
+
+    def saved(self) -> bool:
+        return self._saved
 
     def editor(self) -> Editor:
         return self._editor
