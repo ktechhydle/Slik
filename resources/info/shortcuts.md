@@ -6,8 +6,7 @@ Slik includes many shortcuts to code faster, heres the full list!
 | `Ctrl+Q` | Open the file browser |
 | `Ctrl+Shift+Q` | Open the file searcher |
 | `Ctrl+F` | Toggle folded lines |
-| `Ctrl+D` | Duplicate the current line while keeping the cursor in same position |
-| `Alt+D` | Duplicate the current line and move cursor along |
+| `Ctrl+D` | Duplicate the current line |
 | `Ctrl+Shift+R` | Replace the current line with the clipboard's text |
 | `Ctrl+Arrow` | Move the cursor through words and lines with the arrow keys |
 | `Ctrl+Shift+Arrow` | Move lines up and down or grow the selection left or right |

@@ -1,4 +1,4 @@
-from PyQt6.Qsci import QsciScintilla, QsciAPIs
+from PyQt6.Qsci import QsciCommand, QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction
 from PyQt6.QtWidgets import QApplication
@@ -58,6 +58,12 @@ class Editor(QsciScintilla):
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.enter(event)
+
+        elif event.key() == Qt.Key.Key_D and event.modifiers() and Qt.KeyboardModifier.ControlModifier:
+            line, column = self.getCursorPosition()
+
+            self.SendScintilla(QsciScintilla.SCI_LINEDUPLICATE)
+            self.setCursorPosition(line + 1, column)
 
         elif event.key() in (
                 Qt.Key.Key_ParenLeft,
