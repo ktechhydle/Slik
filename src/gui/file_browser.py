@@ -398,11 +398,13 @@ class FileBrowser(QMenu):
             model.setRootPath(self._path)
             model.setFilter(QDir.Filter.AllEntries | QDir.Filter.NoDotAndDotDot)
 
+            scroll_pos = self._file_view.horizontalScrollBar().value()
             self._file_view.setModel(model)
             self._file_view.setRootIndex(model.index(self._path))
             self._file_view.hideColumn(1)
             self._file_view.hideColumn(2)
             self._file_view.hideColumn(3)
+            self._file_view.horizontalScrollBar().setValue(scroll_pos)
 
             self._watcher.changePath(self._path)
 
