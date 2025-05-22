@@ -1,13 +1,26 @@
 import json
 import markdown
+import webbrowser
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWebEngineCore import QWebEnginePage
+
+
+class HtmlPage(QWebEnginePage):
+    def acceptNavigationRequest(self, url, nav_type, is_main_frame):
+        if nav_type == QWebEnginePage.NavigationType.NavigationTypeLinkClicked:
+            webbrowser.open(url.url())
+
+            return False
+
+        return super().acceptNavigationRequest(url, nav_type, is_main_frame)
 
 
 class HtmlViewer(QWebEngineView):
     def __init__(self, project_dir='', parent=None):
         super().__init__(parent)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
+        self.setPage(HtmlPage(self))
 
         self._project_dir = project_dir
         self._pending_content = None
