@@ -18,7 +18,7 @@ class TabContentIndexer(QThread):
     def run(self):
         for tab in self._tabs:
             old_contents = tab.editor().text()
-            new_contents = slik.read(tab.filename())
+            new_contents = slik.read(tab.filename()) if os.path.exists(tab.filename()) else old_contents
 
             if old_contents != new_contents:
                 self._results.append((tab, new_contents))
@@ -101,9 +101,6 @@ class TabView(QTabWidget):
 
             if message.result() == MessageDialog.Accepted:
                 tab.save()
-
-            else:
-                return
 
         if self.count() == 1:
             self.removeTab(index)

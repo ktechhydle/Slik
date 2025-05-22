@@ -221,17 +221,18 @@ class FileSystemViewer(QTreeView):
             old_name = os.path.basename(old_path)
             dir_path = os.path.dirname(old_path)
 
-            new_name, ok = QInputDialog.getText(self.tab_view, 'Rename', 'New name:', text=old_name)
+            input_dialog = InputDialog(f"Rename '{old_name}'", 'New filename:', (InputDialog.OkButton, InputDialog.NoButton), self.tab_view)
+            input_dialog.exec()
 
-            if ok and new_name:
-                new_path = os.path.join(dir_path, new_name)
+            if input_dialog.result() == InputDialog.Accepted:
+                new_path = os.path.join(dir_path, input_dialog.value())
 
-                try:
-                    os.rename(old_path, new_path)
-                    self.file_browser.updateFileBrowser()
+                if new_path != old_path:
+                    try:
+                        os.rename(old_path, new_path)
 
-                except Exception as e:
-                    raise e
+                    except Exception as e:
+                        raise e
 
     def removeSelected(self):
         if self.selectedIndexes():
@@ -313,6 +314,13 @@ class FileBrowser(QMenu):
         super().mouseReleaseEvent(event)
 
         self._initial_pos = None
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.animateClose()
+
+        else:
+            super().keyPressEvent(event)
 
     def exec(self, pos=None):
         if self.isVisible():
@@ -398,13 +406,15 @@ class FileBrowser(QMenu):
             model.setRootPath(self._path)
             model.setFilter(QDir.Filter.AllEntries | QDir.Filter.NoDotAndDotDot)
 
-            scroll_pos = self._file_view.horizontalScrollBar().value()
+            scroll_pos_x = self._file_view.verticalScrollBar().value()
+            scroll_pos_y = self._file_view.horizontalScrollBar().value()
             self._file_view.setModel(model)
             self._file_view.setRootIndex(model.index(self._path))
             self._file_view.hideColumn(1)
             self._file_view.hideColumn(2)
             self._file_view.hideColumn(3)
-            self._file_view.horizontalScrollBar().setValue(scroll_pos)
+            self._file_view.horizontalScrollBar().setValue(scroll_pos_x)
+            self._file_view.verticalScrollBar().setValue(scroll_pos_y)
 
             self._watcher.changePath(self._path)
 

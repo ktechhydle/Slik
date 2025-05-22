@@ -31,6 +31,13 @@ class MessageDialog(QMenu):
         self.createUI()
         self.createButtons()
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.animateClose()
+
+        else:
+            super().keyPressEvent(event)
+
     def exec(self, pos=None):
         if self.isVisible():
             return

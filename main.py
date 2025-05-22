@@ -57,7 +57,7 @@ def main():
         message = MessageDialog('Error:(',
                       f'Slik encountered an error:\n\n{value}\n',
                       (MessageDialog.OkButton,),
-                      window)
+                      window.tab_view)
         message.exec()
 
         sys.__excepthook__(exctype, value, tb)
