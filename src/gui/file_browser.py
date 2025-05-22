@@ -68,7 +68,8 @@ class FileSystemWatcher(QFileSystemWatcher):
         self.addPath(path)
 
     def clear(self):
-        self.removePaths(self.directories())
+        if self.directories():
+            self.removePaths(self.directories())
 
 
 class FileSystemViewer(QTreeView):
