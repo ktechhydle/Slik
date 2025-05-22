@@ -178,7 +178,7 @@ class Editor(QsciScintilla):
         indent = self.indentation(line)
 
         # python style indents
-        if self.filename().endswith('.py'):
+        if self._file_name.endswith('.py'):
             if current_line_text.endswith(':'):
                 indent += self.tabWidth()
 
@@ -198,10 +198,39 @@ class Editor(QsciScintilla):
             self.endUndoAction()
 
         # bracket style indentation
-        elif self.filename().endswith(('.rs', '.css', '.qss', '.json')):
+        elif self._file_name.endswith(('.rs', '.css', '.qss', '.json')):
             self.beginUndoAction()
 
             if current_line_text.endswith('{') and '}' in self.text(line):
+                self.insert('\n')
+                self.insert('\n')
+                self.setIndentation(line + 1, indent + self.tabWidth())
+                self.setIndentation(line + 2, indent)
+                self.setCursorPosition(line + 1, indent + self.tabWidth())
+
+            elif current_line_text.endswith('{'):
+                self.insert('\n')
+                self.setIndentation(line + 1, indent + self.tabWidth())
+                self.setCursorPosition(line + 1, indent + self.tabWidth())
+
+            else:
+                self.insert('\n')
+                self.setIndentation(line + 1, indent)
+                self.setCursorPosition(line + 1, indent)
+
+            self.endUndoAction()
+
+        # xml style indents
+        elif self._file_name.endswith(('.html', '.xml', '.svg')):
+            self.beginUndoAction()
+
+            if current_line_text.endswith('>') and not current_line_text.replace(' ', '').startswith('</'):
+                self.insert('\n')
+                self.setIndentation(line + 1, indent + self.tabWidth())
+                self.setCursorPosition(line + 1, indent + self.tabWidth())
+
+            # for internal css/js
+            elif current_line_text.endswith('{') and '}' in self.text(line):
                 self.insert('\n')
                 self.insert('\n')
                 self.setIndentation(line + 1, indent + self.tabWidth())
