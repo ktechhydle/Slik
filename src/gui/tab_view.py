@@ -2,6 +2,7 @@ import os
 import slik
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QTabWidget, QWidget
+from src.gui.message_dialog import MessageDialog
 from src.gui.tab import Tab
 
 
@@ -88,6 +89,22 @@ class TabView(QTabWidget):
         self._tabs.append(tab)
 
     def closeTab(self, index: int):
+        tab = self.widget(index)
+
+        if tab and not tab.saved():
+            message = MessageDialog('Unsaved Changes',
+            f'File {tab.basename()} has unsaved changes. Do you want '
+            'to save them?',
+            (MessageDialog.YesButton, MessageDialog.NoButton),
+            self)
+            message.exec()
+
+            if message.result() == MessageDialog.Accepted:
+                tab.save()
+
+            else:
+                return
+
         if self.count() == 1:
             self.removeTab(index)
             self.defaultTab()

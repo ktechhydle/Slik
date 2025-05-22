@@ -15,7 +15,6 @@ class Editor(QsciScintilla):
         self.setTabWidth(4)
         self.setIndentationsUseTabs(False)
         self.setIndentationGuides(True)
-        self.setAutoIndent(True)
         self.setBackspaceUnindents(True)
         self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsAPIs)
         self.setAutoCompletionThreshold(1)
@@ -192,11 +191,6 @@ class Editor(QsciScintilla):
                     '...')):
                 indent -= self.tabWidth()
 
-            else:
-                super().keyPressEvent(event)
-
-                return
-
             self.beginUndoAction()
             self.insert('\n')
             self.setIndentation(line + 1, indent)
@@ -295,8 +289,8 @@ class Editor(QsciScintilla):
         if modifiers and Qt.KeyboardModifier.ControlModifier:
             print(f'Declaration requested here: {line}:{column}')
 
-        elif modifiers and Qt.KeyboardModifier.ShiftModifier:
-            print(f'Usage requested here: {line}:{column}')
+        elif modifiers and Qt.KeyboardModifier.AltModifier:
+            print(f'Usages requested here: {line}:{column}')
 
     def loadAutoCompletions(self):
         pass

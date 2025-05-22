@@ -8,7 +8,7 @@ Slik is the official IDE for MP Software developers.
 ## Overview
 Slik is based on three key points:
 
-1. Fully Automatic: 
+1. Fully Automatic:
 > Slik will detect virtual environments, main entrypoints, and index file system changes.
 
 2. Optimized For Success
