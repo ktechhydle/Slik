@@ -319,6 +319,7 @@ QTabWidget::pane {
 QTabBar {
     background-color: transparent;
     border-bottom: 2px solid #2a2a2a;
+    outline: 0;
 }
 
 QTabBar::tab {
@@ -349,7 +350,7 @@ QTabBar::close-button {
 }
 
 QTabBar::close-button:hover {
-    background-color: #c94e4e;
+    background-color: #505050;
 }
 
 QTabBar::scroller {
@@ -366,6 +367,7 @@ QListWidget {
     border: none;
     border-radius: 5px;
     font-family: "JetBrains Mono";
+    outline: 0;
 }
 
 QListWidget::item {
@@ -490,14 +492,6 @@ QTreeView::item:selected {
 
 #popup QLineEdit:focus {
     background-color: #303030;
-}
-
-#popup QListWidget {
-    outline: 0;
-}
-
-#popup QListWidget::item {
-    border: none;
 }
 
 #configureBar {
