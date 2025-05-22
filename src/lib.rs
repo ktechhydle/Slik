@@ -13,12 +13,30 @@ fn test() -> PyResult<()> {
 #[pymodule]
 fn slik(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(test, m)?)?;
-    m.add_function(wrap_pyfunction!(framework::lsp::get_completions, m)?)?;
-    m.add_function(wrap_pyfunction!(framework::file_ops::read, m)?)?;
-    m.add_function(wrap_pyfunction!(framework::file_ops::write, m)?)?;
-    m.add_function(wrap_pyfunction!(framework::file_ops::search, m)?)?;
-    m.add_function(wrap_pyfunction!(framework::file_ops::index, m)?)?;
-    m.add_function(wrap_pyfunction!(framework::file_ops::get_python_path, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        framework::language_server::completer::get_completions,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        framework::file_system::read_file::read,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        framework::file_system::write_file::write,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        framework::indexing::search_files::search,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        framework::indexing::index_project::index,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        framework::indexing::get_path::get_python_path,
+        m
+    )?)?;
 
     Ok(())
 }
