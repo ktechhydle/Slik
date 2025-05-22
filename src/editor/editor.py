@@ -224,7 +224,7 @@ class Editor(QsciScintilla):
         elif self._file_name.endswith(('.html', '.xml', '.svg')):
             self.beginUndoAction()
 
-            if current_line_text.endswith('>') and not current_line_text.replace(' ', '').startswith('</'):
+            if (current_line_text.endswith('>') and not current_line_text.replace(' ', '').startswith('</')) or current_line_text.endswith('{'):
                 self.insert('\n')
                 self.setIndentation(line + 1, indent + self.tabWidth())
                 self.setCursorPosition(line + 1, indent + self.tabWidth())
@@ -235,11 +235,6 @@ class Editor(QsciScintilla):
                 self.insert('\n')
                 self.setIndentation(line + 1, indent + self.tabWidth())
                 self.setIndentation(line + 2, indent)
-                self.setCursorPosition(line + 1, indent + self.tabWidth())
-
-            elif current_line_text.endswith('{'):
-                self.insert('\n')
-                self.setIndentation(line + 1, indent + self.tabWidth())
                 self.setCursorPosition(line + 1, indent + self.tabWidth())
 
             else:
