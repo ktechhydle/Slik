@@ -22,7 +22,7 @@ class FileSearchIndexer(QThread):
 
         self.finished.emit(self._results)
 
-    def results(self) -> list[tuple[str, str]]:
+    def results(self) -> list[str]:
         return self._results
 
 
@@ -168,11 +168,11 @@ class FileSearcher(QMenu):
 
         self._search_indexer = FileSearchIndexer(self._search_input.text(), self._project_dir)
 
-        def search_finished(results: list[tuple[str, str]]):
+        def search_finished(results: list[str]):
             self._results_list.clear()
 
-            for basename, filename in results:
-                item = QListWidgetItem(os.path.basename(basename))
+            for filename in results:
+                item = QListWidgetItem(os.path.basename(filename))
                 item.filename = filename
 
                 self._results_list.addItem(item)

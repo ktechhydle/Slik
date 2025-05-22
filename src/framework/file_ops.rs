@@ -20,7 +20,7 @@ pub fn write(file_name: &str, contents: &str) -> PyResult<()> {
 }
 
 #[pyfunction]
-pub fn search(project_dir: &str, query: &str) -> PyResult<Vec<(String, String)>> {
+pub fn search(project_dir: &str, query: &str) -> PyResult<Vec<String>> {
     let mut results = Vec::new();
 
     for entry in WalkDir::new(project_dir)
@@ -34,7 +34,7 @@ pub fn search(project_dir: &str, query: &str) -> PyResult<Vec<(String, String)>>
             let file_name = path.display().to_string();
 
             if file_name.contains(query.to_lowercase().as_str()) {
-                results.push((file_name.clone(), file_name.clone()));
+                results.push(file_name);
             }
         }
     }
