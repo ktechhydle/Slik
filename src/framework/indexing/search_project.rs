@@ -15,9 +15,18 @@ pub fn search(project_dir: &str, query: &str) -> PyResult<Vec<String>> {
         let path = entry.path();
 
         if entry.file_type().is_file() && !is_binary_file(path) {
-            let file_name = path.display().to_string();
+            let file_name = path.to_string_lossy().to_string();
+            let searchable_name = path
+                .file_name()
+                .expect("Error converting path to string")
+                .to_string_lossy()
+                .to_string();
 
-            if file_name.contains(query.to_lowercase().as_str()) {
+            if searchable_name
+                .to_lowercase()
+                .as_str()
+                .contains(query.to_lowercase().as_str())
+            {
                 results.push(file_name);
             }
         }
