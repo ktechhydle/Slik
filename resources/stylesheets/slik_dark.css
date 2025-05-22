@@ -277,12 +277,12 @@ QScrollBar::sub-page {
 
 QScrollBar::add-line,
 QScrollBar::sub-line {
+    background-color: none;
     border: none;
-    background: none;
 }
 
 QScrollBar::handle {
-    background: #656565;
+    background-color: #656565;
     border-radius: 5px;
 }
 
@@ -295,7 +295,7 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar::handle:hover {
-    background: #707070;
+    background-color: #707070;
 }
 
 QTabWidget {
@@ -304,7 +304,7 @@ QTabWidget {
 
 QTabWidget::pane {
     border: none;
-    background: transparent;
+    background-color: transparent;
 }
 
 QTabBar {
