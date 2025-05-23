@@ -49,6 +49,8 @@ class Tab(QWidget):
 
         self._editor = Editor(self._file_name, self)
         self._editor.textChanged.connect(self.setUnsaved)
+        self._editor.cursorPositionChanged.connect(self.getAutoCompletions)
+        self._editor.SCN_HOTSPOTCLICK.connect(self.getDeclarationsAndUsages)
 
         if os.path.exists(self._file_name):
             self._editor.setText(slik.read(self._file_name))
@@ -88,6 +90,12 @@ class Tab(QWidget):
                 self._editor.textChanged.connect(lambda: self._viewer.setHtml(self._editor.text()))
 
             self._splitter.addWidget(self._viewer)
+
+    def getAutoCompletions(self):
+        self.tab_view.tabCompletionRequested.emit(self._editor, self._editor.api())
+
+    def getDeclarationsAndUsages(self, position: int, modifiers: Qt.KeyboardModifier):
+        self.tab_view.tabHotSpotRequested.emit(self._editor, position, modifiers)
 
     def save(self):
         slik.write(self._file_name, self._editor.text())

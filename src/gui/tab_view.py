@@ -1,7 +1,8 @@
 import os
 import slik
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, Qt, pyqtSignal
 from PyQt6.QtWidgets import QTabWidget, QWidget
+from PyQt6.Qsci import QsciAPIs, QsciScintilla
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab import Tab
 
@@ -31,6 +32,8 @@ class TabContentIndexer(QThread):
 class TabView(QTabWidget):
     tabOpened = pyqtSignal(str)
     tabClosed = pyqtSignal(str)
+    tabCompletionRequested = pyqtSignal(QsciScintilla, QsciAPIs)
+    tabHotSpotRequested = pyqtSignal(QsciScintilla, int, Qt.KeyboardModifier)
 
     def __init__(self, parent=None):
         super().__init__(parent)

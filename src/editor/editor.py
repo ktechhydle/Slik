@@ -2,7 +2,6 @@ from PyQt6.Qsci import QsciCommand, QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction, QTextCursor
 from PyQt6.QtWidgets import QApplication, QMenu
-from src.editor.auto_completer import AutoCompleter
 from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
 
 
@@ -34,9 +33,7 @@ class Editor(QsciScintilla):
         self._file_name = file_name
         self._lexer = None
 
-        self.cursorPositionChanged.connect(self.getAutoCompletions)
         self.textChanged.connect(self.textModified)
-        self.SCN_HOTSPOTCLICK.connect(self.getDeclarationsAndUsages)
 
         self.createLexer()
         self.createMargins()
@@ -109,9 +106,7 @@ class Editor(QsciScintilla):
 
         self.setLexer(self._lexer)
 
-        self.api = QsciAPIs(self._lexer)
-        self.auto_completer = AutoCompleter(self._file_name, self.api)
-        self.auto_completer.finished.connect(self.loadAutoCompletions)
+        self._api = QsciAPIs(self._lexer)
 
     def createMargins(self):
         self.setMarginType(0, QsciScintilla.MarginType.NumberMargin)
@@ -312,24 +307,6 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_MOVESELECTEDLINESDOWN)
         self.endUndoAction()
 
-    def getAutoCompletions(self):
-        if not self.selectedText():
-            line, column = self.getCursorPosition()
-            self.auto_completer.getCompletion(line + 1, column, self.text())
-            self.autoCompleteFromAPIs()
-
-    def getDeclarationsAndUsages(self, position: int, modifiers: Qt.KeyboardModifier):
-        line, column = self.lineIndexFromPosition(position)
-
-        if modifiers and Qt.KeyboardModifier.ControlModifier:
-            print(f'Declaration requested here: {line}:{column}')
-
-        elif modifiers and Qt.KeyboardModifier.AltModifier:
-            print(f'Usages requested here: {line}:{column}')
-
-    def loadAutoCompletions(self):
-        pass
-
     def textModified(self):
         if self._lexer:
             line, column = self.getCursorPosition()
@@ -348,3 +325,6 @@ class Editor(QsciScintilla):
 
     def filename(self) -> str:
         return self._file_name
+
+    def api(self) -> QsciAPIs:
+        return self._api
