@@ -16,7 +16,7 @@ class AutoCompleter(QThread):
 
     def run(self):
         try:
-            self.loadAutoCompletions(slik.get_completions(self._file_name, self.text, self.line, self.column))
+            self.loadAutoCompletions(slik.get_document_completions(self._file_name, self.text, self.line, self.column))
 
         except Exception as e:
             raise e

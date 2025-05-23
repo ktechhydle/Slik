@@ -1,1 +1,1 @@
-pub mod completer;
+pub mod lsp;

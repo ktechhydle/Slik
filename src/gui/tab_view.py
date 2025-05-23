@@ -29,6 +29,9 @@ class TabContentIndexer(QThread):
 
 
 class TabView(QTabWidget):
+    tabOpened = pyqtSignal(str)
+    tabClosed = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setDocumentMode(True)
@@ -52,6 +55,7 @@ class TabView(QTabWidget):
 
     def openTab(self, filename: str, insert=False):
         filename = os.path.abspath(filename)
+        self.tabOpened.emit(filename)
 
         for tab in self._tabs:
             if tab.filename() == filename:
@@ -90,6 +94,7 @@ class TabView(QTabWidget):
 
     def closeTab(self, index: int):
         tab = self.widget(index)
+        self.tabClosed.emit(tab.filename())
 
         if tab and not tab.saved():
             message = MessageDialog('Unsaved Changes',
