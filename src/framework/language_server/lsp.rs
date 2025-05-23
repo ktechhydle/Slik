@@ -1,47 +1,73 @@
 use lsp_types;
 use pyo3::prelude::*;
 
-#[pyfunction]
-pub fn open_document(file: &str) -> PyResult<()> {
-    Ok(())
-}
+#[pyclass]
+pub struct LanguageServer;
 
-#[pyfunction]
-pub fn close_document(file: &str) -> PyResult<()> {
-    Ok(())
-}
+#[pymethods]
+impl LanguageServer {
+    #[new]
+    fn new() -> Self {
+        LanguageServer {}
+    }
 
-#[pyfunction]
-pub fn get_document_completions(
-    file: &str,
-    code: &str,
-    line: usize,
-    column: usize,
-) -> PyResult<Vec<String>> {
-    Ok(vec!["greet(name: str)".to_string()])
-}
+    pub fn start(&self) {}
 
-#[pyfunction]
-pub fn get_document_definitions(
-    file: &str,
-    code: &str,
-    line: usize,
-    column: usize,
-) -> PyResult<()> {
-    Ok(())
-}
+    pub fn open_document(&self, file: &str) -> PyResult<()> {
+        Ok(())
+    }
 
-#[pyfunction]
-pub fn get_document_usages(file: &str, code: &str, line: usize, column: usize) -> PyResult<()> {
-    Ok(())
-}
+    pub fn close_document(&self, file: &str) -> PyResult<()> {
+        Ok(())
+    }
 
-#[pyfunction]
-pub fn format_document(file: &str, code: &str, line: usize, column: usize) -> PyResult<()> {
-    Ok(())
-}
+    pub fn get_document_completions(
+        &self,
+        file: &str,
+        code: &str,
+        line: usize,
+        column: usize,
+    ) -> PyResult<Vec<String>> {
+        Ok(vec!["greet(name: str)".to_string()])
+    }
 
-#[pyfunction]
-pub fn lint_document(file: &str, code: &str, line: usize, column: usize) -> PyResult<()> {
-    Ok(())
+    pub fn get_document_definitions(
+        &self,
+        file: &str,
+        code: &str,
+        line: usize,
+        column: usize,
+    ) -> PyResult<()> {
+        Ok(())
+    }
+
+    pub fn get_document_usages(
+        &self,
+        file: &str,
+        code: &str,
+        line: usize,
+        column: usize,
+    ) -> PyResult<()> {
+        Ok(())
+    }
+
+    pub fn format_document(
+        &self,
+        file: &str,
+        code: &str,
+        line: usize,
+        column: usize,
+    ) -> PyResult<()> {
+        Ok(())
+    }
+
+    pub fn lint_document(
+        &self,
+        file: &str,
+        code: &str,
+        line: usize,
+        column: usize,
+    ) -> PyResult<()> {
+        Ok(())
+    }
 }

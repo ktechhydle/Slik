@@ -1,4 +1,5 @@
 import slik
+from slik import LanguageServer
 
 
 class LanguageServerManager:
@@ -7,8 +8,10 @@ class LanguageServerManager:
         self._tab_view.tabOpened.connect(self.openDocument)
         self._tab_view.tabClosed.connect(self.closeDocument)
 
+        self._language_server = LanguageServer()
+
     def openDocument(self, filename: str):
-        slik.open_document(filename)
+        self._language_server.open_document(filename)
 
     def closeDocument(self, filename: str):
-        slik.close_document(filename)
+        self._language_server.close_document(filename)

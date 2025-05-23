@@ -13,34 +13,7 @@ fn test() -> PyResult<()> {
 #[pymodule]
 fn slik(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(test, m)?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::open_document,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::close_document,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::get_document_completions,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::get_document_definitions,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::get_document_usages,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::format_document,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        framework::language_server::lsp::lint_document,
-        m
-    )?)?;
+    m.add_class::<framework::language_server::lsp::LanguageServer>()?;
     m.add_function(wrap_pyfunction!(
         framework::file_system::read_file::read,
         m
