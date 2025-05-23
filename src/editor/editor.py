@@ -1,7 +1,7 @@
 from PyQt6.Qsci import QsciCommand, QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction, QTextCursor
+from PyQt6.QtWidgets import QApplication, QMenu
 from src.editor.auto_completer import AutoCompleter
 from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
 
@@ -98,6 +98,7 @@ class Editor(QsciScintilla):
 
         elif self._file_name.endswith('.md'):
             self._lexer = MarkdownLexer()
+            self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsDocument)
 
         elif self._file_name.endswith(('.html', '.svg', '.xml')):
             self._lexer = HTMLLexer()
