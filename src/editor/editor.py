@@ -157,6 +157,10 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE, QsciScintilla.STYLE_BRACEBAD, font.pointSize())
 
     def createActions(self):
+        redo_action = QAction('Redo', self)
+        redo_action.setShortcut(QKeySequence('Ctrl+Shift+Z'))
+        redo_action.triggered.connect(self.redo)
+
         replace_current_line_action = QAction('Replace Current Line', self)
         replace_current_line_action.setShortcut(QKeySequence('Ctrl+Shift+V'))
         replace_current_line_action.triggered.connect(self.replaceCurrentLine)
@@ -169,6 +173,7 @@ class Editor(QsciScintilla):
         move_line_down_action.setShortcut(QKeySequence('Ctrl+Shift+down'))
         move_line_down_action.triggered.connect(self.moveLineDown)
 
+        self.addAction(redo_action)
         self.addAction(replace_current_line_action)
         self.addAction(move_line_up_action)
         self.addAction(move_line_down_action)
