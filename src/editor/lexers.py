@@ -470,6 +470,9 @@ class RustLexer(BaseLexer):
                     'async', 'match', 'for', 'while', 'loop')):
                 level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
 
+            elif 'else' in line_text:
+                level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
+
             if is_blank:
                 level |= QsciScintilla.SC_FOLDLEVELWHITEFLAG
 
