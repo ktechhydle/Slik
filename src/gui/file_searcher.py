@@ -176,7 +176,7 @@ class FileSearcher(QMenu):
             self._results_list.clear()
 
             for filename in results:
-                item = QListWidgetItem(os.path.basename(filename))
+                item = QListWidgetItem(os.path.relpath(filename, self._project_dir).replace('\\', '/'))
                 item.filename = filename
 
                 self._results_list.addItem(item)
