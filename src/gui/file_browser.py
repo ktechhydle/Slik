@@ -79,6 +79,7 @@ class FileSystemViewer(QTreeView):
         self.setHeaderHidden(True)
         self.setDropIndicatorShown(True)
         self.setAcceptDrops(True)
+        self.setIndentation(15)
         self.setSelectionMode(QTreeView.SelectionMode.ExtendedSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
