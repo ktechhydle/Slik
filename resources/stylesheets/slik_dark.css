@@ -446,6 +446,28 @@ QToolTip {
     outline: 0;
 }
 
+#fileBrowser QTreeView::item {
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    color: #c2c2c2;
+    margin: 0px;
+}
+
+#fileBrowser QTreeView::item:hover {
+    background-color: #707070;
+}
+
+#fileBrowser QTreeView::item:selected {
+    background-color: #707070;
+}
+
+#fileBrowser QTreeView::branch {
+    background-color: transparent;
+    margin: 0px;
+    border-image: url("resources/icons/ui/indent_indicator_icon.svg") 0;
+}
+
 #fileBrowser QLabel {
     font-family: "JetBrains Mono";
     font-size: 14px;
