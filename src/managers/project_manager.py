@@ -160,7 +160,7 @@ class ProjectManager:
         file = self._tab_view.currentTab().filename()
 
         if file.endswith('.py'):
-            self._terminal_manager.terminalFromCommand(f'{self._python_path} {file}')
+            self._terminal_manager.terminalFromCommand(f'{self._python_path_selector.pythonPath()} {file}')
 
         elif file.endswith('.rs'):
             if os.path.exists(f'{self.projectDir()}/Cargo.toml'):
