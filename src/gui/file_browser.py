@@ -3,11 +3,12 @@ import shutil
 import slik
 from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
     QDir, QUrl)
-from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
+from PyQt6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDropEvent, QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
     QPushButton, QWidgetAction, QFileDialog, QApplication)
-from src.gui.input_dialog import InputDialog
 from src.gui.message_dialog import MessageDialog
+from src.gui.input_dialog import InputDialog
+from src.gui.move_dialog import MoveDialog
 
 
 class FileSystemModel(QFileSystemModel):
@@ -76,6 +77,8 @@ class FileSystemViewer(QTreeView):
     def __init__(self, tab_view, file_browser, parent=None):
         super().__init__(parent)
         self.setHeaderHidden(True)
+        self.setDropIndicatorShown(True)
+        self.setAcceptDrops(True)
         self.setSelectionMode(QTreeView.SelectionMode.ExtendedSelection)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
@@ -98,6 +101,9 @@ class FileSystemViewer(QTreeView):
             rename_action = QAction('Rename...', self)
             rename_action.triggered.connect(self.renameSelected)
 
+            move_action = QAction('Move...', self)
+            move_action.triggered.connect(self.moveSelected)
+
             delete_action = QAction('Delete', self)
             delete_action.triggered.connect(self.removeSelected)
 
@@ -117,6 +123,7 @@ class FileSystemViewer(QTreeView):
             self.menu.addAction(new_dir_action)
             self.menu.addSeparator()
             self.menu.addAction(rename_action)
+            self.menu.addAction(move_action)
             self.menu.addSeparator()
             self.menu.addAction(delete_action)
             self.menu.addSeparator()
@@ -234,6 +241,68 @@ class FileSystemViewer(QTreeView):
 
                     except Exception as e:
                         raise e
+
+    def moveSelected(self):
+        indexes = self.selectedIndexes()
+
+        if not indexes:
+            return
+
+        model = self.model()
+        paths = list(set(model.filePath(index) for index in indexes if index.isValid()))
+
+        move_dialog = MoveDialog('Move', 'Choose a destination path:',
+                                 (MoveDialog.OkButton, MoveDialog.CancelButton), self)
+        move_dialog.input().setText(os.path.dirname(paths[0].replace('\\', '/')) + '/')
+        move_dialog.exec()
+
+        if move_dialog.result() == MoveDialog.Accepted:
+            dest_dir = move_dialog.value()
+
+            if not os.path.exists(dest_dir):
+                message = MessageDialog('Invalid Destination',
+                                        f"The path '{dest_dir}' does not exist.",
+                                        (MessageDialog.OkButton,), self.tab_view)
+                message.exec()
+
+                return
+
+            confirm = MessageDialog('Confirm Move',
+                                    f'Move {len(paths)} item(s) to:\n{dest_dir}?',
+                                    (MessageDialog.YesButton, MessageDialog.NoButton),
+                                    self.tab_view)
+            confirm.exec()
+
+            if confirm.result() == MessageDialog.Accepted:
+                for path in paths:
+                    try:
+                        filename = os.path.basename(path)
+                        target_path = os.path.join(dest_dir, filename)
+
+                        if os.path.exists(target_path):
+                            overwrite = MessageDialog('Overwrite?',
+                                                      f"'{filename}' already exists at destination. Overwrite?",
+                                                      (MessageDialog.YesButton, MessageDialog.NoButton),
+                                                      self.tab_view)
+                            overwrite.exec()
+
+                            if overwrite.result() != MessageDialog.Accepted:
+                                continue
+
+                            if os.path.isdir(target_path):
+                                shutil.rmtree(target_path)
+
+                            else:
+                                os.remove(target_path)
+
+                        shutil.move(path, target_path)
+
+                    except Exception as e:
+                        error = MessageDialog('Move Error',
+                                              f"Could not move '{os.path.basename(path)}': {str(e)}",
+                                              (MessageDialog.OkButton,), self.tab_view)
+                        error.exec()
+
 
     def removeSelected(self):
         if self.selectedIndexes():

@@ -9,7 +9,7 @@ enum RequestID {
     Completion(i32),
     Definition(i32),
     Usage(i32),
-    Default(i32),
+    Document(i32),
 }
 
 #[pyclass]
@@ -22,6 +22,8 @@ impl LanguageServer {
     // 1 - Completions
     // 2 - Definitions
     // 3 - Usages
+    // 4 - Document Opened
+    // 5 - Document Closed
     #[new]
     fn new() -> Self {
         LanguageServer {}
@@ -30,12 +32,34 @@ impl LanguageServer {
     // Start the lsp command for the document (pyright for .py, rust-analyzer for .rs)
     // This will send a 'textDocument/didOpen' request to the server
     pub fn open_document(&self, filename: &str) -> PyResult<()> {
+        /*let request = json!({
+            "jsonrpc": JSON_RPC_VERSION,
+            "id": RequestID::Document(4),
+            "method": "textDocument/didOpen",
+            "params": {
+                "textDocument": {
+                    "uri": format!("file://{}", filename)
+                }
+            }
+        });*/
+
         Ok(())
     }
 
     // Stop the lsp command for the specified file
     // This will send a 'textDocument/didClose' request to the server
     pub fn close_document(&self, filename: &str) -> PyResult<()> {
+        /*let request = json!({
+            "jsonrpc": JSON_RPC_VERSION,
+            "id": RequestID::Document(5),
+            "method": "textDocument/didClose",
+            "params": {
+                "textDocument": {
+                    "uri": format!("file://{}", filename)
+                }
+            }
+        });*/
+
         Ok(())
     }
 
@@ -75,6 +99,21 @@ impl LanguageServer {
         line: usize,
         column: usize,
     ) -> PyResult<()> {
+        /*let request = json!({
+            "jsonrpc": JSON_RPC_VERSION,
+            "id": RequestID::Definition(2),
+            "method": "textDocument/definition",
+            "params": {
+                "textDocument": {
+                    "uri": format!("file://{}", filename)
+                },
+                "position": {
+                    "line": line,
+                    "character": column
+                }
+            }
+        });*/
+
         Ok(())
     }
 
@@ -87,6 +126,21 @@ impl LanguageServer {
         line: usize,
         column: usize,
     ) -> PyResult<()> {
+        /*let request = json!({
+            "jsonrpc": JSON_RPC_VERSION,
+            "id": RequestID::Usage(3),
+            "method": "textDocument/references",
+            "params": {
+                "textDocument": {
+                    "uri": format!("file://{}", filename)
+                },
+                "position": {
+                    "line": line,
+                    "character": column
+                }
+            }
+        });*/
+
         Ok(())
     }
 }
