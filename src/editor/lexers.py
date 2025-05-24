@@ -2,7 +2,7 @@ import re
 import types
 import builtins
 import keyword
-from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerHTML, QsciLexerCSS, QsciLexerMarkdown, QsciLexerPython
+from PyQt6.Qsci import QsciLexerCustom, QsciScintilla, QsciLexerHTML, QsciLexerCSS, QsciLexerMarkdown, QsciLexerPython, QsciLexerJSON
 from PyQt6.QtGui import QColor, QFont
 
 
@@ -579,6 +579,37 @@ class CSSLexer(QsciLexerCSS):
         self.setColor(Style.COLOR_BUILTIN, CSSLexer.PseudoClass)
         self.setColor(Style.COLOR_STRING, CSSLexer.DoubleQuotedString)
         self.setColor(Style.COLOR_STRING, CSSLexer.SingleQuotedString)
+
+
+class JSONLexer(QsciLexerJSON):
+    def __init__(self):
+        super().__init__()
+        self.setDefaultColor(QColor('#ffffff'))
+        self.setDefaultPaper(Style.COLOR_BG)
+        self.setDefaultFont(Style.FONT_NORMAL)
+        self.setFoldCompact(False)
+
+        self.createStyle()
+
+    def createStyle(self):
+        self.setFont(Style.FONT_NORMAL, JSONLexer.Default)
+        self.setFont(Style.FONT_NORMAL, JSONLexer.Keyword)
+        self.setFont(Style.FONT_NORMAL, JSONLexer.KeywordLD)
+        self.setFont(Style.FONT_ITALIC, JSONLexer.CommentLine)
+        self.setFont(Style.FONT_ITALIC, JSONLexer.CommentBlock)
+
+        self.setColor(Style.COLOR_NORMAL, JSONLexer.Default)
+        self.setColor(Style.COLOR_NORMAL, JSONLexer.Operator)
+        self.setColor(Style.COLOR_COMMENT, JSONLexer.CommentLine)
+        self.setColor(Style.COLOR_COMMENT, JSONLexer.CommentBlock)
+        self.setColor(Style.COLOR_BUILTIN, JSONLexer.Property)
+        self.setColor(Style.COLOR_CONSTANT, JSONLexer.Keyword)
+        self.setColor(Style.COLOR_CONSTANT, JSONLexer.KeywordLD)
+        self.setColor(Style.COLOR_CONSTANT, JSONLexer.Number)
+        self.setColor(Style.COLOR_CONSTANT, JSONLexer.EscapeSequence)
+        self.setColor(Style.COLOR_STRING, JSONLexer.String)
+        self.setColor(Style.COLOR_ERROR, JSONLexer.UnclosedString)
+        self.setColor(Style.COLOR_ERROR, JSONLexer.Error)
 
 
 class MarkdownLexer(QsciLexerMarkdown):

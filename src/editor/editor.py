@@ -2,7 +2,7 @@ from PyQt6.Qsci import QsciCommand, QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction, QTextCursor
 from PyQt6.QtWidgets import QApplication, QMenu
-from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, MarkdownLexer, PlainTextLexer
+from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, JSONLexer, MarkdownLexer, PlainTextLexer
 
 
 class Editor(QsciScintilla):
@@ -96,6 +96,9 @@ class Editor(QsciScintilla):
         elif self._file_name.endswith('.md'):
             self._lexer = MarkdownLexer()
             self.setAutoCompletionSource(QsciScintilla.AutoCompletionSource.AcsDocument)
+
+        elif self._file_name.endswith('.json'):
+            self._lexer = JSONLexer()
 
         elif self._file_name.endswith(('.html', '.svg', '.xml')):
             self._lexer = HTMLLexer()
