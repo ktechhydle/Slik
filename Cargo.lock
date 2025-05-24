@@ -8,6 +8,8 @@ version = "1.0.0"
 dependencies = [
  "lsp-types",
  "pyo3",
+ "serde",
+ "serde_json",
  "sha1",
  "walkdir",
 ]
