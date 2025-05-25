@@ -499,7 +499,7 @@ class RustLexer(BaseLexer):
 
             if line_text.strip().startswith((
                     'pub', 'use', 'fn', 'struct', 'enum', 'impl', 'trait', 'if', 'else',
-                    'async', 'match', 'for', 'while', 'loop', '/*')):
+                    'async', 'match', 'for', 'while', 'loop')):
                 level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
 
             elif 'else' in line_text:
