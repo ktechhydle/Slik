@@ -647,6 +647,106 @@ class JSONLexer(QsciLexerJSON):
         self.setColor(Style.COLOR_ERROR, JSONLexer.Error)
 
 
+class TOMLLexer(BaseLexer):
+    def __init__(self, editor):
+        super().__init__(editor, 'TOML')
+        self.setBuiltinNames(['true', 'false'])
+
+    def createStyle(self):
+        self.setFont(Style.FONT_NORMAL, TOMLLexer.DEFAULT)
+        self.setFont(Style.FONT_ITALIC, TOMLLexer.COMMENTS)
+        self.setColor(Style.COLOR_NORMAL, TOMLLexer.DEFAULT)
+        self.setColor(Style.COLOR_NORMAL, TOMLLexer.BRACKETS)
+        self.setColor(Style.COLOR_COMMENT, TOMLLexer.COMMENTS)
+        self.setColor(Style.COLOR_KEYWORD, TOMLLexer.KEYWORD)
+        self.setColor(Style.COLOR_CONSTANT, TOMLLexer.BUILTINS)
+        self.setColor(Style.COLOR_CONSTANT, TOMLLexer.CONSTANTS)
+        self.setColor(Style.COLOR_STRING, TOMLLexer.STRING)
+
+    def styleText(self, start, end):
+        text = self.editor().text()[start:end]
+        self.generateTokens(text)
+
+        string_flag = False
+        comment_flag = False
+
+        if start > 0:
+            previous_style_nr = self.editor().SendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
+
+            if previous_style_nr == TOMLLexer.COMMENTS:
+                comment_flag = False
+
+        while True:
+            curr_token = self.nextToken()
+
+            if curr_token is None:
+                break
+
+            tok = curr_token[0]
+            tok_len = curr_token[1]
+
+            if comment_flag:
+                self.setStyling(tok_len, RustLexer.COMMENTS)
+
+                if tok.endswith('\n') or tok.startswith('\n'):
+                    comment_flag = False
+
+                continue
+
+            if string_flag:
+                self.setStyling(curr_token[1], RustLexer.STRING)
+
+                if tok == '"':
+                    string_flag = False
+
+                continue
+
+            elif tok == '"':
+                self.setStyling(tok_len, TOMLLexer.STRING)
+                string_flag = True
+
+                continue
+
+            elif tok == '#':
+                self.setStyling(tok_len, TOMLLexer.COMMENTS)
+                comment_flag = True
+
+                continue
+
+            elif tok.isidentifier():
+                self.setStyling(tok_len, TOMLLexer.BUILTINS)
+
+                continue
+
+            elif tok.isnumeric():
+                self.setStyling(tok_len, TOMLLexer.CONSTANTS)
+
+                continue
+
+            elif tok in ['(', ')', '{', '}', '[', ']']:
+                self.setStyling(tok_len, TOMLLexer.BRACKETS)
+
+                continue
+
+            elif tok in self.keywordList():
+                self.setStyling(tok_len, TOMLLexer.KEYWORD)
+
+                continue
+
+            elif tok in self.builtinList():
+                self.setStyling(tok_len, TOMLLexer.BUILTINS)
+
+                continue
+
+            elif tok in self.typeList():
+                self.setStyling(tok_len, TOMLLexer.TYPES)
+
+                continue
+
+            else:
+                self.setStyling(tok_len, TOMLLexer.DEFAULT)
+
+
 class MarkdownLexer(QsciLexerMarkdown):
     def __init__(self):
         super().__init__()

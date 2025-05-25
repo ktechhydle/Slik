@@ -2,7 +2,7 @@ from PyQt6.Qsci import QsciCommand, QsciScintilla, QsciAPIs
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QKeySequence, QKeyEvent, QMouseEvent, QFont, QPixmap, QAction, QTextCursor
 from PyQt6.QtWidgets import QApplication, QMenu
-from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, JSONLexer, MarkdownLexer, PlainTextLexer
+from src.editor.lexers import PythonLexer, RustLexer, HTMLLexer, CSSLexer, JSONLexer, TOMLLexer, MarkdownLexer, PlainTextLexer
 
 
 class Editor(QsciScintilla):
@@ -99,6 +99,9 @@ class Editor(QsciScintilla):
 
         elif self._file_name.endswith('.json'):
             self._lexer = JSONLexer()
+
+        elif self._file_name.endswith('.toml'):
+            self._lexer = TOMLLexer(self)
 
         elif self._file_name.endswith(('.html', '.svg', '.xml')):
             self._lexer = HTMLLexer()
