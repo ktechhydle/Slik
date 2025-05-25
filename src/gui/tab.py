@@ -99,6 +99,7 @@ class Tab(QWidget):
 
     def save(self):
         slik.write(self._file_name, self._editor.text())
+        self._editor.styleAll() # restyle on save
 
         self.setSaved()
 

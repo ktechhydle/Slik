@@ -339,7 +339,7 @@ class RustLexer(BaseLexer):
             if string_flag:
                 self.setStyling(curr_token[1], RustLexer.STRING)
 
-                if tok == '"' or tok == "'":
+                if tok == '"':
                     string_flag = False
 
                 continue
@@ -375,11 +375,17 @@ class RustLexer(BaseLexer):
 
                     continue
 
-            elif tok == "'" or tok == '"':
+            elif tok == '"':
                 self.setStyling(tok_len, RustLexer.STRING)
                 string_flag = True
 
                 continue
+
+            elif tok == '!':
+                if self.peekToken()[0] == '(': # macro
+                    self.setStyling(tok_len, RustLexer.BUILTINS)
+
+                    continue
 
             elif tok == '/':
                 if self.peekToken()[0] == '/': # this is a comment hence the '//'
@@ -403,6 +409,32 @@ class RustLexer(BaseLexer):
                     self.setStyling(comment_len, RustLexer.COMMENTS)
 
                     continue
+
+            elif tok == '/*':
+                comment_text = tok
+                comment_len = tok_len
+
+                while True:
+                    peek = self.peekToken()
+
+                    if peek is None:
+                        break
+
+                    next_tok = self.nextToken()
+
+                    if next_tok is None:
+                        break
+
+                    next_tok_text, next_tok_len = next_tok
+                    comment_text += next_tok_text
+                    comment_len += next_tok_len
+
+                    if next_tok_text == '*/':
+                        break
+
+                self.setStyling(comment_len, RustLexer.COMMENTS)
+
+                continue
 
             elif tok == '#':
                 attribute_text = tok
@@ -461,13 +493,13 @@ class RustLexer(BaseLexer):
         for line_num in range(start_line, end_line + 1):
             line_text = self.editor().text(line_num)
             indent = self.editor().SendScintilla(QsciScintilla.SCI_GETLINEINDENTATION, line_num)
-            level = QsciScintilla.SC_FOLDLEVELBASE + indent // 4
+            level = QsciScintilla.SC_FOLDLEVELBASE + indent // self.editor().tabWidth()
 
             is_blank = not line_text.strip()
 
             if line_text.strip().startswith((
                     'pub', 'use', 'fn', 'struct', 'enum', 'impl', 'trait', 'if', 'else',
-                    'async', 'match', 'for', 'while', 'loop')):
+                    'async', 'match', 'for', 'while', 'loop', '/*')):
                 level |= QsciScintilla.SC_FOLDLEVELHEADERFLAG
 
             elif 'else' in line_text:

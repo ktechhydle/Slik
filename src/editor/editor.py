@@ -33,7 +33,7 @@ class Editor(QsciScintilla):
         self._file_name = file_name
         self._lexer = None
 
-        self.textChanged.connect(self.textModified)
+        self.textChanged.connect(self.styleLine)
 
         self.createLexer()
         self.createMargins()
@@ -310,14 +310,20 @@ class Editor(QsciScintilla):
         self.SendScintilla(QsciScintilla.SCI_MOVESELECTEDLINESDOWN)
         self.endUndoAction()
 
-    def textModified(self):
-        if self._lexer:
+    def styleLine(self):
+        if self._lexer and hasattr(self._lexer, 'startStyling'):
             line, column = self.getCursorPosition()
             start = self.positionFromLineIndex(line, 0)
             end = self.positionFromLineIndex(line, column)
 
-            if hasattr(self._lexer, 'startStyling'): # only custom lexers have the "startStyling" method
-                self._lexer.startStyling(start, end)
+            self._lexer.startStyling(start, end)
+
+    def styleAll(self):
+        if self._lexer and hasattr(self._lexer, 'startStyling'):
+            start = 0
+            end = self.length()
+
+            self._lexer.startStyling(start, end)
 
     def setFileName(self, file_name: str):
         self._file_name = file_name
