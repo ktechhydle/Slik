@@ -1,7 +1,7 @@
 import os
 import shutil
 import slik
-from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
+from PyQt6.QtCore import (QMimeData, Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
     QDir, QUrl)
 from PyQt6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDropEvent, QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence
 from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
@@ -89,6 +89,8 @@ class FileSystemViewer(QTreeView):
         self.customContextMenuRequested.connect(self.showMenu)
         self.doubleClicked.connect(self.openFile)
 
+        self.createActions()
+
     def showMenu(self, pos):
         if not hasattr(self, 'menu'):
             self.menu = QMenu(self.tab_view)
@@ -108,11 +110,17 @@ class FileSystemViewer(QTreeView):
             delete_action = QAction('Delete', self)
             delete_action.triggered.connect(self.removeSelected)
 
+            copy_file_action = QAction('Copy File', self)
+            copy_file_action.triggered.connect(self.copyFile)
+
             copy_full_path_action = QAction('Copy Full Path', self)
             copy_full_path_action.triggered.connect(self.copyPath)
 
             copy_relative_path_action = QAction('Copy Relative Path', self)
             copy_relative_path_action.triggered.connect(lambda: self.copyPath(relative=True))
+
+            paste_file_action = QAction('Paste File', self)
+            paste_file_action.triggered.connect(self.pasteFile)
 
             open_in_explorer_action = QAction('Open In Explorer', self)
             open_in_explorer_action.triggered.connect(self.openExplorer)
@@ -128,13 +136,33 @@ class FileSystemViewer(QTreeView):
             self.menu.addSeparator()
             self.menu.addAction(delete_action)
             self.menu.addSeparator()
+            self.menu.addAction(copy_file_action)
             self.menu.addAction(copy_full_path_action)
             self.menu.addAction(copy_relative_path_action)
+            self.menu.addSeparator()
+            self.menu.addAction(paste_file_action)
             self.menu.addSeparator()
             self.menu.addAction(open_in_explorer_action)
             self.menu.addAction(open_in_application_action)
 
         self.menu.exec(self.mapToGlobal(pos))
+
+    def createActions(self):
+        copy_action = QAction('Copy', self)
+        copy_action.setShortcut(QKeySequence('Ctrl+C'))
+        copy_action.triggered.connect(self.copyFile)
+
+        paste_action = QAction('Paste', self)
+        paste_action.setShortcut(QKeySequence('Ctrl+V'))
+        paste_action.triggered.connect(self.pasteFile)
+
+        delete_action = QAction('Delete', self)
+        delete_action.setShortcut(QKeySequence('Backspace'))
+        delete_action.triggered.connect(self.removeSelected)
+
+        self.addAction(copy_action)
+        self.addAction(paste_action)
+        self.addAction(delete_action)
 
     def newFile(self):
         if self.selectedIndexes():
@@ -304,7 +332,6 @@ class FileSystemViewer(QTreeView):
                                               (MessageDialog.OkButton,), self.tab_view)
                         error.exec()
 
-
     def removeSelected(self):
         if self.selectedIndexes():
             indexes = self.selectedIndexes()
@@ -332,6 +359,27 @@ class FileSystemViewer(QTreeView):
                     except Exception as e:
                         raise e
 
+    def copyFile(self):
+        indexes = self.selectedIndexes()
+
+        if not indexes:
+            return
+
+        model = self.model()
+        urls = []
+
+        for index in indexes:
+            if not index.isValid():
+                continue
+
+            filepath = model.filePath(index)
+            urls.append(QUrl.fromLocalFile(filepath))
+
+        mime_data = QMimeData()
+        mime_data.setUrls(urls)  # Set file urls on clipboard
+
+        QApplication.clipboard().setMimeData(mime_data)
+
     def copyPath(self, relative=False):
         if self.selectedIndexes():
             index = self.selectedIndexes()[0]
@@ -346,6 +394,62 @@ class FileSystemViewer(QTreeView):
 
             else:
                 QApplication.clipboard().setText(os.path.abspath(filepath).replace('\\', '/'))
+
+    def pasteFile(self):
+        clipboard = QApplication.clipboard()
+        mime_data = clipboard.mimeData()
+
+        if not mime_data or not mime_data.hasUrls():
+            return
+
+        urls = mime_data.urls()
+
+        if not urls:
+            return
+
+        if self.selectedIndexes():
+            index = self.selectedIndexes()[0]
+            dest_dir = self.model().filePath(index)
+
+            if os.path.isfile(dest_dir):
+                dest_dir = os.path.dirname(dest_dir)
+
+        else:
+            dest_dir = self.file_browser.projectDir()  # fallback
+
+        for url in urls:
+            src_path = url.toLocalFile()
+            basename = os.path.basename(src_path)
+            target_path = os.path.join(dest_dir, basename)
+
+            if os.path.exists(target_path):
+                overwrite = MessageDialog('Overwrite',
+                                          f"'{basename}' already exists. Overwrite?",
+                                          (MessageDialog.YesButton, MessageDialog.NoButton),
+                                          self.tab_view)
+                overwrite.exec()
+
+                if overwrite.result() != MessageDialog.Accepted:
+                    continue
+
+                if os.path.isdir(target_path):
+                    shutil.rmtree(target_path)
+
+                else:
+                    os.remove(target_path)
+
+            try:
+                if os.path.isdir(src_path):
+                    shutil.copytree(src_path, target_path)
+
+                else:
+                    shutil.copy2(src_path, target_path)
+
+            except Exception as e:
+                error = MessageDialog('Paste Error',
+                                      f"Could not paste '{basename}': {str(e)}",
+                                      (MessageDialog.OkButton,), self.tab_view)
+                error.exec()
 
 
 class FileBrowser(QMenu):
