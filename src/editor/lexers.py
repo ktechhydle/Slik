@@ -650,7 +650,7 @@ class JSONLexer(QsciLexerJSON):
 class TOMLLexer(BaseLexer):
     def __init__(self, editor):
         super().__init__(editor, 'TOML')
-        self.setBuiltinNames(['true', 'false'])
+        self.setKeywords(['true', 'false'])
 
     def createStyle(self):
         self.setFont(Style.FONT_NORMAL, TOMLLexer.DEFAULT)
@@ -658,7 +658,7 @@ class TOMLLexer(BaseLexer):
         self.setColor(Style.COLOR_NORMAL, TOMLLexer.DEFAULT)
         self.setColor(Style.COLOR_NORMAL, TOMLLexer.BRACKETS)
         self.setColor(Style.COLOR_COMMENT, TOMLLexer.COMMENTS)
-        self.setColor(Style.COLOR_KEYWORD, TOMLLexer.KEYWORD)
+        self.setColor(Style.COLOR_BUILTIN, TOMLLexer.KEYWORD)
         self.setColor(Style.COLOR_CONSTANT, TOMLLexer.BUILTINS)
         self.setColor(Style.COLOR_CONSTANT, TOMLLexer.CONSTANTS)
         self.setColor(Style.COLOR_STRING, TOMLLexer.STRING)
@@ -713,7 +713,7 @@ class TOMLLexer(BaseLexer):
 
                 continue
 
-            elif tok.isidentifier():
+            elif tok.isidentifier() and tok not in self.keywordList():
                 self.setStyling(tok_len, TOMLLexer.BUILTINS)
 
                 continue
