@@ -364,7 +364,7 @@ QTableWidget {
 
 QListWidget {
     background-color: #121212;
-    border: none;
+    border: 2px solid #383838;
     border-radius: 5px;
     font-family: "JetBrains Mono";
     outline: 0;
@@ -373,8 +373,8 @@ QListWidget {
 QListWidget::item {
     color: #ffffff;
     background-color: transparent;
-    padding: 5px;
-    margin: 2px;
+    padding: 2px;
+    margin: 3px;
     border-radius: 5px;
 }
 
@@ -510,6 +510,16 @@ QToolTip {
 
 #popup QLineEdit:focus {
     background-color: #303030;
+}
+
+#popup QListWidget {
+    border: none;
+}
+
+#popup QListWidget::item {
+    padding: 5px;
+    margin: 0px;
+    border-radius: 5px;
 }
 
 #configureBar {
