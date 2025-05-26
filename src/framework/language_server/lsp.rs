@@ -27,14 +27,14 @@ impl LanguageServer {
     // This will essentially send one request, then retrieve results. No async, no threading, one request at a time.
     #[new]
     fn new() -> Self {
-        let python_command = Command::new("node_modules/.bin/pyright-langserver.cmd")
-            .arg("--stdio")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn();
+        // let python_command = Command::new("node_modules/.bin/pyright-langserver.cmd")
+        //     .arg("--stdio")
+        //     .stdin(Stdio::piped())
+        //     .stdout(Stdio::piped())
+        //     .spawn();
 
-        let python_writer = python_command.stdin.take().unwrap();
-        let python_reader = BufReader::new(python_command.stdout.take().unwrap());
+        // let python_writer = python_command.unwrap().stdin.take().unwrap();
+        // let python_reader = BufReader::new(python_command.unwrap().stdout.take().unwrap());
 
         LanguageServer {
             rust_lsp_command: "rust-analyzer",
@@ -115,7 +115,7 @@ impl LanguageServer {
     ) -> PyResult<HashMap<String, (usize, usize)>> {
         let request = json!({
             "jsonrpc": JSON_RPC_VERSION,
-            "id": RequestID::Definition(2),
+            "id": 1,
             "method": "textDocument/definition",
             "params": {
                 "textDocument": {
@@ -145,7 +145,7 @@ impl LanguageServer {
     ) -> PyResult<()> {
         let request = json!({
             "jsonrpc": JSON_RPC_VERSION,
-            "id": RequestID::Usage(3),
+            "id": 1,
             "method": "textDocument/references",
             "params": {
                 "textDocument": {

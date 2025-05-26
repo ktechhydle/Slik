@@ -337,7 +337,7 @@ class RustLexer(BaseLexer):
                 continue
 
             if string_flag:
-                self.setStyling(curr_token[1], RustLexer.STRING)
+                self.setStyling(tok_len, RustLexer.STRING)
 
                 if tok == '"':
                     string_flag = False
@@ -389,8 +389,9 @@ class RustLexer(BaseLexer):
 
             elif tok == '/':
                 if self.peekToken()[0] == '/': # this is a comment hence the '//'
+                    _ = self.nextToken() # consume '/'
                     comment_text = tok
-                    comment_len = tok_len
+                    comment_len = tok_len + 1 # include the consumed '/'
 
                     while True:
                         peek = self.peekToken()
@@ -409,32 +410,6 @@ class RustLexer(BaseLexer):
                     self.setStyling(comment_len, RustLexer.COMMENTS)
 
                     continue
-
-            elif tok == '/*':
-                comment_text = tok
-                comment_len = tok_len
-
-                while True:
-                    peek = self.peekToken()
-
-                    if peek is None:
-                        break
-
-                    next_tok = self.nextToken()
-
-                    if next_tok is None:
-                        break
-
-                    next_tok_text, next_tok_len = next_tok
-                    comment_text += next_tok_text
-                    comment_len += next_tok_len
-
-                    if next_tok_text == '*/':
-                        break
-
-                self.setStyling(comment_len, RustLexer.COMMENTS)
-
-                continue
 
             elif tok == '#':
                 attribute_text = tok
@@ -455,6 +430,8 @@ class RustLexer(BaseLexer):
                     attribute_len += next_tok[1]
 
                 self.setStyling(attribute_len, RustLexer.DECORATOR)
+
+                continue
 
             elif tok.isnumeric():
                 self.setStyling(tok_len, RustLexer.CONSTANTS)
