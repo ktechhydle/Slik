@@ -310,17 +310,26 @@ class RustLexer(BaseLexer):
         text = self.editor().text()[start:end]
         self.generateTokens(text)
 
+        # loop optimizations
+        sendScintilla = self.editor().SendScintilla
+        setStyling = self.setStyling
+        keywordList = self.keywordList
+        builtinList = self.builtinList
+        typeList = self.typeList
+        peekToken = self.peekToken
+        nextToken = self.nextToken
+
         string_flag = False
         comment_flag = False
 
         if start > 0:
-            previous_style_nr = self.editor().SendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
+            previous_style_nr = sendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
 
             if previous_style_nr == RustLexer.COMMENTS:
                 comment_flag = False
 
         while True:
-            curr_token = self.nextToken()
+            curr_token = nextToken()
 
             if curr_token is None:
                 break
@@ -329,7 +338,7 @@ class RustLexer(BaseLexer):
             tok_len = curr_token[1]
 
             if comment_flag:
-                self.setStyling(tok_len, RustLexer.COMMENTS)
+                setStyling(tok_len, RustLexer.COMMENTS)
 
                 if tok.endswith('\n') or tok.startswith('\n'):
                     comment_flag = False
@@ -337,7 +346,7 @@ class RustLexer(BaseLexer):
                 continue
 
             if string_flag:
-                self.setStyling(tok_len, RustLexer.STRING)
+                setStyling(tok_len, RustLexer.STRING)
 
                 if tok == '"':
                     string_flag = False
@@ -349,14 +358,14 @@ class RustLexer(BaseLexer):
                 brac, _ = self.skipSpacesPeek(ni)
 
                 if name[0].isidentifier() and brac[0] == '{':
-                    self.setStyling(tok_len, RustLexer.KEYWORD)
-                    _ = self.nextToken(ni)
-                    self.setStyling(name[1] + 1, RustLexer.CLASS_DEF)
+                    setStyling(tok_len, RustLexer.KEYWORD)
+                    _ = nextToken(ni)
+                    setStyling(name[1] + 1, RustLexer.CLASS_DEF)
 
                     continue
 
                 else:
-                    self.setStyling(tok_len, RustLexer.KEYWORD)
+                    setStyling(tok_len, RustLexer.KEYWORD)
 
                     continue
 
@@ -364,42 +373,42 @@ class RustLexer(BaseLexer):
                 name, ni = self.skipSpacesPeek()
 
                 if name[0].isidentifier():
-                    self.setStyling(tok_len, RustLexer.KEYWORD)
-                    _ = self.nextToken(ni)
-                    self.setStyling(name[1] + 1, RustLexer.FUNCTION_DEF)
+                    setStyling(tok_len, RustLexer.KEYWORD)
+                    _ = nextToken(ni)
+                    setStyling(name[1] + 1, RustLexer.FUNCTION_DEF)
 
                     continue
 
                 else:
-                    self.setStyling(tok_len, RustLexer.KEYWORD)
+                    setStyling(tok_len, RustLexer.KEYWORD)
 
                     continue
 
             elif tok == '"':
-                self.setStyling(tok_len, RustLexer.STRING)
+                setStyling(tok_len, RustLexer.STRING)
                 string_flag = True
 
                 continue
 
             elif tok == '!':
-                if self.peekToken()[0] == '(': # macro
-                    self.setStyling(tok_len, RustLexer.BUILTINS)
+                if peekToken()[0] == '(': # macro
+                    setStyling(tok_len, RustLexer.BUILTINS)
 
                     continue
 
             elif tok == '/':
-                if self.peekToken()[0] == '/': # this is a comment hence the '//'
-                    _ = self.nextToken() # consume '/'
+                if peekToken()[0] == '/': # this is a comment hence the '//'
+                    _ = nextToken() # consume '/'
                     comment_text = tok
                     comment_len = tok_len + 1 # include the consumed '/'
 
                     while True:
-                        peek = self.peekToken()
+                        peek = peekToken()
 
                         if peek is None or '\n' in peek[0]:
                             break
 
-                        next_tok = self.nextToken()
+                        next_tok = nextToken()
 
                         if next_tok is None:
                             break
@@ -407,7 +416,7 @@ class RustLexer(BaseLexer):
                         comment_text += next_tok[0]
                         comment_len += next_tok[1]
 
-                    self.setStyling(comment_len, RustLexer.COMMENTS)
+                    setStyling(comment_len, RustLexer.COMMENTS)
 
                     continue
 
@@ -416,12 +425,12 @@ class RustLexer(BaseLexer):
                 attribute_len = tok_len
 
                 while True:
-                    peek = self.peekToken()
+                    peek = peekToken()
 
                     if peek is None or '\n' in peek[0]:
                         break
 
-                    next_tok = self.nextToken()
+                    next_tok = nextToken()
 
                     if next_tok is None:
                         break
@@ -429,37 +438,37 @@ class RustLexer(BaseLexer):
                     attribute_text += next_tok[0]
                     attribute_len += next_tok[1]
 
-                self.setStyling(attribute_len, RustLexer.DECORATOR)
+                setStyling(attribute_len, RustLexer.DECORATOR)
 
                 continue
 
             elif tok.isnumeric():
-                self.setStyling(tok_len, RustLexer.CONSTANTS)
+                setStyling(tok_len, RustLexer.CONSTANTS)
 
                 continue
 
             elif tok in ['(', ')', '{', '}', '[', ']']:
-                self.setStyling(tok_len, RustLexer.BRACKETS)
+                setStyling(tok_len, RustLexer.BRACKETS)
 
                 continue
 
-            elif tok in self.keywordList():
-                self.setStyling(tok_len, RustLexer.KEYWORD)
+            elif tok in keywordList():
+                setStyling(tok_len, RustLexer.KEYWORD)
 
                 continue
 
-            elif tok in self.builtinList():
-                self.setStyling(tok_len, RustLexer.BUILTINS)
+            elif tok in builtinList():
+                setStyling(tok_len, RustLexer.BUILTINS)
 
                 continue
 
-            elif tok in self.typeList():
-                self.setStyling(tok_len, RustLexer.TYPES)
+            elif tok in typeList():
+                setStyling(tok_len, RustLexer.TYPES)
 
                 continue
 
             else:
-                self.setStyling(tok_len, RustLexer.DEFAULT)
+                setStyling(tok_len, RustLexer.DEFAULT)
 
         self.applyFolding(start, end)
 

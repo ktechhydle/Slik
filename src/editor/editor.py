@@ -322,11 +322,9 @@ class Editor(QsciScintilla):
             self._lexer.startStyling(start, end)
 
     def styleAll(self):
-        if self._lexer and hasattr(self._lexer, 'startStyling'):
-            start = 0
-            end = self.length()
-
-            self._lexer.startStyling(start, end)
+        if self._lexer:
+            self._lexer.startStyling(0)
+            self._lexer.styleText(0, self.length())
 
     def setFileName(self, file_name: str):
         self._file_name = file_name
