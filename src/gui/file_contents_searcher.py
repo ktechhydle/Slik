@@ -1,13 +1,13 @@
 import os
 import slik
-from PyQt6.QtCore import (Qt, QFileSystemWatcher, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
-                          QDir, QUrl, QThread, QTimer)
-from PyQt6.QtGui import QFileSystemModel, QPixmap, QIcon, QAction, QDesktopServices, QKeySequence, QMouseEvent
-from PyQt6.QtWidgets import (QTreeView, QMenu, QInputDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
-                             QPushButton, QWidgetAction, QFileDialog, QListWidget, QLineEdit, QListWidgetItem)
+from PyQt6.QtCore import (Qt, QModelIndex, pyqtSignal, QRect, QPropertyAnimation, QEasingCurve,
+                          QThread, QTimer)
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import (QMenu, QWidgetAction, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QLabel,
+                             QPushButton, QListWidget, QLineEdit, QListWidgetItem)
 
 
-class FileSearchIndexer(QThread):
+class FileContentsSearchIndexer(QThread):
     finished = pyqtSignal(list)
 
     def __init__(self, search_query: str, project_dir: str):
@@ -15,18 +15,18 @@ class FileSearchIndexer(QThread):
 
         self._search_query = search_query
         self._project_dir = project_dir
-        self._results = []
+        self._results = {}
 
     def run(self):
-        self._results = slik.search(self._project_dir, self._search_query)
+        self._results = slik.search_file_contents(self._project_dir, self._search_query)
 
         self.finished.emit(self._results)
 
-    def results(self) -> list[str]:
+    def results(self) -> list[tuple[str, tuple[int, int]]]:
         return self._results
 
 
-class FileSearcher(QMenu):
+class FileContentsSearcher(QMenu):
     projectDirChanged = pyqtSignal(str)
     projectChanged = pyqtSignal()
 
@@ -134,7 +134,7 @@ class FileSearcher(QMenu):
         title_bar.setLayout(QHBoxLayout())
         title_bar.layout().setContentsMargins(0, 0, 0, 0)
 
-        self._project_dir_label = QLabel(f"Search '{os.path.basename(self._project_dir)}'")
+        self._project_dir_label = QLabel(f"Search Contents In '{os.path.basename(self._project_dir)}'")
 
         close_btn = QPushButton(QIcon('resources/icons/ui/close_icon.svg'), '', self)
         close_btn.setObjectName('actionButton')
@@ -146,7 +146,7 @@ class FileSearcher(QMenu):
         title_bar.layout().addWidget(close_btn)
 
         self._search_input = QLineEdit()
-        self._search_input.setPlaceholderText('Search Project Files...')
+        self._search_input.setPlaceholderText('Search File Contents...')
         self._search_input.textChanged.connect(self.runSearch)
         self._results_list = QListWidget()
         self._results_list.itemClicked.connect(self.openFile)
@@ -162,7 +162,7 @@ class FileSearcher(QMenu):
 
     def openFile(self, item: QListWidgetItem):
         if hasattr(item, 'filename'):
-            self.tab_view.openTab(item.filename)
+            self.tab_view.openTab(item.filename, cursor_pos=item.position)
 
         self.animateClose()
 
@@ -170,14 +170,19 @@ class FileSearcher(QMenu):
         if hasattr(self, '_search_indexer'):
             self._search_indexer.wait()
 
-        self._search_indexer = FileSearchIndexer(self._search_input.text(), self._project_dir)
+        self._search_indexer = FileContentsSearchIndexer(self._search_input.text(), self._project_dir)
 
-        def search_finished(results: list[str]):
+        def search_finished(results: list[tuple[str, tuple[int, int]]]):
+            print(results)
             self._results_list.clear()
 
-            for filename in results:
-                item = QListWidgetItem(os.path.relpath(filename, self._project_dir).replace('\\', '/'))
+            for section in results:
+                filename = section[0]
+                position = section[1]
+                display_name = f'{os.path.relpath(filename, self._project_dir).replace('\\', '/')} - {position}'
+                item = QListWidgetItem(display_name)
                 item.filename = filename
+                item.position = position
 
                 self._results_list.addItem(item)
 
@@ -187,7 +192,7 @@ class FileSearcher(QMenu):
     def setProjectDir(self, directory: str):
         if directory != self._project_dir:
             self._project_dir = directory
-            self._project_dir_label.setText(f"Search '{os.path.basename(directory)}'")
+            self._project_dir_label.setText(f"Search Contents In '{os.path.basename(directory)}'")
 
             self.runSearch()
 

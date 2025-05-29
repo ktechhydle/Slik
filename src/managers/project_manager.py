@@ -4,10 +4,11 @@ from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QTabWidget, QComboBox
 from PyQt6.QtGui import QAction, QKeySequence
 from src.managers.terminal_manager import TerminalManager
+from src.gui.file_browser import FileBrowser
 from src.gui.file_searcher import FileSearcher
+from src.gui.file_contents_searcher import FileContentsSearcher
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
-from src.gui.file_browser import FileBrowser
 
 
 class ProjectIndexer(QThread):
@@ -47,11 +48,13 @@ class ProjectManager:
 
     def createDialogs(self):
         self._file_searcher = FileSearcher(self._tab_view, self._tab_view)
+        self._file_contents_searcher = FileContentsSearcher(self._tab_view, self._tab_view)
 
         self._file_browser = FileBrowser('', self._tab_view, self._tab_view)
         self._file_browser.projectDirChanged.connect(self._terminal_manager.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._tab_view.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._file_searcher.setProjectDir)
+        self._file_browser.projectDirChanged.connect(self._file_contents_searcher.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._project_indexer.setProjectDir)
         self._file_browser.projectDirChanged.connect(self._python_path_selector.setProjectDir)
         self._file_browser.projectDirChanged.connect(self.indexProject)
@@ -76,6 +79,10 @@ class ProjectManager:
         file_searcher_action.setShortcut(QKeySequence('Ctrl+Shift+Q'))
         file_searcher_action.triggered.connect(self.showFileSearcher)
 
+        file_contents_searcher_action = QAction('File Contents Searcher', self._tab_view)
+        file_contents_searcher_action.setShortcut(QKeySequence('Ctrl+Alt+Q'))
+        file_contents_searcher_action.triggered.connect(self.showFileContentsSearcher)
+
         run_project_action = QAction('Run', self._tab_view)
         run_project_action.setShortcut(QKeySequence('Ctrl+R'))
         run_project_action.triggered.connect(self.run)
@@ -96,6 +103,7 @@ class ProjectManager:
         self._tab_view.addAction(toggle_collapse_action)
         self._tab_view.addAction(file_browser_action)
         self._tab_view.addAction(file_searcher_action)
+        self._tab_view.addAction(file_contents_searcher_action)
         self._tab_view.addAction(run_project_action)
         self._tab_view.addAction(run_current_file_action)
         self._tab_view.addAction(new_terminal_action)
@@ -106,6 +114,9 @@ class ProjectManager:
 
     def showFileSearcher(self):
         self._file_searcher.exec()
+
+    def showFileContentsSearcher(self):
+        self._file_contents_searcher.exec()
 
     def openProject(self, path: str):
         self._file_browser.setPath(path)

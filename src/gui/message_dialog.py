@@ -59,7 +59,7 @@ class MessageDialog(QMenu):
         end_rect = QRect(
             global_center.x() - target_width // 2,
             global_center.y() - target_height // 2,
-            target_width,
+            target_width + 10,
             target_height
         )
 

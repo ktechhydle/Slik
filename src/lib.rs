@@ -26,6 +26,10 @@ fn slik(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m
     )?)?;
     m.add_function(wrap_pyfunction!(
+        framework::indexing::search_contents::search_file_contents,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
         framework::indexing::index_project::index,
         m
     )?)?;

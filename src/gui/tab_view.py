@@ -51,12 +51,13 @@ class TabView(QTabWidget):
 
         self.defaultTab()
 
-    def openTab(self, filename: str, insert=False):
+    def openTab(self, filename: str, insert=False, cursor_pos: tuple[int, int] | None = None):
         filename = os.path.abspath(filename)
 
         for tab in self._tabs:
             if tab.filename() == filename:
                 index = self.indexOf(tab)
+
                 if index == -1:
                     # tab exists in memory but not in widget, re-add it
                     name = tab.basename()
@@ -73,6 +74,9 @@ class TabView(QTabWidget):
                     # tab already exists in the widget; switch to it
                     self.setCurrentIndex(index)
 
+                if cursor_pos:
+                    tab.editor().setCursorPosition(*cursor_pos)
+
                 return
 
         # tab doesn't exist at all, create and add it
@@ -86,6 +90,9 @@ class TabView(QTabWidget):
         else:
             self.addTab(tab, name)
             self.setCurrentIndex(self.count() - 1)
+
+        if cursor_pos:
+            tab.editor().setCursorPosition(*cursor_pos)
 
         self._tabs.append(tab)
 
