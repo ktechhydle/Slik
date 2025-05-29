@@ -318,6 +318,7 @@ class RustLexer(BaseLexer):
         typeList = self.typeList
         peekToken = self.peekToken
         nextToken = self.nextToken
+        skipSpacesPeek = self.skipSpacesPeek
 
         string_flag = False
         comment_flag = False
@@ -354,8 +355,8 @@ class RustLexer(BaseLexer):
                 continue
 
             if tok in ('struct', 'enum'):
-                name, ni = self.skipSpacesPeek()
-                brac, _ = self.skipSpacesPeek(ni)
+                name, ni = skipSpacesPeek()
+                brac, _ = skipSpacesPeek(ni)
 
                 if name[0].isidentifier() and brac[0] == '{':
                     setStyling(tok_len, RustLexer.KEYWORD)
@@ -370,7 +371,7 @@ class RustLexer(BaseLexer):
                     continue
 
             elif tok == 'fn':
-                name, ni = self.skipSpacesPeek()
+                name, ni = skipSpacesPeek()
 
                 if name[0].isidentifier():
                     setStyling(tok_len, RustLexer.KEYWORD)
@@ -653,17 +654,25 @@ class TOMLLexer(BaseLexer):
         text = self.editor().text()[start:end]
         self.generateTokens(text)
 
+        sendScintilla = self.editor().SendScintilla
+        setStyling = self.setStyling
+        keywordList = self.keywordList
+        builtinList = self.builtinList
+        typeList = self.typeList
+        peekToken = self.peekToken
+        nextToken = self.nextToken
+
         string_flag = False
         comment_flag = False
 
         if start > 0:
-            previous_style_nr = self.editor().SendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
+            previous_style_nr = sendScintilla(QsciScintilla.SCI_GETSTYLEAT, start - 1)
 
             if previous_style_nr == TOMLLexer.COMMENTS:
                 comment_flag = False
 
         while True:
-            curr_token = self.nextToken()
+            curr_token = nextToken()
 
             if curr_token is None:
                 break
@@ -672,7 +681,7 @@ class TOMLLexer(BaseLexer):
             tok_len = curr_token[1]
 
             if comment_flag:
-                self.setStyling(tok_len, RustLexer.COMMENTS)
+                setStyling(tok_len, RustLexer.COMMENTS)
 
                 if tok.endswith('\n') or tok.startswith('\n'):
                     comment_flag = False
@@ -680,57 +689,57 @@ class TOMLLexer(BaseLexer):
                 continue
 
             if string_flag:
-                self.setStyling(curr_token[1], RustLexer.STRING)
+                setStyling(curr_token[1], RustLexer.STRING)
 
-                if tok == '"':
+                if tok == '"' or "'":
                     string_flag = False
 
                 continue
 
-            elif tok == '"':
-                self.setStyling(tok_len, TOMLLexer.STRING)
+            elif tok == '"' or "'":
+                setStyling(tok_len, TOMLLexer.STRING)
                 string_flag = True
 
                 continue
 
             elif tok == '#':
-                self.setStyling(tok_len, TOMLLexer.COMMENTS)
+                setStyling(tok_len, TOMLLexer.COMMENTS)
                 comment_flag = True
 
                 continue
 
-            elif tok.isidentifier() and tok not in self.keywordList():
-                self.setStyling(tok_len, TOMLLexer.BUILTINS)
+            elif tok.isidentifier() and tok not in keywordList():
+                setStyling(tok_len, TOMLLexer.BUILTINS)
 
                 continue
 
             elif tok.isnumeric():
-                self.setStyling(tok_len, TOMLLexer.CONSTANTS)
+                setStyling(tok_len, TOMLLexer.CONSTANTS)
 
                 continue
 
             elif tok in ['(', ')', '{', '}', '[', ']']:
-                self.setStyling(tok_len, TOMLLexer.BRACKETS)
+                setStyling(tok_len, TOMLLexer.BRACKETS)
 
                 continue
 
-            elif tok in self.keywordList():
-                self.setStyling(tok_len, TOMLLexer.KEYWORD)
+            elif tok in keywordList():
+                setStyling(tok_len, TOMLLexer.KEYWORD)
 
                 continue
 
-            elif tok in self.builtinList():
-                self.setStyling(tok_len, TOMLLexer.BUILTINS)
+            elif tok in builtinList():
+                setStyling(tok_len, TOMLLexer.BUILTINS)
 
                 continue
 
-            elif tok in self.typeList():
-                self.setStyling(tok_len, TOMLLexer.TYPES)
+            elif tok in typeList():
+                setStyling(tok_len, TOMLLexer.TYPES)
 
                 continue
 
             else:
-                self.setStyling(tok_len, TOMLLexer.DEFAULT)
+                setStyling(tok_len, TOMLLexer.DEFAULT)
 
 
 class MarkdownLexer(QsciLexerMarkdown):
