@@ -256,6 +256,8 @@ class PythonLexer(QsciLexerPython):
         self.setColor(Style.COLOR_STRING, PythonLexer.TripleDoubleQuotedFString)
         self.setColor(Style.COLOR_ERROR, PythonLexer.UnclosedString)
 
+        self.setPaper(Style.COLOR_BG, PythonLexer.UnclosedString)
+
 
 class RustLexer(BaseLexer):
     def __init__(self, editor):
