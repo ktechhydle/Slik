@@ -321,6 +321,7 @@ class RustLexer(BaseLexer):
         skipSpacesPeek = self.skipSpacesPeek
 
         string_flag = False
+        string_tok = None
         comment_flag = False
 
         if start > 0:
@@ -349,8 +350,9 @@ class RustLexer(BaseLexer):
             if string_flag:
                 setStyling(tok_len, RustLexer.STRING)
 
-                if tok == '"':
+                if tok == string_tok:
                     string_flag = False
+                    string_tok = None
 
                 continue
 
@@ -388,6 +390,7 @@ class RustLexer(BaseLexer):
             elif tok == '"':
                 setStyling(tok_len, RustLexer.STRING)
                 string_flag = True
+                string_tok = tok
 
                 continue
 
@@ -690,7 +693,7 @@ class TOMLLexer(BaseLexer):
                 continue
 
             if string_flag:
-                setStyling(curr_token[1], RustLexer.STRING)
+                setStyling(tok_len, RustLexer.STRING)
 
                 if tok == string_tok:
                     string_flag = False
