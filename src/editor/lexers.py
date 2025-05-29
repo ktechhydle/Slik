@@ -663,6 +663,7 @@ class TOMLLexer(BaseLexer):
         nextToken = self.nextToken
 
         string_flag = False
+        string_tok = None
         comment_flag = False
 
         if start > 0:
@@ -691,14 +692,16 @@ class TOMLLexer(BaseLexer):
             if string_flag:
                 setStyling(curr_token[1], RustLexer.STRING)
 
-                if tok == '"' or "'":
+                if tok == string_tok:
                     string_flag = False
+                    string_tok = None
 
                 continue
 
-            elif tok == '"' or "'":
+            elif tok == '"' or tok == "'":
                 setStyling(tok_len, TOMLLexer.STRING)
                 string_flag = True
+                string_tok = tok
 
                 continue
 
