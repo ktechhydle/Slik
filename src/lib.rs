@@ -13,7 +13,6 @@ fn test() -> PyResult<()> {
 #[pymodule]
 fn slik(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(test, m)?)?;
-    m.add_class::<framework::language_server::lsp::LanguageServer>()?;
     m.add_function(wrap_pyfunction!(
         framework::file_system::read_file::read,
         m

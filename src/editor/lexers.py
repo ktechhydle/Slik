@@ -256,11 +256,6 @@ class PythonLexer(QsciLexerPython):
         self.setColor(Style.COLOR_STRING, PythonLexer.TripleDoubleQuotedFString)
         self.setColor(Style.COLOR_ERROR, PythonLexer.UnclosedString)
 
-    def setHotSpotsEnabled(self, enabled: bool):
-        self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.ClassName, enabled)
-        self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.FunctionMethodName, enabled)
-        self._editor.SendScintilla(QsciScintilla.SCI_STYLESETHOTSPOT, PythonLexer.Identifier, enabled)
-
 
 class RustLexer(BaseLexer):
     def __init__(self, editor):
@@ -632,6 +627,9 @@ class JSONLexer(QsciLexerJSON):
         self.setColor(Style.COLOR_STRING, JSONLexer.String)
         self.setColor(Style.COLOR_ERROR, JSONLexer.UnclosedString)
         self.setColor(Style.COLOR_ERROR, JSONLexer.Error)
+
+        self.setPaper(Style.COLOR_BG, JSONLexer.Default)
+        self.setPaper(Style.COLOR_BG, JSONLexer.Error)
 
 
 class TOMLLexer(BaseLexer):

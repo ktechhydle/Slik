@@ -40,22 +40,11 @@ class Editor(QsciScintilla):
         self.createStyle()
         self.createActions()
 
-    def mouseMoveEvent(self, event: QMouseEvent):
-        super().mouseMoveEvent(event)
-
-        if event.modifiers() and Qt.KeyboardModifier.ControlModifier:
-            if isinstance(self._lexer, PythonLexer):
-                self._lexer.setHotSpotsEnabled(True)
-
-        else:
-            if isinstance(self._lexer, PythonLexer):
-                self._lexer.setHotSpotsEnabled(False)
-
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.enter(event)
 
-        elif event.key() == Qt.Key.Key_D and event.modifiers() and Qt.KeyboardModifier.ControlModifier:
+        elif event.key() == Qt.Key.Key_D and (event.modifiers() and Qt.KeyboardModifier.ControlModifier):
             line, column = self.getCursorPosition()
 
             self.SendScintilla(QsciScintilla.SCI_LINEDUPLICATE)
@@ -322,7 +311,7 @@ class Editor(QsciScintilla):
             self._lexer.startStyling(start, end)
 
     def styleAll(self):
-        if self._lexer:
+        if self._lexer and hasattr(self._lexer, 'startStyling'):
             self._lexer.startStyling(0)
             self._lexer.styleText(0, self.length())
 

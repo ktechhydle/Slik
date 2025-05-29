@@ -6,7 +6,6 @@ from PyQt6.QtGui import QIcon, QFontDatabase
 from PyQt6.QtWidgets import QMainWindow, QSplitter, QApplication
 from src.managers.terminal_manager import TerminalManager
 from src.managers.project_manager import ProjectManager
-from src.managers.lsp_manager import LanguageServerManager
 from src.gui.configure_bar import ConfigureBar
 from src.gui.message_dialog import MessageDialog
 from src.gui.tab_view import TabView
@@ -36,7 +35,6 @@ class Slik(QMainWindow):
                                               self.configure_bar.runTypeSelector(),
                                               self.configure_bar.pythonPathSelector())
         self.project_manager.openProject(os.path.abspath('.'))
-        self.lsp_manager = LanguageServerManager(self.tab_view)
 
         splitter.addWidget(self.tab_view)
         self.setCentralWidget(splitter)
