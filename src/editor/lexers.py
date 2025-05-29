@@ -640,7 +640,7 @@ class JSONLexer(QsciLexerJSON):
 class TOMLLexer(BaseLexer):
     def __init__(self, editor):
         super().__init__(editor, 'TOML')
-        self.setKeywords(['true', 'false'])
+        self.setKeywords(['true', 'false', '='])
 
     def createStyle(self):
         self.setFont(Style.FONT_NORMAL, TOMLLexer.DEFAULT)
