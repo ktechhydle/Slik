@@ -309,6 +309,7 @@ class RustLexer(BaseLexer):
     def styleText(self, start, end):
         text = self.editor().text()[start:end]
         self.generateTokens(text)
+        self.startStyling(start)
 
         # loop optimizations
         sendScintilla = self.editor().SendScintilla
@@ -365,12 +366,10 @@ class RustLexer(BaseLexer):
                     _ = nextToken(ni)
                     setStyling(name[1] + 1, RustLexer.CLASS_DEF)
 
-                    continue
-
                 else:
                     setStyling(tok_len, RustLexer.KEYWORD)
 
-                    continue
+                continue
 
             elif tok == 'fn':
                 name, ni = skipSpacesPeek()
@@ -380,12 +379,10 @@ class RustLexer(BaseLexer):
                     _ = nextToken(ni)
                     setStyling(name[1] + 1, RustLexer.FUNCTION_DEF)
 
-                    continue
-
                 else:
                     setStyling(tok_len, RustLexer.KEYWORD)
 
-                    continue
+                continue
 
             elif tok == '"':
                 setStyling(tok_len, RustLexer.STRING)
@@ -398,7 +395,7 @@ class RustLexer(BaseLexer):
                 if peekToken()[0] == '(': # macro
                     setStyling(tok_len, RustLexer.BUILTINS)
 
-                    continue
+                continue
 
             elif tok == '/':
                 if peekToken()[0] == '/': # this is a comment hence the '//'
@@ -422,7 +419,7 @@ class RustLexer(BaseLexer):
 
                     setStyling(comment_len, RustLexer.COMMENTS)
 
-                    continue
+                continue
 
             elif tok == '#':
                 attribute_text = tok

@@ -448,10 +448,11 @@ QToolTip {
 
 #fileBrowser QTreeView::item {
     background-color: transparent;
+    color: #c2c2c2;
+    padding: 2px;
+    margin: 1px;
     border: none;
     border-radius: 5px;
-    color: #c2c2c2;
-    margin: 0px;
 }
 
 #fileBrowser QTreeView::item:hover {
@@ -464,8 +465,9 @@ QToolTip {
 
 #fileBrowser QTreeView::branch {
     background-color: transparent;
-    margin: 0px;
+    border: none;
     border-image: url("resources/icons/ui/indent_indicator_icon.svg") 0;
+    margin: 0px;
 }
 
 #fileBrowser QLabel {
