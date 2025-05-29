@@ -80,7 +80,7 @@ class ProjectManager:
         file_searcher_action.triggered.connect(self.showFileSearcher)
 
         file_contents_searcher_action = QAction('File Contents Searcher', self._tab_view)
-        file_contents_searcher_action.setShortcut(QKeySequence('Ctrl+Alt+Q'))
+        file_contents_searcher_action.setShortcut(QKeySequence('Ctrl+W'))
         file_contents_searcher_action.triggered.connect(self.showFileContentsSearcher)
 
         run_project_action = QAction('Run', self._tab_view)

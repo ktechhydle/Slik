@@ -179,7 +179,8 @@ class FileContentsSearcher(QMenu):
             for section in results:
                 filename = section[0]
                 position = section[1]
-                display_name = f'{os.path.relpath(filename, self._project_dir).replace('\\', '/')} - {position}'
+                display_position = f'Line: {position[0]}, Column: {position[1]}'
+                display_name = f'{os.path.relpath(filename, self._project_dir).replace('\\', '/')} - {display_position}'
                 item = QListWidgetItem(display_name)
                 item.filename = filename
                 item.position = position
