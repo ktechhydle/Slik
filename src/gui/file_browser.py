@@ -423,20 +423,28 @@ class FileSystemViewer(QTreeView):
             target_path = os.path.join(dest_dir, basename)
 
             if os.path.exists(target_path):
-                overwrite = MessageDialog('Overwrite',
-                                          f"'{basename}' already exists. Overwrite?",
-                                          (MessageDialog.YesButton, MessageDialog.NoButton),
-                                          self.tab_view)
-                overwrite.exec()
-
-                if overwrite.result() != MessageDialog.Accepted:
-                    continue
-
-                if os.path.isdir(target_path):
-                    shutil.rmtree(target_path)
-
+                if len(urls) == 1:
+                    root, ext = os.path.splitext(target_path)
+                    root += '_copy' 
+                    root += ext
+                    
+                    target_path = root
+                    
                 else:
-                    os.remove(target_path)
+                    overwrite = MessageDialog('Overwrite',
+                                              f"'{basename}' already exists. Overwrite?",
+                                              (MessageDialog.YesButton, MessageDialog.NoButton),
+                                              self.tab_view)
+                    overwrite.exec()
+
+                    if overwrite.result() != MessageDialog.Accepted:
+                        continue
+
+                    if os.path.isdir(target_path):
+                        shutil.rmtree(target_path)
+
+                    else:
+                        os.remove(target_path)
 
             try:
                 if os.path.isdir(src_path):
