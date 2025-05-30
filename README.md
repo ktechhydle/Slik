@@ -1,9 +1,12 @@
-<img src="resources\icons\logos\slik_icon.svg" width="125">
+> [!WARNING]
+> Development on this project has paused. We will come back eventually upon request.
+
+<img src="resources/icons/logos/slik_icon.svg" width="125">
 
 # Slik
 Slik is our custom IDE, built entirely for MP Software developers.
 
-<img src="resources/screenshots/slik_startup.png" style="border-radius: 5px; width: auto;">
+<img src="resources/screenshots/slik_startup.png" style="border-radius: 5px; width: 100%;">
 
 ## Overview
 Slik is based on three key points:
